@@ -1,0 +1,22 @@
+das_version: "0.1"
+artifact:
+  id: "KAN-2"
+  type: initiative
+  version: 1
+  status: draft
+  title: "Add card search endpoint filtered by customer name"
+  initiative: "KAN-2"
+  owner: "team.cards"
+source:
+  provider: "jira"
+  work_item_id: "KAN-2"
+  url: "https://randomtry.atlassian.net/browse/KAN-2"
+scope:
+  domains: [cards, customer-support]
+  repositories: []
+policy:
+  risk_tier: "medium"
+  data_classification: "confidential"
+  implementation_locked_until: architecture.approved
+workflow:
+  state: intake

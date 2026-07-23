@@ -1,0 +1,16 @@
+das_version: "0.1"
+initiative: "KAN-2"
+context_pack:
+  id: "CTX-KAN-2-v1"
+  version: 1
+  status: draft
+  layers:
+    consistent: [enterprise, domain, product, technology]
+    relative: [initiative, estate, runtime]
+  items:
+    - id: kan-2-jira-requirement
+      source: context/relative/card-search-by-customer-name.md
+      reason: Preserve the Jira KAN-2 source scope, acceptance criteria, assumptions, and open design decisions for HLD context.
+  exclusions:
+    - PAN, SAD, secrets, authentication headers, private keys, unrestricted card records, and unnecessary customer information.
+  content_sha256: ""
