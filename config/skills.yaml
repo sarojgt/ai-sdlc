@@ -1,0 +1,8 @@
+version: 1
+skills:
+  - name: requirements_analysis
+    description: Analyze initiative requirements and acceptance criteria.
+  - name: architecture_design
+    description: Produce architecture and design artifacts.
+  - name: security_review
+    description: Evaluate design and implementation against security guardrails.

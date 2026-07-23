@@ -1,0 +1,8 @@
+version: 1
+layers:
+  consistent:
+    description: Shared repository context that applies across initiatives.
+  relative:
+    description: Initiative-specific context captured with each request.
+  guardrails:
+    description: Architecture and security constraints for all work.

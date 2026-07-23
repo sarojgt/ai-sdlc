@@ -1,0 +1,10 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://example.com/ai-sdlc/schemas/das.schema.yaml
+title: Design Artifact Schema
+type: object
+additionalProperties: true
+properties:
+  version:
+    type: integer
+  initiative:
+    type: string

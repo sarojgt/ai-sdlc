@@ -1,0 +1,10 @@
+version: 1
+stages:
+  - name: intake
+    description: Capture and qualify initiative inputs.
+  - name: high_level_design
+    description: Generate and review high-level design artifacts.
+  - name: low_level_design
+    description: Generate and review low-level design artifacts.
+  - name: delivery
+    description: Implement, validate, and release approved changes.

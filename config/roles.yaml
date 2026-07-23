@@ -1,0 +1,10 @@
+version: 1
+roles:
+  product_owner:
+    description: Owns business outcomes and requirements approval.
+  architect:
+    description: Owns architectural direction and design approval.
+  security_reviewer:
+    description: Reviews security guardrails and evidence.
+  delivery_engineer:
+    description: Implements and validates approved work.

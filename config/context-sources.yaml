@@ -1,0 +1,6 @@
+version: 1
+sources:
+  - name: repository
+    description: Files and documentation stored in this repository.
+  - name: initiative
+    description: Context supplied for a specific initiative.

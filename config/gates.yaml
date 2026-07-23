@@ -1,0 +1,10 @@
+version: 1
+gates:
+  - name: requirements_approved
+    required: true
+  - name: hld_approved
+    required: true
+  - name: lld_approved
+    required: true
+  - name: security_review_complete
+    required: true
