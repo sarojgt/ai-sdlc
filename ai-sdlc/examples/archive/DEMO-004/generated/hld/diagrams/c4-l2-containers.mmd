@@ -1,0 +1,30 @@
+C4Container
+title Banking.Live transaction status webhooks — container view
+
+System_Boundary(chd, "CHD / source boundary") {
+  Container(producer, "BL2/Lume producer", "Domain service", "Detects eligible status changes")
+  Container(adapter, "BL2 compatibility adapter", "Optional worker/outbox reader", "Durable handoff and sanitization")
+  Container(sanitize, "Event sanitizer", "Policy component", "Allow-lists tokenized/reference fields")
+}
+System_Boundary(cw, "Common Workload / shared platform boundary") {
+  Container(gateway, "Subscription API", "API Gateway + service", "Receives subscription requests")
+  Container(auth, "Authorization", "Auth0 + IMS", "Authenticates and authorizes client/region")
+  Container(stream, "Event transport", "Kafka/MSK or approved equivalent", "Durable governed event boundary")
+  Container(orchestrator, "Webhook orchestration", "Shared Webhook Platform", "Resolves subscriptions and delivery state")
+  Container(delivery, "Delivery workers", "Shared Webhook Platform", "Signs, sends, retries, DLQs, replays")
+  Container(observe, "Observability", "Shared telemetry", "Redacted logs, metrics, traces")
+}
+System_Ext(client, "Client endpoint", "HTTPS webhook receiver")
+
+Rel(producer, sanitize, "Status change")
+Rel(producer, adapter, "BL2 fallback")
+Rel(adapter, sanitize, "Read durable record")
+Rel(sanitize, stream, "Publish approved event")
+Rel(gateway, auth, "Validate token and grants")
+Rel(gateway, orchestrator, "Create/update subscription")
+Rel(stream, orchestrator, "Consume event")
+Rel(orchestrator, delivery, "Enqueue delivery")
+Rel(delivery, client, "Signed HTTPS webhook")
+Rel(producer, observe, "Safe correlation telemetry")
+Rel(stream, observe, "Lag and trace telemetry")
+Rel(delivery, observe, "Outcome and retry telemetry")

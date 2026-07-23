@@ -1,0 +1,40 @@
+das_version: "0.1"
+initiative: "DEMO-004"
+context_pack:
+  id: "CTX-DEMO-004-v1"
+  version: 1
+  status: prepared
+  layers:
+    consistent: [enterprise, domain, product, technology]
+    relative: [initiative, estate, runtime]
+  items:
+    - id: enterprise-capabilities-and-reuse
+      source: context/consistent/platform/enterprise-capabilities-and-reuse.md
+      reason: Reuse the shared Webhook Platform instead of building delivery logic.
+    - id: webhook-platform-principles
+      source: context/consistent/platform/webhook-platform-principles.md
+      reason: Define subscription, delivery, retry, and ownership boundaries.
+    - id: banking-live
+      source: context/consistent/product/banking-live.md
+      reason: Distinguish legacy BL and strategic Lume product direction.
+    - id: banking-live-estate
+      source: context/consistent/product/banking-live-estate.md
+      reason: Identify possible BL producers, APIs, and database boundaries.
+    - id: banking-live-deployments-and-migration
+      source: context/consistent/platform/banking-live-deployments-and-migration.md
+      reason: Classify BL2 support, Lume target, environments, and coexistence.
+    - id: authentication-and-authorization
+      source: context/consistent/architecture/authentication-and-authorization.md
+      reason: Apply Auth0, API Gateway, IMS, and client/region authorization.
+    - id: chd-and-common-workload-zones
+      source: context/consistent/architecture/chd-and-common-workload-zones.md
+      reason: Keep CHD out of shared webhook and observability flows.
+    - id: observability-principles
+      source: context/consistent/platform/observability-principles.md
+      reason: Define logs, metrics, traces, SLOs, and alerting.
+    - id: event-streaming-principles
+      source: context/consistent/platform/event-streaming-principles.md
+      reason: Define event contract, ownership, schema, and delivery boundary.
+  exclusions:
+    - Production PAN, SAD, tokens, private keys, secrets, and unrestricted payloads.
+  content_sha256: ""

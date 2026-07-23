@@ -1,0 +1,49 @@
+das_version: "0.1"
+initiative: "DEMO-005"
+context_pack:
+  id: "CTX-DEMO-005-v1"
+  version: 1
+  status: prepared
+  layers:
+    consistent: [enterprise, domain, product, technology]
+    relative: [initiative, estate, runtime]
+  items:
+    - id: payapi-apple-pay-query-relative
+      source: context/relative/payapi-apple-pay-query.md
+      reason: Fix the feature boundary to PayAPI plus PayCore t_core and prevent invented services or projections.
+    - id: api-standards
+      source: context/consistent/architecture/api-standards.md
+      reason: Define endpoint, pagination, versioning, error, and contract conventions.
+    - id: ims-and-api-gateway
+      source: context/consistent/architecture/ims-and-api-gateway.md
+      reason: Reuse the approved API Gateway and IMS integration boundary.
+    - id: authentication-and-authorization
+      source: context/consistent/architecture/authentication-and-authorization.md
+      reason: Apply Auth0, client, region, and portal authorization rules.
+    - id: tokenization-and-token-service-partners
+      source: context/consistent/product/tokenization-and-token-service-partners.md
+      reason: Define safe card-token handling and prohibit raw card data exposure.
+    - id: payments-domain
+      source: context/consistent/business/payments-domain.md
+      reason: Interpret transaction, payment, and Apple Pay domain terminology.
+    - id: banking-live-estate
+      source: context/consistent/product/banking-live-estate.md
+      reason: Identify possible Banking.Live transaction sources and boundaries.
+    - id: banking-live-deployments-and-migration
+      source: context/consistent/platform/banking-live-deployments-and-migration.md
+      reason: Classify BL2 support, Lume target, environments, regions, and isolation.
+    - id: chd-and-common-workload-zones
+      source: context/consistent/architecture/chd-and-common-workload-zones.md
+      reason: Keep sensitive transaction data within approved boundaries.
+    - id: observability-principles
+      source: context/consistent/platform/observability-principles.md
+      reason: Define safe telemetry, audit, SLO, and operational requirements.
+    - id: enterprise-capabilities-and-reuse
+      source: context/consistent/platform/enterprise-capabilities-and-reuse.md
+      reason: Reuse approved gateway, persistence, identity, and observability capabilities.
+    - id: tech-radar
+      source: context/consistent/technology/tech-radar.md
+      reason: Constrain technology choices to approved enterprise standards.
+  exclusions:
+    - Production PAN, SAD, raw Apple Pay payloads, secrets, private keys, tokens, and unrestricted logs.
+  content_sha256: ""

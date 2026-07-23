@@ -1,0 +1,20 @@
+das_version: "0.1"
+artifact:
+  id: "DEMO-001"
+  type: initiative
+  version: 1
+  status: draft
+  title: "Payment status notification improvement"
+  initiative: "DEMO-001"
+  owner: "team.payments"
+scope:
+  domain: payments
+  repositories: [demo-service]
+  environments: [test]
+policy:
+  risk_tier: medium
+  data_classification: internal
+  implementation_locked_until: architecture.approved
+workflow:
+  state: intake
+  required_gates: [requirements, hld, lld, implementation]

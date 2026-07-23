@@ -1,0 +1,12 @@
+das_version: "0.1"
+initiative: "DEMO-005"
+links:
+  - from: "github:DEMO-005"
+    to: "REQ-DEMO-005"
+    relation: specifies
+  - from: "REQ-DEMO-005"
+    to: "HLD-DEMO-005"
+    relation: designed-by
+  - from: "HLD-DEMO-005"
+    to: "LLD-DEMO-005"
+    relation: detailed-by

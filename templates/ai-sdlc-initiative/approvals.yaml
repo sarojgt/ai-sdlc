@@ -1,0 +1,39 @@
+das_version: "0.1"
+initiative: "DEMO-001"
+records:
+  - gate: "business"
+    decision: "pending"
+    principal: ""
+    role: "Product Owner"
+    artifact_id: "REQ-DEMO-001"
+    artifact_version: 1
+    content_sha256: ""
+    timestamp: ""
+    conditions: []
+  - gate: "architecture"
+    decision: "pending"
+    principal: ""
+    role: "Solution Architect"
+    artifact_id: "HLD-DEMO-001"
+    artifact_version: 1
+    content_sha256: ""
+    timestamp: ""
+    conditions: []
+  - gate: "engineering"
+    decision: "pending"
+    principal: ""
+    role: "Senior Engineer"
+    artifact_id: "LLD-DEMO-001"
+    artifact_version: 1
+    content_sha256: ""
+    timestamp: ""
+    conditions: []
+  - gate: "release"
+    decision: "pending"
+    principal: ""
+    role: "Release Owner"
+    artifact_id: "RELEASE-DEMO-001"
+    artifact_version: 1
+    content_sha256: ""
+    timestamp: ""
+    conditions: []

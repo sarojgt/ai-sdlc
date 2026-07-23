@@ -1,0 +1,42 @@
+name: DAS and Architecture Gate
+
+on:
+  pull_request:
+    paths:
+      - "initiatives/**"
+      - "config/**"
+      - "schemas/**"
+      - ".github/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  das-gate:
+    name: das-gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate repository structure
+        run: |
+          for initiative in poc/initiatives/*; do
+            test -d "$initiative" || continue
+            bash poc/tooling/validate_structure.sh "$initiative"
+          done
+
+      - name: Validate initiative metadata
+        run: |
+          echo "POC placeholder: run the DAS validator here"
+          echo "Required future checks: schema, IDs, links, hashes, required sections"
+
+      - name: Architecture gate
+        run: |
+          echo "POC placeholder: fail unless current HLD has a valid human approval"
+          echo "Required future checks: role, current commit, content hash, no blocking comments"
+
+      - name: Publish gate summary
+        run: echo "DAS gate executed"

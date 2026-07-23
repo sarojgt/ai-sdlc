@@ -1,0 +1,54 @@
+gates:
+  requirements:
+    required_role: product_owner
+    artifact_type: requirement
+    next_state: hld_review
+    automated_checks:
+      - das_schema_valid
+      - acceptance_criteria_present
+      - business_outcome_present
+      - scope_and_boundaries_present
+      - stakeholders_present
+      - data_and_integration_context_present
+      - context_manifest_present
+      - traceability_complete
+  hld:
+    required_role: solution_architect
+    artifact_type: hld
+    next_state: lld_draft
+    automated_checks:
+      - das_schema_valid
+      - multiple_options_present
+      - tradeoff_scorecard_present
+      - risks_present
+      - rollback_present
+      - requirements_coverage_complete
+      - no_blocking_comments
+    invalidates_on_change: [lld, implementation_plan, stories]
+  lld:
+    required_role: senior_engineer
+    artifact_type: lld
+    next_state: implementation_ready
+    automated_checks:
+      - approved_hld_parent
+      - contracts_present
+      - test_strategy_present
+      - migration_strategy_present
+  implementation:
+    required_role: codeowner
+    artifact_type: pull_request
+    next_state: release_ready
+    automated_checks:
+      - approved_hld_parent
+      - approved_lld_parent
+      - tests_pass
+      - security_checks_pass
+      - traceability_complete
+  release:
+    required_role: release_owner
+    artifact_type: release_evidence
+    next_state: deployed
+    automated_checks:
+      - deployment_health_present
+      - rollback_plan_present
+      - required_checks_pass
