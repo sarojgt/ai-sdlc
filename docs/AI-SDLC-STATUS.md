@@ -73,6 +73,7 @@ from starting early.
 - [x] Older demo initiatives archived under `ai-sdlc/examples/archive/`.
 - [x] Incidental `.DS_Store` and graph workspace artifacts removed/ignored.
 - [x] DEMO-005 used as the current reference initiative.
+- [~] Auto-mark initiative PRs approved when required human review lands.
 
 ## Current repository workflow
 

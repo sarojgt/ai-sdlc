@@ -137,6 +137,10 @@ ai-sdlc/initiatives/PAY-4567/hld/hld.md
 ai-sdlc/initiatives/PAY-4567/feedback/
 ```
 
+An approved initiative PR can automatically flip `initiative.yaml` and
+`initiative.md` to `approved` and record the approval trail in
+`approvals.yaml`.
+
 Only after the HLD approval record is present should the LLD flow be enabled.
 The LLD contains detailed APIs, schemas, classes, implementation sequencing,
 test strategy, and migration details.

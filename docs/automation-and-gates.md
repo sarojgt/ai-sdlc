@@ -86,6 +86,7 @@ Jira automation already supports triggers such as work item creation, transition
 | Architecture CODEOWNER requested | Path matches HLD/ADR | Request Solution Architect review |
 | Architecture review approved | Correct human role and current hash | Emit `architecture.approved` event |
 | Architecture review dismissed or stale | New commit after approval | Invalidate approval and rerun gate |
+| Initiative PR approved | Required human reviewer approved the initiative PR | Update `initiative.yaml`, `initiative.md`, and `approvals.yaml` to `approved` |
 | Implementation PR opened | Contains `hld_id`, `hld_hash`, `lld_id` | Verify parent approvals; fail check if invalid |
 | Implementation PR changes design-sensitive paths | Database/API/security/infrastructure path changed | Recalculate risk and request additional reviewers |
 | PR merged | All required checks and human reviews pass | Transition Jira story; update traceability; start integration/deployment workflow |
@@ -334,7 +335,8 @@ Build these first:
 7. `approval-service` — append-only human approval records and invalidation.
 8. `rerun-router` — maps feedback type to affected artifacts and jobs.
 9. `notification-service` — reviewer requests, escalations, failures, and reminders.
-10. `audit-export` — complete initiative evidence for governance and release review.
+10. `initiative-approval-sync` — auto-mark initiative PRs approved when the required human review lands.
+11. `audit-export` — complete initiative evidence for governance and release review.
 
 ## Automation maturity levels
 

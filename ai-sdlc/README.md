@@ -197,6 +197,10 @@ just ai-sdlc-hld PAY-4567 codex gpt-5.6-luna
 The loop is bounded by `config/hld-loop-policy.yaml`. A passing AI review only
 creates a human architecture review request; it never approves the HLD.
 
+An approved initiative PR can automatically flip `initiative.yaml` and
+`initiative.md` to `approved` and record the approval trail in
+`approvals.yaml`.
+
 After architect feedback:
 
 ```text

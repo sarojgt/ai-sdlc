@@ -1,0 +1,65 @@
+name: Initiative Approval Sync
+
+on:
+  pull_request_review:
+    types:
+      - submitted
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  sync-approval:
+    if: >
+      github.event.review.state == 'approved' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Determine initiative scope
+        id: scope
+        run: |
+          set -euo pipefail
+          changed_files="$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" -- ai-sdlc/initiatives)"
+          initiative_dirs="$(
+            printf '%s\n' "$changed_files" \
+              | awk -F/ '/^ai-sdlc\/initiatives\/[^/]+\// {print $1"/"$2"/"$3}' \
+              | sort -u
+          )"
+          count="$(printf '%s\n' "$initiative_dirs" | sed '/^$/d' | wc -l | tr -d ' ')"
+          if [ "$count" -ne 1 ]; then
+            echo "Expected exactly one initiative directory, found $count." >&2
+            printf '%s\n' "$initiative_dirs" >&2
+            exit 1
+          fi
+          initiative_dir="$(printf '%s\n' "$initiative_dirs" | sed -n '1p')"
+          echo "initiative_dir=$initiative_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Mark initiative approved
+        run: |
+          python3 ai-sdlc/tooling/sync_initiative_approval.py \
+            "${{ steps.scope.outputs.initiative_dir }}" \
+            "${{ github.event.review.user.login }}" \
+            "${{ github.event.review.id }}" \
+            "${{ github.event.review.submitted_at }}"
+
+      - name: Commit approval sync
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "${{ steps.scope.outputs.initiative_dir }}/initiative.yaml" \
+                  "${{ steps.scope.outputs.initiative_dir }}/initiative.md" \
+                  "${{ steps.scope.outputs.initiative_dir }}/approvals.yaml"
+          if git diff --cached --quiet; then
+            echo "No approval sync changes detected."
+            exit 0
+          fi
+          git commit -m "mark ${{ steps.scope.outputs.initiative_dir }} approved"
+          git push
