@@ -1,0 +1,22 @@
+das_version: "0.1"
+artifact:
+  id: "KAN-4"
+  type: initiative
+  version: 1
+  status: draft
+  title: "Temporary card blocking API"
+  initiative: "KAN-4"
+  owner: "team.cards"
+source:
+  provider: "jira"
+  work_item_id: "KAN-4"
+  url: "https://randomtry.atlassian.net/browse/KAN-4"
+scope:
+  domains: [cards, card-controls, payments]
+  repositories: []
+policy:
+  risk_tier: "high"
+  data_classification: "confidential"
+  implementation_locked_until: architecture.approved
+workflow:
+  state: intake

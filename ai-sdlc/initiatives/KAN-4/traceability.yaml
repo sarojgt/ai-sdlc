@@ -1,0 +1,12 @@
+das_version: "0.1"
+initiative: "KAN-4"
+links:
+  - from: "jira:KAN-4"
+    to: "REQ-KAN-4"
+    relation: specifies
+  - from: "REQ-KAN-4"
+    to: "HLD-KAN-4"
+    relation: designed-by
+  - from: "HLD-KAN-4"
+    to: "LLD-KAN-4"
+    relation: detailed-by
