@@ -66,8 +66,8 @@ def main() -> int:
     initiative_md.write_text(md_text)
 
     approvals_text = approvals_yaml.read_text()
-    decision = re.search(r"^\s*decision:\s*([^\s]+)\s*$", approvals_text, flags=re.MULTILINE)
-    if decision and decision.group(1) == "approved":
+    decision_match = re.search(r"^\s*decision:\s*([^\s]+)\s*$", approvals_text, flags=re.MULTILINE)
+    if decision_match and decision_match.group(1) == "approved":
         print(f"Approval state for {initiative_dir.name} is already approved")
         return 0
 
