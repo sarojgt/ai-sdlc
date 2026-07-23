@@ -74,6 +74,7 @@ from starting early.
 - [x] Incidental `.DS_Store` and graph workspace artifacts removed/ignored.
 - [x] DEMO-005 used as the current reference initiative.
 - [~] Auto-mark initiative PRs approved when required human review lands.
+- [~] Manual backfill path for missed initiative approvals.
 
 ## Current repository workflow
 

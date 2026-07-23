@@ -4,6 +4,19 @@ on:
   pull_request_review:
     types:
       - submitted
+  pull_request:
+    types:
+      - closed
+  workflow_dispatch:
+    inputs:
+      initiative_dir:
+        description: Initiative directory to backfill, for example ai-sdlc/initiatives/DEMO-005
+        required: false
+        type: string
+      pull_request_number:
+        description: Optional PR number to backfill from GitHub history
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -12,42 +25,92 @@ permissions:
 jobs:
   sync-approval:
     if: >
-      github.event.review.state == 'approved' &&
-      github.event.pull_request.head.repo.full_name == github.repository
+      (github.event_name == 'pull_request_review' && github.event.review.state == 'approved') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.head.repo.full_name == github.repository) ||
+      (github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: ${{ github.event.pull_request.head.ref || github.event.repository.default_branch }}
           fetch-depth: 0
 
       - name: Determine initiative scope
         id: scope
         run: |
           set -euo pipefail
-          changed_files="$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" -- ai-sdlc/initiatives)"
-          initiative_dirs="$(
-            printf '%s\n' "$changed_files" \
-              | awk -F/ '/^ai-sdlc\/initiatives\/[^/]+\// {print $1"/"$2"/"$3}' \
-              | sort -u
-          )"
-          count="$(printf '%s\n' "$initiative_dirs" | sed '/^$/d' | wc -l | tr -d ' ')"
-          if [ "$count" -ne 1 ]; then
-            echo "Expected exactly one initiative directory, found $count." >&2
-            printf '%s\n' "$initiative_dirs" >&2
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.initiative_dir || '' }}" ]; then
+            initiative_dir="${{ inputs.initiative_dir }}"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "workflow_dispatch requires initiative_dir." >&2
+            exit 1
+          else
+            changed_files="$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" -- ai-sdlc/initiatives)"
+            initiative_dirs="$(
+              printf '%s\n' "$changed_files" \
+                | awk -F/ '/^ai-sdlc\/initiatives\/[^/]+\// {print $1"/"$2"/"$3}' \
+                | sort -u
+            )"
+            count="$(printf '%s\n' "$initiative_dirs" | sed '/^$/d' | wc -l | tr -d ' ')"
+            if [ "$count" -ne 1 ]; then
+              echo "Expected exactly one initiative directory, found $count." >&2
+              printf '%s\n' "$initiative_dirs" >&2
+              exit 1
+            fi
+            initiative_dir="$(printf '%s\n' "$initiative_dirs" | sed -n '1p')"
+          fi
+          echo "initiative_dir=$initiative_dir" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare publish branch
+        id: branch
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            suffix="$(printf '%s' "${{ steps.scope.outputs.initiative_dir }}" | tr '/.' '-')"
+            if [ -n "${{ inputs.pull_request_number || '' }}" ]; then
+              suffix="$suffix-pr-${{ inputs.pull_request_number }}"
+            fi
+            publish_branch="backfill/initiative-approval-${suffix}"
+            git checkout -b "$publish_branch"
+          else
+            publish_branch="${{ github.event.pull_request.head.ref }}"
+          fi
+          echo "publish_branch=$publish_branch" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve review metadata for backfill
+        id: review
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ -z "${{ inputs.pull_request_number || '' }}" ]; then
+            echo "review_user=github-actions[bot]" >> "$GITHUB_OUTPUT"
+            echo "review_id=workflow-dispatch" >> "$GITHUB_OUTPUT"
+            echo "submitted_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          pr_number="${{ inputs.pull_request_number }}"
+          review_json="$(gh api repos/${{ github.repository }}/pulls/$pr_number/reviews --jq '.[] | select(.state == "APPROVED") | {user: .user.login, id: .id, submitted_at: .submitted_at}' | head -1)"
+          if [ -z "$review_json" ]; then
+            echo "No approved review found for PR #$pr_number" >&2
             exit 1
           fi
-          initiative_dir="$(printf '%s\n' "$initiative_dirs" | sed -n '1p')"
-          echo "initiative_dir=$initiative_dir" >> "$GITHUB_OUTPUT"
+          review_user="$(printf '%s' "$review_json" | jq -r '.user')"
+          review_id="$(printf '%s' "$review_json" | jq -r '.id')"
+          submitted_at="$(printf '%s' "$review_json" | jq -r '.submitted_at')"
+          echo "review_user=$review_user" >> "$GITHUB_OUTPUT"
+          echo "review_id=$review_id" >> "$GITHUB_OUTPUT"
+          echo "submitted_at=$submitted_at" >> "$GITHUB_OUTPUT"
 
       - name: Mark initiative approved
         run: |
           python3 ai-sdlc/tooling/sync_initiative_approval.py \
             "${{ steps.scope.outputs.initiative_dir }}" \
-            "${{ github.event.review.user.login }}" \
-            "${{ github.event.review.id }}" \
-            "${{ github.event.review.submitted_at }}"
+            "${{ github.event.review.user.login || steps.review.outputs.review_user || github.actor }}" \
+            "${{ github.event.review.id || steps.review.outputs.review_id || github.run_id }}" \
+            "${{ github.event.review.submitted_at || steps.review.outputs.submitted_at || github.event.head_commit.timestamp || github.event.pull_request.merged_at }}"
 
       - name: Commit approval sync
         run: |
@@ -62,4 +125,4 @@ jobs:
             exit 0
           fi
           git commit -m "mark ${{ steps.scope.outputs.initiative_dir }} approved"
-          git push
+          git push -u origin "${{ steps.branch.outputs.publish_branch }}"
