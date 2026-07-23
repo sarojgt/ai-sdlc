@@ -1,0 +1,27 @@
+das_version: "0.1"
+initiative: "{{ initiative.id }}"
+records:
+  - gate: requirements
+    decision: pending
+    principal: ""
+    role: product_owner
+    artifact_id: "REQ-{{ initiative.id }}"
+    artifact_version: 1
+    content_sha256: ""
+    timestamp: ""
+  - gate: hld
+    decision: pending
+    principal: ""
+    role: solution_architect
+    artifact_id: "HLD-{{ initiative.id }}"
+    artifact_version: 1
+    content_sha256: ""
+    timestamp: ""
+  - gate: lld
+    decision: pending
+    principal: ""
+    role: senior_engineer
+    artifact_id: "LLD-{{ initiative.id }}"
+    artifact_version: 1
+    content_sha256: ""
+    timestamp: ""

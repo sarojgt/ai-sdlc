@@ -1,0 +1,18 @@
+C4Context
+title Banking.Live transaction status webhooks — system context
+
+Person(client, "Banking.Live client", "Subscribes and receives status webhooks")
+Person(operator, "Support/operator", "Monitors and performs authorized recovery")
+System(bl, "Banking.Live / Lume", "Authoritative transaction status producers")
+System_Ext(api, "API Gateway + Auth0 + IMS", "Authenticated subscription and client/region authorization")
+System_Ext(events, "Enterprise Event Streaming", "Governed durable event transport")
+System_Ext(webhooks, "Shared Webhook Platform", "Subscriptions, delivery, retry, DLQ, history, replay")
+System_Ext(obs, "Shared Observability", "Redacted logs, metrics, traces, alerts")
+
+Rel(client, api, "Manage subscription")
+Rel(api, webhooks, "Authorized subscription request")
+Rel(bl, events, "Publish sanitized status event")
+Rel(events, webhooks, "Deliver governed event")
+Rel(webhooks, client, "Deliver signed webhook")
+Rel(operator, obs, "Monitor")
+Rel(webhooks, obs, "Emit delivery telemetry")

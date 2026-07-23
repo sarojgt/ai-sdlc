@@ -1,0 +1,8 @@
+agent_response:
+  run_id: "RUN-DEMO-004-HLD-1"
+  status: completed
+  provider: codex
+  model: "gpt-5.6-luna"
+  skill_id: hld-generation
+  generated_directory: generated/hld/
+  human_approval_required: true

@@ -1,0 +1,21 @@
+das_version: "0.1"
+artifact:
+  id: "DEMO-004"
+  type: initiative
+  version: 1
+  status: draft
+  title: "Client-scoped Banking.Live transaction status webhooks"
+  initiative: "DEMO-004"
+  owner: "team.banking-live"
+source:
+  provider: "github"
+  work_item_id: "DEMO-004"
+scope:
+  domains: {{ initiative.domains }}
+  repositories: {{ initiative.repositories }}
+policy:
+  risk_tier: "medium"
+  data_classification: "internal"
+  implementation_locked_until: architecture.approved
+workflow:
+  state: intake

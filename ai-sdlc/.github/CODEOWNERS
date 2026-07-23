@@ -1,0 +1,7 @@
+# Replace these placeholders with real GitHub teams.
+* @engineering-team
+/initiatives/**/requirement.md @product-owner-team
+/initiatives/**/hld/** @solution-architect-team
+/initiatives/**/lld/** @senior-engineering-team
+/initiatives/**/adrs/** @solution-architect-team
+/config/** @architecture-board-team @security-team

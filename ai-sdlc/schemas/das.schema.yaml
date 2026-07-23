@@ -1,0 +1,23 @@
+schema: das
+version: "0.1"
+required:
+  - das_version
+  - artifact
+  - traceability
+  - policy
+artifact:
+  required: [id, type, version, status, title, initiative]
+  status: [draft, in_review, approved, superseded, rejected]
+  type: [initiative, requirement, hld, lld, adr, plan, approval, evidence]
+  immutable_identity: [id, version, content_sha256]
+traceability:
+  required: [parents]
+policy:
+  required: [risk_tier, data_classification]
+approval:
+  required: [gate, decision, principal, role, timestamp, artifact_version, content_sha256]
+rules:
+  - "approved artifacts require an approval record"
+  - "lld and plan artifacts require an approved hld parent"
+  - "implementation requires approved hld and lld parents"
+  - "approval content hash must equal artifact content hash"

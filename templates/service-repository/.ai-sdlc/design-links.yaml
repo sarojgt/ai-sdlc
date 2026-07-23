@@ -1,0 +1,6 @@
+das_version: "0.1"
+repository: "replace-repository-id"
+design_repository: "git+https://git.example/design-repository"
+active_initiatives: []
+local_adrs: "docs/adr"
+required_hld_reference: true

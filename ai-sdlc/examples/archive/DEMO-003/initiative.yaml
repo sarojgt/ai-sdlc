@@ -1,0 +1,21 @@
+das_version: "0.1"
+artifact:
+  id: "DEMO-003"
+  type: initiative
+  version: 1
+  status: draft
+  title: "Payment webhook delivery reliability"
+  initiative: "DEMO-003"
+  owner: "team.payments"
+source:
+  provider: "github"
+  work_item_id: "DEMO-003"
+scope:
+  domains: {{ initiative.domains }}
+  repositories: {{ initiative.repositories }}
+policy:
+  risk_tier: "medium"
+  data_classification: "internal"
+  implementation_locked_until: architecture.approved
+workflow:
+  state: intake

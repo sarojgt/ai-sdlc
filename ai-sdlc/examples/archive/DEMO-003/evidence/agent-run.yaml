@@ -1,0 +1,8 @@
+run_id: "RUN-DEMO-003-HLD-2"
+initiative_id: "DEMO-003"
+task_type: hld
+agent_provider: "codex"
+agent_model: "gpt-5.6-luna"
+status: request-prepared
+approval_authority: none
+next_action: invoke-configured-agent-adapter

@@ -1,0 +1,36 @@
+flowchart LR
+  subgraph CHD[CHD / PCI boundary]
+    BL2[BL2 producer\nsource status]:::chd
+    LUME[Lume producer\nsource status]:::chd
+    ADAPTER[Optional BL2\ncompatibility adapter]:::chd
+    SAN[Allow-list + sanitize\nreference/token data]:::control
+  end
+
+  subgraph CW[Common Workload / shared platform boundary]
+    GW[API Gateway / API Hub]
+    AUTH[Auth0\nJWT authentication]
+    IMS[IMS\nclient + region authorization]
+    STREAM[Enterprise Kafka/MSK\ngoverned event boundary]
+    WH[Shared Webhook Platform\nsubscriptions + delivery]
+    CLIENT[Client HTTPS endpoint]
+    OBS[Shared observability\nredacted telemetry]
+  end
+
+  USER[Client or operator] --> GW
+  GW --> AUTH
+  GW --> IMS
+  GW --> WH
+  BL2 --> SAN
+  LUME --> SAN
+  BL2 -. fallback .-> ADAPTER
+  ADAPTER --> SAN
+  SAN --> STREAM
+  STREAM --> WH
+  WH --> CLIENT
+  BL2 -. safe metrics/RID .-> OBS
+  LUME -. safe metrics/RID .-> OBS
+  STREAM -. lag/trace .-> OBS
+  WH -. delivery/DLQ .-> OBS
+
+  classDef chd fill:#fce4ec,stroke:#ad1457,color:#000;
+  classDef control fill:#fff3e0,stroke:#ef6c00,color:#000;

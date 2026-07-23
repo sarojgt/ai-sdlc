@@ -1,0 +1,15 @@
+das_version: "0.1"
+initiative: "DEMO-001"
+links:
+  - from: "github:issue/REPLACE"
+    to: "REQ-DEMO-001"
+    relation: specifies
+  - from: "REQ-DEMO-001"
+    to: "HLD-DEMO-001"
+    relation: designed-by
+  - from: "HLD-DEMO-001"
+    to: "LLD-DEMO-001"
+    relation: detailed-by
+  - from: "LLD-DEMO-001"
+    to: "github:pr/REPLACE"
+    relation: implemented-by

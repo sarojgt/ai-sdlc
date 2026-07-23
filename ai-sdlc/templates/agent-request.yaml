@@ -1,0 +1,24 @@
+agent_request:
+  run_id: "RUN-{{ initiative.id }}-{{ task.type }}-{{ task.sequence }}"
+  initiative_id: "{{ initiative.id }}"
+  task_type: "{{ task.type }}"
+  skill_id: "{{ task.skill }}"
+  agent:
+    provider: "{{ agent.provider }}"
+    model: "{{ agent.model }}"
+  requirement:
+    artifact_id: "REQ-{{ initiative.id }}"
+    version: "{{ requirement.version }}"
+    content_sha256: "{{ requirement.hash }}"
+  context:
+    pack_id: "CTX-{{ initiative.id }}-v{{ context.version }}"
+    pack_version: "{{ context.version }}"
+    manifest: "context-manifest.yaml"
+    content_sha256: "{{ context.hash }}"
+  policy:
+    risk_tier: "{{ policy.risk_tier }}"
+    allowed_tools: [read_context, read_repository, render_diagram]
+    denied_tools: [approve_architecture, merge, deploy_production]
+  output:
+    schema: "{{ task.output_schema }}"
+    directory: "generated/"

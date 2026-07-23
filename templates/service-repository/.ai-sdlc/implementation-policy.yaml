@@ -1,0 +1,12 @@
+das_version: "0.1"
+policy:
+  require_approved_hld: true
+  require_approved_lld: true
+  require_human_codeowner_review: true
+  allow_agent_merge: false
+  allow_agent_production_write: false
+  required_checks:
+    - das-validate
+    - architecture-gate
+    - unit-tests
+    - security-scan

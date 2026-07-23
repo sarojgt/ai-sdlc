@@ -1,0 +1,29 @@
+flowchart TB
+  subgraph ENV[Environment boundary: dev / test / staging / production]
+    subgraph REGION_A[Region A]
+      subgraph CHD_A[CHD runtime boundary]
+        BL_A[BL2 or Lume producer]
+        AD_A[Optional dedicated BL2 adapter]
+        SAN_A[Sanitizer]
+      end
+      subgraph CW_A[Common Workload shared runtime]
+        GW_A[API Gateway]
+        IMS_A[Auth0 / IMS integration]
+        K_A[Shared event transport]
+        WH_A[Shared Webhook Platform]
+        OBS_A[Shared observability]
+      end
+    end
+    subgraph REGION_B[Region B / residency or DR target — to confirm]
+      CW_B[Regional shared platform or failover runtime]
+    end
+  end
+  BL_A --> SAN_A --> K_A --> WH_A
+  BL_A -. BL2 fallback .-> AD_A --> SAN_A
+  GW_A --> IMS_A --> WH_A
+  WH_A --> OBS_A
+  WH_A -. approved regional routing/DR .-> CW_B
+  classDef chd fill:#fce4ec,stroke:#ad1457,color:#000;
+  classDef cw fill:#e3f2fd,stroke:#1565c0,color:#000;
+  class BL_A,AD_A,SAN_A chd;
+  class GW_A,IMS_A,K_A,WH_A,OBS_A,CW_B cw;

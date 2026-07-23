@@ -1,0 +1,27 @@
+das_version: "0.1"
+initiative: "DEMO-001"
+context_pack:
+  id: "CTX-DEMO-001"
+  version: 1
+  status: draft
+  generated_by: "manual-seed"
+  items:
+    - id: CTX-001
+      uri: "github://org/demo-service@REPLACE_COMMIT"
+      source_type: repository
+      source_version: REPLACE_COMMIT
+      authority: service-owner
+      classification: internal
+      why_included: "Current service behavior"
+    - id: CTX-002
+      uri: "ai-sdlc/config/context-sources.yaml"
+      source_type: context-policy
+      source_version: working-tree
+      authority: architecture-board
+      classification: internal
+      why_included: "Context selection policy"
+  exclusions:
+    - pattern: "**/.env*"
+      reason: "secrets excluded"
+    - pattern: "**/fixtures/**"
+      reason: "unnecessary data excluded"

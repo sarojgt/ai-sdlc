@@ -1,0 +1,33 @@
+sequenceDiagram
+    autonumber
+    participant P as payment-service
+    participant T as Durable transport / outbox
+    participant W as partner-webhook-service
+    participant D as Delivery state
+    participant H as Enabled partner endpoint
+    participant O as Operations / observability
+
+    P->>T: Publish accepted transition with event_id
+    Note over P,T: event_id identifies the accepted transition; it is created once.
+    T->>W: Deliver event (at-least-once)
+    W->>D: Create or load (partner_id, event_id)
+    alt New delivery intent
+        W->>H: POST webhook + event_id + X-Payment-Event-Id
+        H-->>W: Accepted or classified failure
+        W->>D: Record attempt, status, redacted outcome
+    else Duplicate delivery message
+        W->>D: Suppress duplicate intent; preserve event_id
+    end
+    W-->>O: State, latency, attempts, and redacted metrics
+    alt Transient failure and retry budget remains
+        W->>T: Schedule bounded backoff with jitter
+        T->>W: Retry same event_id
+        W->>H: Retry webhook with same event_id/header
+    else Permanent failure or retry budget exhausted
+        W->>D: Mark dead-lettered
+        W-->>O: DLQ visibility and alert
+    end
+    O->>W: Authorized, audited replay request
+    W->>H: Replay same event_id/header
+    W->>D: Record replay attempt and outcome
+    Note over W,H: Any migration/coexistence path must share the same identity boundary.
