@@ -1,0 +1,22 @@
+das_version: "0.1"
+artifact:
+  id: "KAN-3"
+  type: initiative
+  version: 1
+  status: draft
+  title: "Add backfill trigger for initiative approval sync and post-merge processing"
+  initiative: "KAN-3"
+  owner: "team.ai-sdlc"
+source:
+  provider: "jira"
+  work_item_id: "KAN-3"
+  url: "https://randomtry.atlassian.net/browse/KAN-3"
+scope:
+  domains: [ai-sdlc, github-actions, approval-automation]
+  repositories: [sarojgt/ai-sdlc]
+policy:
+  risk_tier: "medium"
+  data_classification: "internal"
+  implementation_locked_until: architecture.approved
+workflow:
+  state: intake

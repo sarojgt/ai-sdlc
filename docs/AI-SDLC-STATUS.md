@@ -73,7 +73,8 @@ from starting early.
 - [x] Older demo initiatives archived under `ai-sdlc/examples/archive/`.
 - [x] Incidental `.DS_Store` and graph workspace artifacts removed/ignored.
 - [x] DEMO-005 used as the current reference initiative.
-- [~] Auto-mark initiative PRs approved when required human review lands.
+- [x] Auto-mark initiative PRs approved when required human review lands,
+      including manual backfill for missed approval events.
 
 ## Current repository workflow
 
@@ -157,7 +158,7 @@ from starting early.
 ### Phase 2 — GitHub automation
 
 - [ ] GitHub Issue forms for business-friendly intake.
-- [ ] GitHub Actions triggers and draft PRs.
+- [~] GitHub Actions triggers and draft PRs.
 - [ ] CODEOWNERS and required checks.
 - [ ] PR comments mapped to bounded AI reruns.
 
