@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   sync-approval:
-    if: >
+    if: >-
       github.event_name == 'pull_request_review' &&
       github.event.review.state == 'approved' &&
       github.event.review.user.type == 'User' &&
@@ -42,7 +42,7 @@ jobs:
           )"
           count="$(printf '%s\n' "$initiative_dirs" | sed '/^$/d' | wc -l | tr -d ' ')"
           if [ "$count" -eq 0 ]; then
-            echo "Automatic approval sync found no initiative directory changes for this PR." >&2
+            echo "Approval sync found no initiative directory changes for this PR." >&2
             exit 1
           elif [ "$count" -ne 1 ]; then
             echo "Expected exactly one initiative directory, found $count." >&2
