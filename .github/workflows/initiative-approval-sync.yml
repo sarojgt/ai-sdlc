@@ -17,20 +17,30 @@ permissions:
 
 jobs:
   sync-approval:
-    if: >
-      github.event_name == 'pull_request_review' &&
-      github.event.review.state == 'approved' &&
-      github.event.review.user.type == 'User' &&
-      github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'pull_request_review'
     runs-on: ubuntu-latest
     steps:
+      - name: Filter approval event
+        id: filter
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event.review.state }}" = "approved" ] &&
+             [ "${{ github.event.review.user.type }}" = "User" ] &&
+             [ "${{ github.event.pull_request.head.repo.full_name }}" = "${{ github.repository }}" ]; then
+            echo "should_sync=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_sync=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout PR branch
+        if: steps.filter.outputs.should_sync == 'true'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
       - name: Determine initiative scope
+        if: steps.filter.outputs.should_sync == 'true'
         id: scope
         run: |
           set -euo pipefail
@@ -53,6 +63,7 @@ jobs:
           echo "initiative_dir=$initiative_dir" >> "$GITHUB_OUTPUT"
 
       - name: Mark initiative approved
+        if: steps.filter.outputs.should_sync == 'true'
         run: |
           python3 ai-sdlc/tooling/sync_initiative_approval.py \
             "${{ steps.scope.outputs.initiative_dir }}" \
@@ -61,6 +72,7 @@ jobs:
             "${{ github.event.review.submitted_at }}"
 
       - name: Commit approval sync
+        if: steps.filter.outputs.should_sync == 'true'
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -73,7 +85,7 @@ jobs:
             exit 0
           fi
           git commit -m "mark ${{ steps.scope.outputs.initiative_dir }} approved"
-          git push
+          git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
 
   backfill-approval:
     if: github.event_name == 'workflow_dispatch'
