@@ -4,12 +4,6 @@ on:
   pull_request_review:
     types:
       - submitted
-  workflow_dispatch:
-    inputs:
-      pull_request_number:
-        description: Pull request number to reconcile
-        required: true
-        type: number
 
 permissions:
   contents: write
@@ -17,10 +11,8 @@ permissions:
 
 jobs:
   sync-approval:
-    if: >-
-      github.event_name == 'pull_request_review' &&
+    if: >
       github.event.review.state == 'approved' &&
-      !endsWith(github.actor, '[bot]') &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
@@ -41,10 +33,7 @@ jobs:
               | sort -u
           )"
           count="$(printf '%s\n' "$initiative_dirs" | sed '/^$/d' | wc -l | tr -d ' ')"
-          if [ "$count" -eq 0 ]; then
-            echo "Approval sync found no initiative directory changes for this PR." >&2
-            exit 1
-          elif [ "$count" -ne 1 ]; then
+          if [ "$count" -ne 1 ]; then
             echo "Expected exactly one initiative directory, found $count." >&2
             printf '%s\n' "$initiative_dirs" >&2
             exit 1
@@ -53,152 +42,24 @@ jobs:
           echo "initiative_dir=$initiative_dir" >> "$GITHUB_OUTPUT"
 
       - name: Mark initiative approved
-        env:
-          INITIATIVE_DIR: ${{ steps.scope.outputs.initiative_dir }}
-          REVIEWER: ${{ github.event.review.user.login }}
-          REVIEW_ID: ${{ github.event.review.id }}
-          SUBMITTED_AT: ${{ github.event.review.submitted_at }}
         run: |
           python3 ai-sdlc/tooling/sync_initiative_approval.py \
-            "$INITIATIVE_DIR" \
-            "$REVIEWER" \
-            "$REVIEW_ID" \
-            "$SUBMITTED_AT"
+            "${{ steps.scope.outputs.initiative_dir }}" \
+            "${{ github.event.review.user.login }}" \
+            "${{ github.event.review.id }}" \
+            "${{ github.event.review.submitted_at }}"
 
       - name: Commit approval sync
-        env:
-          INITIATIVE_DIR: ${{ steps.scope.outputs.initiative_dir }}
-          PUSH_REF: ${{ github.event.pull_request.head.ref }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$INITIATIVE_DIR/initiative.yaml" \
-                  "$INITIATIVE_DIR/initiative.md" \
-                  "$INITIATIVE_DIR/approvals.yaml"
+          git add "${{ steps.scope.outputs.initiative_dir }}/initiative.yaml" \
+                  "${{ steps.scope.outputs.initiative_dir }}/initiative.md" \
+                  "${{ steps.scope.outputs.initiative_dir }}/approvals.yaml"
           if git diff --cached --quiet; then
             echo "No approval sync changes detected."
             exit 0
           fi
-          git commit -m "mark $INITIATIVE_DIR approved"
-          git push origin "HEAD:$PUSH_REF"
-
-  backfill-approval:
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ github.token }}
-      PR_NUMBER: ${{ inputs.pull_request_number }}
-    steps:
-      - name: Resolve pull request target
-        id: pr
-        run: |
-          set -euo pipefail
-          state="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.state')"
-          merged="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.merged')"
-          head_repo="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.head.repo.full_name')"
-          head_ref="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.head.ref')"
-          base_ref="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.base.ref')"
-
-          if [ "$state" = "open" ]; then
-            if [ "$head_repo" != "$GITHUB_REPOSITORY" ]; then
-              echo "Cannot backfill an open PR from a fork because the workflow cannot safely write to the fork branch." >&2
-              exit 1
-            fi
-            checkout_ref="$head_ref"
-            push_ref="$head_ref"
-          elif [ "$merged" = "true" ]; then
-            checkout_ref="$base_ref"
-            push_ref="$base_ref"
-          else
-            echo "PR #$PR_NUMBER is closed without merge; no initiative approval can be reconciled." >&2
-            exit 1
-          fi
-
-          echo "checkout_ref=$checkout_ref" >> "$GITHUB_OUTPUT"
-          echo "push_ref=$push_ref" >> "$GITHUB_OUTPUT"
-
-      - name: Checkout reconciliation target
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.pr.outputs.checkout_ref }}
-          fetch-depth: 0
-
-      - name: Determine initiative scope
-        id: scope
-        run: |
-          set -euo pipefail
-          changed_files="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" --paginate --jq '.[].filename')"
-          initiative_dirs="$(
-            printf '%s\n' "$changed_files" \
-              | awk -F/ '/^ai-sdlc\/initiatives\/[^/]+\// {print $1"/"$2"/"$3}' \
-              | sort -u
-          )"
-          count="$(printf '%s\n' "$initiative_dirs" | sed '/^$/d' | wc -l | tr -d ' ')"
-          if [ "$count" -eq 0 ]; then
-            echo "Manual approval backfill found no initiative directory changes for PR #$PR_NUMBER." >&2
-            exit 1
-          elif [ "$count" -ne 1 ]; then
-            echo "Expected exactly one initiative directory, found $count." >&2
-            printf '%s\n' "$initiative_dirs" >&2
-            exit 1
-          fi
-          initiative_dir="$(printf '%s\n' "$initiative_dirs" | sed -n '1p')"
-          if [ ! -d "$initiative_dir" ]; then
-            echo "Initiative directory is not present on ${{ steps.pr.outputs.checkout_ref }}: $initiative_dir" >&2
-            exit 1
-          fi
-          echo "initiative_dir=$initiative_dir" >> "$GITHUB_OUTPUT"
-
-      - name: Find latest human approval
-        id: approval
-        run: |
-          set -euo pipefail
-          approved_review="$(
-            gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/reviews" --paginate \
-              --jq '.[] | select(.state == "APPROVED" and (.user.login? != null) and ((.user.login | endswith("[bot]")) | not)) | [.user.login, (.id | tostring), .submitted_at] | @tsv' \
-              | tail -n 1
-          )"
-          if [ -z "$approved_review" ]; then
-            echo "No approved reviews found for PR #$PR_NUMBER; nothing to reconcile."
-            echo "has_approval=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          IFS=$'\t' read -r reviewer review_id submitted_at <<< "$approved_review"
-          echo "has_approval=true" >> "$GITHUB_OUTPUT"
-          echo "reviewer=$reviewer" >> "$GITHUB_OUTPUT"
-          echo "review_id=$review_id" >> "$GITHUB_OUTPUT"
-          echo "submitted_at=$submitted_at" >> "$GITHUB_OUTPUT"
-
-      - name: Mark initiative approved
-        if: steps.approval.outputs.has_approval == 'true'
-        env:
-          INITIATIVE_DIR: ${{ steps.scope.outputs.initiative_dir }}
-          REVIEWER: ${{ steps.approval.outputs.reviewer }}
-          REVIEW_ID: ${{ steps.approval.outputs.review_id }}
-          SUBMITTED_AT: ${{ steps.approval.outputs.submitted_at }}
-        run: |
-          python3 ai-sdlc/tooling/sync_initiative_approval.py \
-            "$INITIATIVE_DIR" \
-            "$REVIEWER" \
-            "$REVIEW_ID" \
-            "$SUBMITTED_AT"
-
-      - name: Commit approval backfill
-        if: steps.approval.outputs.has_approval == 'true'
-        env:
-          INITIATIVE_DIR: ${{ steps.scope.outputs.initiative_dir }}
-          PUSH_REF: ${{ steps.pr.outputs.push_ref }}
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$INITIATIVE_DIR/initiative.yaml" \
-                  "$INITIATIVE_DIR/initiative.md" \
-                  "$INITIATIVE_DIR/approvals.yaml"
-          if git diff --cached --quiet; then
-            echo "No approval backfill changes detected."
-            exit 0
-          fi
-          git commit -m "backfill approval sync for PR #$PR_NUMBER"
-          git push origin "HEAD:$PUSH_REF"
+          git commit -m "mark ${{ steps.scope.outputs.initiative_dir }} approved"
+          git push
