@@ -18,6 +18,7 @@ permissions:
 jobs:
   sync-approval:
     if: >
+      github.event_name == 'pull_request_review' &&
       github.event.review.state == 'approved' &&
       github.event.review.user.type == 'User' &&
       github.event.pull_request.head.repo.full_name == github.repository
@@ -40,7 +41,10 @@ jobs:
               | sort -u
           )"
           count="$(printf '%s\n' "$initiative_dirs" | sed '/^$/d' | wc -l | tr -d ' ')"
-          if [ "$count" -ne 1 ]; then
+          if [ "$count" -eq 0 ]; then
+            echo "No initiative directory changes found for this PR." >&2
+            exit 1
+          elif [ "$count" -ne 1 ]; then
             echo "Expected exactly one initiative directory, found $count." >&2
             printf '%s\n' "$initiative_dirs" >&2
             exit 1
@@ -123,7 +127,10 @@ jobs:
               | sort -u
           )"
           count="$(printf '%s\n' "$initiative_dirs" | sed '/^$/d' | wc -l | tr -d ' ')"
-          if [ "$count" -ne 1 ]; then
+          if [ "$count" -eq 0 ]; then
+            echo "No initiative directory changes found for PR #$PR_NUMBER." >&2
+            exit 1
+          elif [ "$count" -ne 1 ]; then
             echo "Expected exactly one initiative directory, found $count." >&2
             printf '%s\n' "$initiative_dirs" >&2
             exit 1
