@@ -20,8 +20,7 @@ jobs:
     if: >-
       github.event_name == 'pull_request_review' &&
       github.event.review.state == 'approved' &&
-      github.event.review.user != null &&
-      github.event.review.user.type == 'User' &&
+      !endsWith(github.actor, '[bot]') &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
@@ -157,7 +156,7 @@ jobs:
           set -euo pipefail
           approved_review="$(
             gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/reviews" --paginate \
-              --jq '.[] | select(.state == "APPROVED" and (.user.type? == "User")) | [.user.login, (.id | tostring), .submitted_at] | @tsv' \
+              --jq '.[] | select(.state == "APPROVED" and (.user.login? != null) and ((.user.login | endswith("[bot]")) | not)) | [.user.login, (.id | tostring), .submitted_at] | @tsv' \
               | tail -n 1
           )"
           if [ -z "$approved_review" ]; then
