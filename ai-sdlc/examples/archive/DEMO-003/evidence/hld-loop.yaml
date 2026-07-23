@@ -1,0 +1,9 @@
+hld_loop:
+  status: ai_review_passed
+  initiative: "DEMO-003"
+  iterations: 2
+  generator_provider: "codex"
+  generator_model: "gpt-5.6-luna"
+  reviewer_provider: "codex"
+  reviewer_model: "gpt-5.6-terra"
+  human_architecture_approval_required: true

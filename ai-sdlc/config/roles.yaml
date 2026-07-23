@@ -1,0 +1,25 @@
+roles:
+  product_owner:
+    purpose: "Own business intent, scope, and acceptance"
+    can_approve: ["requirements"]
+    can_use_tools: ["read_context", "comment_design"]
+  solution_architect:
+    purpose: "Own architecture choice and material trade-offs"
+    can_approve: ["hld"]
+    can_use_tools: ["read_context", "generate_options", "comment_design"]
+  senior_engineer:
+    purpose: "Own implementability and engineering quality"
+    can_approve: ["lld", "implementation"]
+    can_use_tools: ["read_context", "generate_plan", "review_pr"]
+  security_reviewer:
+    purpose: "Own security findings and risk exceptions"
+    can_approve: ["security_exception"]
+    can_use_tools: ["read_context", "run_security_checks", "comment_pr"]
+  release_owner:
+    purpose: "Own deployment authorization and rollback decision"
+    can_approve: ["release"]
+    can_use_tools: ["read_evidence", "review_deployment"]
+  ai_agent:
+    purpose: "Generate drafts, execute bounded tasks, and collect evidence"
+    can_approve: []
+    can_use_tools: ["read_context", "write_branch", "run_tests", "open_pr"]

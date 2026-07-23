@@ -1,0 +1,203 @@
+context_sources:
+  - id: enterprise-architecture
+    class: enterprise
+    source: "ai-sdlc/context/consistent/architecture/architecture-principles.md"
+    authority: architecture-board
+    freshness: 90d
+  - id: security-baseline
+    class: guardrail
+    source: "ai-sdlc/context/guardrails/security-baseline.md"
+    authority: security
+    freshness: 90d
+  - id: domain-payments
+    class: domain
+    source: "ai-sdlc/context/consistent/business/payments-domain.md"
+    authority: domain-owner
+    freshness: 180d
+  - id: payment-hub-context
+    class: domain
+    source: "ai-sdlc/context/consistent/business/payment-hub-context.md"
+    authority: payment-hub-product-and-engineering
+    freshness: 90d
+  - id: global-issuer-processor
+    class: domain
+    source: "ai-sdlc/context/consistent/business/global-issuer-processor.md"
+    authority: business-and-architecture-strategy
+    freshness: 90d
+  - id: target-platform-architecture
+    class: enterprise
+    source: "ai-sdlc/context/consistent/architecture/target-platform-architecture.md"
+    authority: architecture-board-and-platform
+    freshness: 90d
+  - id: lume-strategic-platform
+    class: enterprise
+    source: "ai-sdlc/context/consistent/platform/lume-strategic-platform.md"
+    authority: platform-strategy
+    freshness: 90d
+  - id: lume-deployment-models
+    class: enterprise
+    source: "ai-sdlc/context/consistent/platform/lume-deployment-models.md"
+    authority: platform-strategy
+    freshness: 90d
+  - id: lume-tactical-vs-target
+    class: enterprise
+    source: "ai-sdlc/context/consistent/platform/lume-tactical-vs-target.md"
+    authority: platform-strategy
+    freshness: 90d
+  - id: banking-live-deployments-and-migration
+    class: enterprise
+    source: "ai-sdlc/context/consistent/platform/banking-live-deployments-and-migration.md"
+    authority: banking-live-platform-and-lume-strategy
+    freshness: 60d
+  - id: client-data-isolation
+    class: enterprise
+    source: "ai-sdlc/context/consistent/platform/client-data-isolation.md"
+    authority: architecture-and-platform
+    freshness: 90d
+  - id: api-standards
+    class: enterprise
+    source: "ai-sdlc/context/consistent/architecture/api-standards.md"
+    authority: architecture-and-api-governance
+    freshness: 90d
+  - id: cloud-platform-principles
+    class: enterprise
+    source: "ai-sdlc/context/consistent/architecture/cloud-platform-principles.md"
+    authority: architecture-and-platform
+    freshness: 90d
+  - id: webhook-platform-principles
+    class: enterprise
+    source: "ai-sdlc/context/consistent/platform/webhook-platform-principles.md"
+    authority: architecture-board
+    freshness: 90d
+  - id: event-streaming-principles
+    class: enterprise
+    source: "ai-sdlc/context/consistent/platform/event-streaming-principles.md"
+    authority: architecture-board
+    freshness: 90d
+  - id: secure-logging
+    class: guardrail
+    source: "ai-sdlc/context/guardrails/security/secure-logging.md"
+    authority: security
+    freshness: 90d
+  - id: arb-governance
+    class: guardrail
+    source: "ai-sdlc/context/guardrails/architecture/arb-governance.md"
+    authority: architecture-review-board
+    freshness: 90d
+  - id: paymentology-tech-radar
+    class: technology
+    source: "ai-sdlc/context/consistent/technology/tech-radar.md"
+    authority: engineering-and-platform-governance
+    freshness: 30d
+  - id: jfrog-artifactory
+    class: technology
+    source: "ai-sdlc/context/consistent/technology/jfrog-artifactory.md"
+    authority: engineering-platform
+    freshness: 90d
+  - id: banking-live
+    class: product
+    source: "ai-sdlc/context/consistent/product/banking-live.md"
+    authority: product-and-platform-architecture
+    freshness: 90d
+  - id: banking-live-estate
+    class: product
+    source: "ai-sdlc/context/consistent/product/banking-live-estate.md"
+    authority: banking-live-platform-and-architecture
+    freshness: 60d
+  - id: decision-and-rule-engines
+    class: product
+    source: "ai-sdlc/context/consistent/product/decision-and-rule-engines.md"
+    authority: banking-live-decisioning-architecture
+    freshness: 90d
+  - id: tokenization-and-token-service-partners
+    class: product
+    source: "ai-sdlc/context/consistent/product/tokenization-and-token-service-partners.md"
+    authority: tokenization-and-card-platform-architecture
+    freshness: 90d
+  - id: acs-3ds-apata
+    class: product
+    source: "ai-sdlc/context/consistent/product/acs-3ds-apata.md"
+    authority: authentication-and-card-platform-architecture
+    freshness: 90d
+  - id: paycredit
+    class: product
+    source: "ai-sdlc/context/consistent/product/paycredit.md"
+    authority: product-and-platform-architecture
+    freshness: 90d
+  - id: program-management
+    class: product
+    source: "ai-sdlc/context/consistent/product/program-management.md"
+    authority: product-and-architecture
+    freshness: 90d
+  - id: disputes-management
+    class: product
+    source: "ai-sdlc/context/consistent/product/disputes.md"
+    authority: architecture-review-board
+    freshness: 90d
+  - id: portal-atlas
+    class: enterprise
+    source: "ai-sdlc/context/consistent/architecture/portal-atlas.md"
+    authority: portals-platform
+    freshness: 90d
+  - id: ims-and-api-gateway
+    class: enterprise
+    source: "ai-sdlc/context/consistent/architecture/ims-and-api-gateway.md"
+    authority: identity-and-platform-architecture
+    freshness: 90d
+  - id: enterprise-capabilities-and-reuse
+    class: enterprise
+    source: "ai-sdlc/context/consistent/platform/enterprise-capabilities-and-reuse.md"
+    authority: platform-architecture-and-engineering
+    freshness: 90d
+  - id: observability-principles
+    class: enterprise
+    source: "ai-sdlc/context/consistent/platform/observability-principles.md"
+    authority: platform-engineering-and-security
+    freshness: 90d
+  - id: authentication-and-authorization
+    class: enterprise
+    source: "ai-sdlc/context/consistent/architecture/authentication-and-authorization.md"
+    authority: identity-platform-and-security-architecture
+    freshness: 90d
+  - id: chd-and-common-workload-zones
+    class: enterprise
+    source: "ai-sdlc/context/consistent/architecture/chd-and-common-workload-zones.md"
+    authority: cloud-security-and-platform-architecture
+    freshness: 90d
+  - id: mtls-and-zero-touch-pki
+    class: guardrail
+    source: "ai-sdlc/context/consistent/security/mtls-and-zero-touch-pki.md"
+    authority: security-and-platform-architecture
+    freshness: 90d
+  - id: initiative-issue
+    class: relative
+    source: "github.issue.body"
+    authority: product-owner
+    freshness: current
+  - id: service-repository
+    class: relative
+    source: "github.repository"
+    authority: service-owner
+    freshness: commit
+  - id: approved-designs
+    class: precedent
+    source: "initiatives/**/hld/hld.md"
+    authority: architecture-board
+    freshness: 730d
+  - id: runtime-evidence
+    class: runtime
+    source: "github.actions.artifacts"
+    authority: engineering-platform
+    freshness: current
+
+selection:
+  include_explicit_issue_references: true
+  include_direct_dependencies: true
+  include_relevant_standards: true
+  max_transitive_dependency_depth: 2
+  exclude_patterns:
+    - "**/.env*"
+    - "**/*secret*"
+    - "**/fixtures/**"
+    - "**/node_modules/**"
+    - "**/build/**"

@@ -1,0 +1,26 @@
+skills:
+  - id: requirements-analysis
+    entrypoint: "ai-sdlc-skill requirements-analysis"
+    input: [source_work_item, consistent_context, relative_context]
+    output: requirement
+    human_owner: product_owner
+    prohibited_actions: [approve_requirement, approve_architecture]
+  - id: hld-generation
+    entrypoint: "ai-sdlc-skill hld-generation"
+    input: [approved_requirement, consistent_context, relative_context, guardrails]
+    output: hld
+    human_owner: solution_architect
+    required_outputs: [multiple_options, tradeoffs, risks, diagrams, rollback, adrs]
+    prohibited_actions: [approve_architecture, generate_implementation_before_approval]
+  - id: lld-generation
+    entrypoint: "ai-sdlc-skill lld-generation"
+    input: [approved_hld, relative_context, guardrails]
+    output: lld
+    human_owner: senior_engineer
+    prohibited_actions: [change_hld_intent, approve_lld]
+  - id: implementation
+    entrypoint: "ai-sdlc-skill implementation"
+    input: [approved_lld, scoped_workstream, repository_context]
+    output: pull_request
+    human_owner: codeowner
+    prohibited_actions: [merge, deploy_production, change_approved_design]

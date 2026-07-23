@@ -1,0 +1,12 @@
+das_version: "0.1"
+initiative: "DEMO-002"
+context_pack:
+  id: "CTX-DEMO-002-v1"
+  version: 1
+  status: draft
+  layers:
+    consistent: [enterprise, domain, product, technology]
+    relative: [initiative, estate, runtime]
+  items: []
+  exclusions: []
+  content_sha256: ""

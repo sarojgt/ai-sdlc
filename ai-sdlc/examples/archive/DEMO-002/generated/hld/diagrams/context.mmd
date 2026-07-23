@@ -1,0 +1,28 @@
+flowchart LR
+    C[Customer]
+    P[payment-service\nAuthoritative payment state]
+    E[Terminal status event\nMinimal allow-listed payload]
+    B[(Durable event transport)]
+    N[notification-service\nValidate + idempotency]
+    I[(Notification/idempotency store)]
+    A[Channel adapter]
+    V[Notification provider]
+    D[Customer-visible notification]
+    O[Operations\nmetrics, traces, DLQ, replay]
+
+    P -->|completed / failed| E
+    E --> B
+    B --> N
+    N <--> I
+    N --> A
+    A --> V
+    V --> D
+    D --> C
+    B -. retry / dead letter .-> O
+    N -. latency / outcomes .-> O
+    P -. correlation / reconciliation .-> O
+
+    classDef sensitive fill:#fff2cc,stroke:#b8860b,color:#222;
+    classDef boundary fill:#e8f1fb,stroke:#356aa0,color:#222;
+    class E boundary;
+    class I sensitive;

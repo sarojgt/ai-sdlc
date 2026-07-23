@@ -1,0 +1,15 @@
+das_version: "0.1"
+repository:
+  id: "replace-repository-id"
+  name: "replace-service-name"
+  owner: "team.example"
+  lifecycle: "production"
+  language: "replace"
+  build_system: "replace"
+  deployment_targets: ["test", "production"]
+catalog:
+  system: "replace-system"
+  domain: "replace-domain"
+  provides_apis: []
+  consumes_apis: []
+  depends_on: []

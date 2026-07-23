@@ -1,0 +1,21 @@
+das_version: "0.1"
+artifact:
+  id: "{{ initiative.id }}"
+  type: initiative
+  version: 1
+  status: draft
+  title: "{{ initiative.title }}"
+  initiative: "{{ initiative.id }}"
+  owner: "{{ initiative.owner }}"
+source:
+  provider: "{{ source.provider }}"
+  work_item_id: "{{ source.work_item_id }}"
+scope:
+  domains: {{ initiative.domains }}
+  repositories: {{ initiative.repositories }}
+policy:
+  risk_tier: "{{ policy.risk_tier }}"
+  data_classification: "{{ policy.data_classification }}"
+  implementation_locked_until: architecture.approved
+workflow:
+  state: intake

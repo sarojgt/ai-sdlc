@@ -1,0 +1,35 @@
+sequenceDiagram
+  autonumber
+  actor Client as Banking.Live client
+  participant GW as API Gateway
+  participant IAM as Auth0 + IMS
+  participant WH as Webhook Platform
+  participant P as BL2/Lume producer
+  participant S as Sanitizer/event boundary
+  participant E as Event transport
+  participant EP as Client endpoint
+  participant O as Observability
+
+  Client->>GW: Create/update subscription
+  GW->>IAM: Validate token and client/region grant
+  IAM-->>GW: Allow or deny
+  alt authorized
+    GW->>WH: Store subscription
+    WH-->>GW: Subscription status
+    GW-->>Client: Success
+  else unauthorized
+    GW-->>Client: Deny and audit
+  end
+
+  P->>S: Eligible status change
+  S->>S: Allow-list and remove CHD data
+  S->>E: Publish event_id + approved reference data
+  E->>WH: Consume event
+  WH->>EP: Signed HTTPS webhook
+  alt transient endpoint failure
+    WH->>WH: Bounded retry with jitter
+    WH-->>EP: Retry or dead-letter
+  else accepted
+    EP-->>WH: 2xx response
+  end
+  WH->>O: Redacted delivery outcome, lag, trace

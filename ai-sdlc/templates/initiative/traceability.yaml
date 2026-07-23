@@ -1,0 +1,12 @@
+das_version: "0.1"
+initiative: "{{ initiative.id }}"
+links:
+  - from: "{{ source.provider }}:{{ source.work_item_id }}"
+    to: "REQ-{{ initiative.id }}"
+    relation: specifies
+  - from: "REQ-{{ initiative.id }}"
+    to: "HLD-{{ initiative.id }}"
+    relation: designed-by
+  - from: "HLD-{{ initiative.id }}"
+    to: "LLD-{{ initiative.id }}"
+    relation: detailed-by

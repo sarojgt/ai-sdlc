@@ -1,0 +1,54 @@
+name: AI-SDLC Feature
+description: Start a governed AI-SDLC initiative.
+title: "[AI-SDLC] "
+labels: ["ai-sdlc", "intake"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Complete the business intent. AI will assemble technical context after submission.
+  - type: input
+    id: outcome
+    attributes:
+      label: Business outcome
+      description: What measurable outcome should this change produce?
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: Who has the problem and what happens today?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Describe observable success conditions.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Known constraints
+      description: Regulatory, product, technology, timeline, or operational constraints.
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Initial risk tier
+      options: [low, medium, high, critical]
+    validations:
+      required: true
+  - type: input
+    id: product_owner
+    attributes:
+      label: Product Owner
+    validations:
+      required: true
+  - type: input
+    id: solution_architect
+    attributes:
+      label: Solution Architect
+    validations:
+      required: true

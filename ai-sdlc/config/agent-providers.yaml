@@ -1,0 +1,54 @@
+agent_providers:
+  codex:
+    adapter_command: "ai-sdlc-agent-codex"
+    default_model: "gpt-5.6-luna"
+    model_selection: per_run
+    models:
+      - "gpt-5.6-luna"
+      - "gpt-5.6-terra"
+      - "gpt-5.6-sol"
+      - "gpt-5.3-codex"
+    capabilities: [requirements, hld, lld, implementation, review]
+    execution: local_cli
+    approval_authority: none
+  claude:
+    adapter_command: "ai-sdlc-agent-claude"
+    default_model: "provider-default"
+    model_selection: per_run
+    models: []
+    capabilities: [requirements, hld, lld, implementation, review]
+    execution: local_cli
+    approval_authority: none
+  github-copilot:
+    adapter_command: "ai-sdlc-agent-github-copilot"
+    default_model: "provider-default"
+    model_selection: per_run
+    models: []
+    capabilities: [requirements, hld, lld, implementation, review]
+    execution: repository_or_cloud_cli
+    approval_authority: none
+  custom:
+    adapter_command: "ai-sdlc-agent-custom"
+    default_model: "provider-default"
+    model_selection: per_run
+    models: []
+    capabilities: [requirements, hld, lld, implementation, review]
+    execution: managed_adapter
+    approval_authority: none
+
+contract:
+  input: "agent-request.yaml"
+  output: "agent-response.yaml"
+  artifacts_directory: "generated/"
+  required_metadata:
+    - initiative_id
+    - task_type
+    - context_pack_id
+    - context_pack_hash
+    - skill_id
+    - policy_version
+  prohibited:
+    - approve_architecture
+    - approve_requirements
+    - merge_protected_branch
+    - deploy_production

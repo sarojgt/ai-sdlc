@@ -1,0 +1,24 @@
+agent_request:
+  run_id: "RUN-DEMO-004-hld-1"
+  initiative_id: "DEMO-004"
+  task_type: "hld"
+  skill_id: "hld-generation"
+  agent:
+    provider: "codex"
+    model: "gpt-5.6-luna"
+  requirement:
+    artifact_id: "REQ-DEMO-004"
+    version: "1"
+    content_sha256: "REQUIRED_HASH"
+  context:
+    pack_id: "CTX-DEMO-004-v1"
+    pack_version: "1"
+    manifest: "context-manifest.yaml"
+    content_sha256: "REQUIRED_CONTEXT_HASH"
+  policy:
+    risk_tier: "medium"
+    allowed_tools: [read_context, read_repository, render_diagram]
+    denied_tools: [approve_architecture, merge, deploy_production]
+  output:
+    schema: "hld.v0.1"
+    directory: "generated/"

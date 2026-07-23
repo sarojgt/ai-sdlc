@@ -1,0 +1,36 @@
+context_layers:
+  consistent:
+    - id: enterprise
+      purpose: "Organization-wide principles and operating constraints"
+      sources: ["context/consistent/architecture/architecture-principles.md", "context/consistent/architecture/api-standards.md", "context/consistent/architecture/cloud-platform-principles.md", "context/consistent/architecture/target-platform-architecture.md", "context/consistent/architecture/authentication-and-authorization.md", "context/consistent/architecture/chd-and-common-workload-zones.md", "context/guardrails/security-baseline.md", "context/guardrails/security/secure-logging.md", "context/guardrails/architecture/arb-governance.md"]
+      owner_role: architecture_board
+    - id: domain
+      purpose: "Shared business language and domain rules"
+      sources: ["context/consistent/business/payments-domain.md", "context/consistent/business/payment-hub-context.md", "context/consistent/business/global-issuer-processor.md"]
+      owner_role: domain_owner
+    - id: product
+      purpose: "Product intent, customers, outcomes, and roadmap constraints"
+      sources: ["context/consistent/product/banking-live.md", "context/consistent/product/banking-live-estate.md", "context/consistent/product/decision-and-rule-engines.md", "context/consistent/product/tokenization-and-token-service-partners.md", "context/consistent/product/acs-3ds-apata.md", "context/consistent/product/paycredit.md", "context/consistent/product/program-management.md", "context/consistent/product/disputes.md", "context/consistent/platform/webhook-platform-principles.md", "context/consistent/platform/event-streaming-principles.md", "context/consistent/platform/enterprise-capabilities-and-reuse.md", "context/consistent/platform/observability-principles.md", "context/consistent/platform/banking-live-deployments-and-migration.md", "context/consistent/platform/lume-strategic-platform.md", "context/consistent/platform/lume-deployment-models.md", "context/consistent/platform/lume-tactical-vs-target.md", "context/consistent/platform/client-data-isolation.md"]
+      owner_role: product_owner
+    - id: technology
+      purpose: "Approved technology, API, platform, and delivery patterns"
+      sources: ["context/consistent/technology/tech-radar.md", "context/consistent/technology/jfrog-artifactory.md", "context/consistent/security/mtls-and-zero-touch-pki.md"]
+      owner_role: engineering_platform
+  relative:
+    - id: initiative
+      purpose: "Requirement-specific business and delivery context"
+      sources: ["source_work_item", "initiative_manifest"]
+      owner_role: initiative_owner
+    - id: estate
+      purpose: "Current repositories, APIs, dependencies, ADRs, and ownership"
+      sources: ["repository_provider", "catalog_provider"]
+      owner_role: service_owner
+    - id: runtime
+      purpose: "Current health, incidents, cost, topology, and deployment evidence"
+      sources: ["observability_provider", "deployment_provider"]
+      owner_role: platform
+selection:
+  always_include: [enterprise, domain, technology, initiative]
+  include_when_impacted: [estate, runtime]
+  include_similar_approved_designs: true
+  exclude_sensitive_data_without_explicit_authorization: true

@@ -1,0 +1,32 @@
+hooks:
+  before_agent_run:
+    - validate_initiative_exists
+    - validate_required_parent_artifact
+    - validate_context_pack
+    - evaluate_risk_policy
+    - create_agent_run_record
+  after_agent_run:
+    - validate_agent_response
+    - validate_das_artifacts
+    - scan_for_secrets
+    - calculate_content_hashes
+    - attach_run_evidence
+  before_human_gate:
+    - validate_required_sections
+    - validate_traceability
+    - check_blocking_findings
+    - create_review_request
+  on_human_approval:
+    - verify_reviewer_role
+    - verify_current_commit
+    - record_approval_hash
+    - emit_gate_approved_event
+  on_human_feedback:
+    - classify_feedback
+    - identify_affected_artifacts
+    - invalidate_downstream_artifacts
+    - rerun_bounded_scope
+  on_agent_failure:
+    - save_logs_and_partial_artifacts
+    - retry_within_budget
+    - escalate_to_human_after_retry_budget

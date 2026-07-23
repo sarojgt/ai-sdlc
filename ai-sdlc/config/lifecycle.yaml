@@ -1,0 +1,65 @@
+lifecycle:
+  version: "0.1"
+  states:
+    - intake
+    - context_ready
+    - requirements_draft
+    - requirements_review
+    - requirements_approved
+    - hld_draft
+    - hld_review
+    - hld_approved
+    - lld_draft
+    - lld_review
+    - lld_approved
+    - implementation_ready
+    - implementing
+    - pr_review
+    - release_ready
+    - deployed
+    - learning
+  transitions:
+    - from: intake
+      event: context.build_requested
+      to: context_ready
+      actor: automation
+    - from: context_ready
+      event: requirements.generate_requested
+      to: requirements_draft
+      actor: automation
+    - from: requirements_review
+      event: business.approved
+      to: requirements_approved
+      actor: human:product_owner
+    - from: requirements_approved
+      event: hld.generate_requested
+      to: hld_review
+      actor: automation
+    - from: hld_review
+      event: architecture.approved
+      to: hld_approved
+      actor: human:solution_architect
+    - from: hld_approved
+      event: lld.generate_requested
+      to: lld_draft
+      actor: automation
+    - from: lld_review
+      event: engineering.approved
+      to: lld_approved
+      actor: human:senior_engineer
+    - from: lld_approved
+      event: implementation.generate_requested
+      to: implementation_ready
+      actor: automation
+    - from: pr_review
+      event: human.merge_approved
+      to: release_ready
+      actor: human:codeowner
+    - from: release_ready
+      event: release.approved
+      to: deployed
+      actor: human:release_owner
+  rules:
+    downstream_generation_requires_approved_hld: true
+    approval_applies_to_content_hash: true
+    changed_parent_invalidates_children: true

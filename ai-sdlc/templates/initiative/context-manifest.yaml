@@ -1,0 +1,12 @@
+das_version: "0.1"
+initiative: "{{ initiative.id }}"
+context_pack:
+  id: "CTX-{{ initiative.id }}-v1"
+  version: 1
+  status: draft
+  layers:
+    consistent: [enterprise, domain, product, technology]
+    relative: [initiative, estate, runtime]
+  items: []
+  exclusions: []
+  content_sha256: ""
