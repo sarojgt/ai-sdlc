@@ -11,6 +11,7 @@ artifact:
 traceability:
   parents: ["HLD-{{ initiative.id }}@sha256:REQUIRED_APPROVED_HASH"]
   satisfies: []
+design_baseline: "../evidence/design-baseline.yaml"
 approvals:
   required: [engineering]
   records: []

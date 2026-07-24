@@ -41,6 +41,15 @@ shared context are Markdown in GitHub. Confluence, Jira, vector search, and
 other enterprise integrations can be added later without changing the
 initiative artifact structure or human approval gates.
 
+The GitHub workflow automatically starts after a validated approved initiative
+scaffold is merged. It can also be started manually with an initiative ID and
+separate Copilot generator and reviewer models. Demo defaults are the lower-cost
+`claude-haiku-4.5` generator and `gemini-3.5-flash` reviewer. The workflow uses
+the same bounded `hld_loop.sh` as local execution and refuses identical model
+selections. It uses the Actions `GITHUB_TOKEN` by default, with an optional
+`COPILOT_GITHUB_TOKEN` Actions secret as a personal-token fallback when the
+organization has not enabled Copilot CLI for Actions.
+
 New intake PRs should stay small: capture the requirement and the minimum
 initiative metadata first, then let the post-merge automation expand the
 reusable boilerplate and synchronize approval metadata in one follow-up PR.
@@ -211,6 +220,11 @@ just ai-sdlc-hld PAY-4567 codex gpt-5.6-luna
 
 The loop is bounded by `config/hld-loop-policy.yaml`. A passing AI review only
 creates a human architecture review request; it never approves the HLD.
+
+HLD generation also creates `evidence/design-baseline.yaml`, which records the
+exact requirement, initiative, HLD, LLD, and context versions and hashes used by
+the design. Run `just ai-sdlc-version-view` to render the current repository
+version matrix.
 
 An approved initiative PR can automatically flip `initiative.yaml` and
 `initiative.md` to `approved` and record the approval trail in

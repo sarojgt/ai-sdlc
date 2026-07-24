@@ -29,8 +29,10 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BRANCH_NAME: ${{ github.event.pull_request.head.ref }}
         run: |
           python3 ai-sdlc/tooling/validate_conventional_commits.py \
             --pr-title "$PR_TITLE" \
             --base "$BASE_SHA" \
-            --head "$HEAD_SHA"
+            --head "$HEAD_SHA" \
+            --branch "$BRANCH_NAME"

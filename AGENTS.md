@@ -38,6 +38,12 @@ For the exact intake file allowlist and handoff behavior, read
 
 ## Commit and release conventions
 
+- Use change-focused branch names in the form
+  `type/scope-short-description`, for example
+  `feat/initiative-card-blocking`, `feat/hld-card-blocking`,
+  `fix/workflow-approval-sync`, or `ci/release-semantic-tags`.
+- Never use an AI provider or agent name as the branch prefix, including
+  `agent/`, `copilot/`, `codex/`, `claude/`, `gemini/`, or `qwen/`.
 - Use Conventional Commit titles and commit messages:
   `type(scope): description`.
 - Use lifecycle scopes such as `initiative`, `requirement`, `context`, `hld`,
@@ -47,11 +53,11 @@ For the exact intake file allowlist and handoff behavior, read
   supported types documented in `ai-sdlc/config/conventional-commits.yaml`.
 - Mark breaking changes with `type(scope)!:` or a `BREAKING CHANGE:` footer.
 - Pull requests and commits are checked by GitHub Actions.
-- Merges to `main` create semantic release tags only for framework scopes:
-  breaking changes increment major, `feat` increments minor, and
-  `fix`/`perf`/`refactor`/`revert` increment patch. Initiative, requirement,
-  context, HLD, LLD, approval, and traceability artifacts do not version the
-  framework by themselves.
+- Merges to `main` create semantic release tags for both tracks. Framework
+  scopes create the global version; initiative, requirement, context, HLD, LLD,
+  approval, and traceability scopes create their scoped artifact version.
+  Breaking changes increment major, `feat` increments minor, and
+  `fix`/`perf`/`refactor`/`revert` increment patch on each applicable track.
 
 ## Mission
 
@@ -76,6 +82,10 @@ Before making a workflow or artifact change, read:
 - Shared enterprise knowledge is under `ai-sdlc/context/`.
 - Initiative-specific knowledge is under `initiatives/<ID>/context/relative/`.
 - The canonical HLD is `initiatives/<ID>/hld/hld.md`.
+- HLD generation must create and preserve
+  `initiatives/<ID>/evidence/design-baseline.yaml`.
+- The design baseline is the authoritative link between requirement, context,
+  HLD, LLD, tags, hashes, and source commit.
 - The LLD is locked until human architecture approval.
 - Keep diagrams embedded in the HLD when they are part of the human decision.
 - Use YAML only for metadata, validation, traceability, and execution evidence.
@@ -102,6 +112,9 @@ hide incomplete context.
 - Preserve unrelated worktree changes.
 - Use the configured provider adapter rather than embedding provider-specific
   assumptions in templates or lifecycle rules.
+- GitHub automation may invoke the Copilot CLI adapter for HLD generation and
+  review. Generator and reviewer models must be explicitly recorded and must
+  be different; the existing bounded loop is the lifecycle orchestrator.
 
 ## Current project state
 

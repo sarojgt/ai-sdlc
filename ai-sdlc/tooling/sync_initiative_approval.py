@@ -33,9 +33,10 @@ def main() -> int:
 
     initiative_yaml = initiative_dir / "initiative.yaml"
     initiative_md = initiative_dir / "initiative.md"
+    requirement_md = initiative_dir / "requirement.md"
     approvals_yaml = initiative_dir / "approvals.yaml"
 
-    for path in (initiative_yaml, initiative_md, approvals_yaml):
+    for path in (initiative_yaml, initiative_md, requirement_md, approvals_yaml):
         if not path.exists():
             fail(f"Missing required file: {path}")
 
@@ -76,6 +77,15 @@ def main() -> int:
         "initiative markdown status",
     )
     initiative_md.write_text(md_text)
+
+    requirement_text = requirement_md.read_text()
+    requirement_text = replace_first(
+        requirement_text,
+        r"^(\s*status:\s*)[^\n]+$",
+        r"\1approved",
+        "requirement artifact status",
+    )
+    requirement_md.write_text(requirement_text)
 
     approvals_text = replace_first(
         approvals_text,

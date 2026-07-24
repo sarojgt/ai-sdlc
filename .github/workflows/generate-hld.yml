@@ -1,0 +1,175 @@
+name: Generate HLD with Copilot
+
+on:
+  pull_request:
+    types: [closed]
+    paths:
+      - "ai-sdlc/initiatives/**"
+  workflow_dispatch:
+    inputs:
+      initiative_id:
+        description: Initiative ID, for example DEMO-005
+        required: true
+        type: string
+      generator_model:
+        description: Copilot model used to generate the HLD
+        required: true
+        default: claude-haiku-4.5
+        type: string
+      reviewer_model:
+        description: Different Copilot model used to review the HLD
+        required: true
+        default: gemini-3.5-flash
+        type: string
+      force:
+        description: Rerun even if HLD loop evidence already exists
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+  copilot-requests: write
+
+concurrency:
+  group: hld-generation-${{ inputs.initiative_id || github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  resolve:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    outputs:
+      initiative_id: ${{ steps.scope.outputs.initiative_id }}
+      should_run: ${{ steps.scope.outputs.should_run }}
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+
+      - name: Resolve approved initiative
+        id: scope
+        env:
+          DISPATCH_INITIATIVE: ${{ inputs.initiative_id }}
+          FORCE_RUN: ${{ inputs.force || false }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number || 0 }}
+          EVENT_NAME: ${{ github.event_name }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          initiative_id="$DISPATCH_INITIATIVE"
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            mapfile -t initiatives < <(gh pr view "$PULL_REQUEST_NUMBER" --json files --jq '.files[].path' | awk -F/ '/^ai-sdlc\/initiatives\/[^/]+\// {print $3}' | sort -u)
+            if [ "${#initiatives[@]}" -ne 1 ]; then
+              echo "Expected exactly one initiative in the merged PR; found ${#initiatives[@]}" >&2
+              exit 1
+            fi
+            initiative_id="${initiatives[0]}"
+          fi
+
+          target="ai-sdlc/initiatives/$initiative_id"
+          test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
+          grep -q 'status: approved' "$target/requirement.md" || {
+            echo "Requirement is not approved; HLD generation will not start."
+            echo "This is expected for an initial intake merge before approval sync."
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "initiative_id=$initiative_id" >> "$GITHUB_OUTPUT"
+            exit 0
+          }
+          grep -A 4 'gate: requirements' "$target/approvals.yaml" | grep -q 'decision: approved' || {
+            echo "Human requirements approval is not recorded; HLD generation will not start."
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "initiative_id=$initiative_id" >> "$GITHUB_OUTPUT"
+            exit 0
+          }
+
+          if [ "$FORCE_RUN" != "true" ] && [ -f "$target/evidence/hld-loop.yaml" ]; then
+            echo "HLD loop evidence already exists; skipping duplicate automatic run."
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "initiative_id=$initiative_id" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "initiative_id=$initiative_id" >> "$GITHUB_OUTPUT"
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
+
+  hld:
+    needs: resolve
+    if: needs.resolve.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install GitHub Copilot CLI
+        run: npm install -g @github/copilot
+
+      - name: Validate independent model selection
+        env:
+          GENERATOR_MODEL: ${{ inputs.generator_model || 'claude-haiku-4.5' }}
+          REVIEWER_MODEL: ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}
+        run: |
+          set -euo pipefail
+          test -n "$GENERATOR_MODEL" && test -n "$REVIEWER_MODEL"
+          if [ "$GENERATOR_MODEL" = "$REVIEWER_MODEL" ]; then
+            echo "Generator and reviewer must use different models." >&2
+            exit 1
+          fi
+          echo "Generator model: $GENERATOR_MODEL"
+          echo "Reviewer model: $REVIEWER_MODEL"
+
+      - name: Run bounded HLD generation and review loop
+        env:
+          GENERATOR_MODEL: ${{ inputs.generator_model || 'claude-haiku-4.5' }}
+          REVIEWER_MODEL: ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}
+          GITHUB_TOKEN: ${{ github.token }}
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x ai-sdlc/tooling/providers/github-copilot.sh
+          chmod +x ai-sdlc/tooling/providers/github-copilot-review.sh
+          ./ai-sdlc/tooling/hld_loop.sh \
+            "${{ needs.resolve.outputs.initiative_id }}" \
+            github-copilot "$GENERATOR_MODEL" \
+            github-copilot "$REVIEWER_MODEL"
+
+      - name: Validate generated initiative
+        run: |
+          bash ai-sdlc/tooling/validate_structure.sh \
+            "ai-sdlc/initiatives/${{ needs.resolve.outputs.initiative_id }}"
+
+      - name: Create HLD review pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ github.token }}
+          commit-message: "feat(hld): generate HLD for ${{ needs.resolve.outputs.initiative_id }}"
+          title: "feat(hld): generate HLD for ${{ needs.resolve.outputs.initiative_id }}"
+          body: |
+            ## AI-generated HLD proposal
+
+            Initiative: `${{ needs.resolve.outputs.initiative_id }}`
+            Generator: `github-copilot / ${{ inputs.generator_model || 'claude-haiku-4.5' }}`
+            Reviewer: `github-copilot / ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}`
+
+            The bounded AI review loop passed. This PR remains pending human
+            Solution Architect / ARB approval. AI has not approved architecture.
+          branch: "feat/hld-${{ needs.resolve.outputs.initiative_id }}"
+          delete-branch: false
+          draft: true

@@ -59,11 +59,41 @@ docs(policy): improve the operating guide          # no release
 ```
 
 Breaking changes use `feat!:` or a `BREAKING CHANGE:` footer and create a major
-release. Merges to `main` are evaluated by the semantic release workflow. Only
-framework scopes (`workflow`, `policy`, `release`, `ai-sdlc`, and `repo`) create
-AI-SDLC framework versions. Artifact scopes describe initiative work but do not
-version the framework itself. When a release is required, the workflow creates
-a `vMAJOR.MINOR.PATCH` tag and GitHub release with generated notes.
+release. Merges to `main` are evaluated by the semantic release workflow.
+Framework scopes (`workflow`, `policy`, `release`, `ai-sdlc`, and `repo`) create
+the global `vMAJOR.MINOR.PATCH` version. Artifact scopes also create independent
+versions: `initiative/<ID>/v...`, `initiative/<ID>/hld/v...`,
+`initiative/<ID>/lld/v...`, and context tags such as
+`context/consistent/v...`. This keeps initiative and context history versioned
+without treating each design artifact as a framework release.
+
+To view the current versions:
+
+```text
+just ai-sdlc-version-view
+```
+
+Before HLD generation, the workflow creates
+`initiatives/<ID>/evidence/design-baseline.yaml`. It records the requirement
+hash, initiative tag, HLD/LLD parent tags, consistent and guardrail context
+tags, relative context hash, and source commit. The HLD references this file,
+so reviewers can verify exactly which versions informed the design.
+
+## Branch naming standard
+
+Branches describe the change and use the same type and lifecycle scope:
+
+```text
+feat/initiative-card-blocking
+feat/hld-card-blocking
+fix/workflow-approval-sync
+docs/policy-branch-naming
+ci/release-semantic-tags
+```
+
+Do not use provider or agent names such as `agent/`, `copilot/`, `codex/`, or
+`claude/` in branch names. GitHub validates the branch, PR title, and commit
+messages together.
 
 ## End-to-end flow
 
@@ -178,9 +208,24 @@ test strategy, and migration details.
 ## Current versus target integration
 
 Current: GitHub/repository artifacts, Markdown requirements and HLDs, `just`
-commands, provider adapters, and human review.
+commands, provider adapters, GitHub Actions HLD orchestration, and human
+review.
 
-Future: GitHub Issue and Actions triggers, automatic draft HLD PRs, Jira intake
+The HLD workflow can run automatically after an approved initiative scaffold
+is merged, or manually from GitHub Actions. It uses GitHub Copilot CLI with
+separate generator and reviewer models, defaults to the lower-cost
+`claude-haiku-4.5` generator and `gemini-3.5-flash` reviewer, and rejects a run
+where both models are the same. The existing bounded loop enforces iteration,
+time, unchanged-output, and repeated-feedback limits before creating a draft
+HLD PR.
+
+Authentication uses the built-in GitHub Actions token by default. If the
+organization has not enabled Copilot CLI billing for Actions, configure an
+Actions secret named `COPILOT_GITHUB_TOKEN` containing a personal access token
+with Copilot Requests permission. The secret is used only for Copilot requests;
+the workflow token still creates the draft PR.
+
+Future: GitHub Issue and Actions intake triggers, Jira intake
 and traceability, Confluence context synchronization, multi-repository
 orchestration, and implementation/deployment evidence automation.
 

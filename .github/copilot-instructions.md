@@ -45,13 +45,29 @@ manually add that boilerplate to the intake PR.
 - Stop for human Solution Architect or ARB approval before LLD.
 - Stop for senior engineering approval before implementation work.
 
+When an approved initiative scaffold is merged, the GitHub Actions HLD
+orchestrator may invoke Copilot CLI automatically. Use the configured
+generator and reviewer model inputs; the reviewer must use a different model
+from the generator. The orchestrator runs the existing bounded HLD loop and
+creates a draft HLD PR only after AI review passes. Do not bypass the workflow
+by approving architecture or changing protected approval records.
+
 Read the root `AGENTS.md` and the initiative intake guide before changing
 workflow or initiative artifacts.
 
 ## Commit and PR format
+
+Use change-focused branch names such as
+`feat/initiative-card-blocking`, `feat/hld-card-blocking`, or
+`fix/workflow-approval-sync`. Never use an AI provider or agent name such as
+`agent/`, `copilot/`, `codex/`, or `claude/` as the branch prefix.
 
 Use Conventional Commits for both the PR title and commits:
 `feat(initiative): description`, `feat(hld): description`,
 `feat(lld): description`, `fix(requirement): description`, or
 `fix(workflow): description`. Breaking changes use `!` or a `BREAKING CHANGE:`
 footer. Do not use free-form titles such as `Update files` or `Add changes`.
+
+Artifact commits are versioned independently from framework releases. A
+`feat(initiative)`, `feat(hld)`, `feat(lld)`, or `feat(context)` commit creates
+the corresponding scoped artifact tag after merge to `main`.

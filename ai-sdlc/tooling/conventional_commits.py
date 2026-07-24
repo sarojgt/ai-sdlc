@@ -50,6 +50,12 @@ HEADER = re.compile(
     r"^(?P<type>[a-z]+)\((?P<scope>[A-Za-z0-9._/-]+)\)(?P<breaking>!)?:\s+(?P<description>\S.*)$"
 )
 
+BRANCH = re.compile(
+    r"^(?P<type>[a-z]+)\/(?P<scope>ai-sdlc|initiative|requirement|context|hld|lld|approval|traceability|workflow|policy|release|repo)-(?P<description>[a-z0-9]+(?:-[a-z0-9]+)*)$"
+)
+
+PROHIBITED_BRANCH_PREFIXES = {"agent", "copilot", "codex", "claude", "gemini", "qwen", "ai"}
+
 
 @dataclass(frozen=True)
 class Commit:
@@ -68,10 +74,17 @@ class Commit:
         return match.group("type") if match else None
 
     def release_bump(self) -> str:
+        """Return the bump for the AI-SDLC framework release track."""
         if self.breaking:
             return "major"
         if self.scope in ARTIFACT_ONLY_SCOPES:
             return "none"
+        return TYPES.get(self.commit_type or "", "none")
+
+    def artifact_release_bump(self) -> str:
+        """Return the bump for an initiative, design, or context track."""
+        if self.breaking:
+            return "major"
         return TYPES.get(self.commit_type or "", "none")
 
     @property
@@ -88,6 +101,19 @@ def validate_commit(commit: Commit) -> str | None:
         return f"uses unsupported type `{match.group('type')}`"
     if match.group("scope") not in SCOPES:
         return f"uses unsupported scope `{match.group('scope')}`"
+    return None
+
+
+def validate_branch_name(branch: str) -> str | None:
+    match = BRANCH.match(branch)
+    if not match:
+        return "must match `type/scope-short-description` using lowercase kebab-case"
+    if match.group("type") not in TYPES:
+        return f"uses unsupported type `{match.group('type')}`"
+    if match.group("scope") not in SCOPES:
+        return f"uses unsupported scope `{match.group('scope')}`"
+    if match.group("type") in PROHIBITED_BRANCH_PREFIXES:
+        return f"uses prohibited provider-oriented prefix `{match.group('type')}`"
     return None
 
 

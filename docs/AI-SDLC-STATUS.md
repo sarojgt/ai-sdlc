@@ -41,7 +41,7 @@ from starting early.
 - [~] Codex CLI adapter; local Codex installation and authentication are
       required to run generation and review.
 - [~] GitHub CLI authentication for branch, push, and PR automation.
-- [ ] Provider-specific adapters and credentials for Claude, Gemini, Copilot,
+- [~] Provider-specific adapters and credentials for Claude, Gemini, Copilot,
       Qwen, local models, or other providers.
 - [ ] Optional Mermaid, Docker, cloud, repository-scanning, Jira, Confluence,
       and MCP tooling as each integration is introduced.
@@ -79,7 +79,11 @@ from starting early.
 - [x] Post-merge scaffold creates reusable HLD and LLD Markdown templates.
 - [x] Cross-agent repository and Copilot instructions define artifact boundaries.
 - [x] Conventional Commit policy and PR title guidance added.
+- [x] Change-focused branch naming policy and validation added.
 - [x] Semantic release tag workflow added for merges to `main`.
+- [x] Scoped semantic versions added for initiatives, HLDs, LLDs, and context.
+- [x] HLD design baseline records exact parent versions and context hashes.
+- [x] Human-readable version matrix command and GitHub summary added.
 
 ## Current repository workflow
 
@@ -131,9 +135,9 @@ from starting early.
 - [x] Provider and model overrides supported.
 - [x] Dry-run support available.
 - [ ] Add GitHub Issue → initiative automation.
-- [ ] Add label-triggered HLD workflow.
-- [ ] Add draft HLD PR creation.
-- [ ] Add AI review comments to the HLD PR.
+- [x] Add automatic and manual HLD workflow triggers.
+- [x] Add draft HLD PR creation.
+- [~] Add AI review comments to the HLD PR.
 - [ ] Add human feedback webhook/command reruns.
 - [ ] Add Jira issue and status synchronization.
 - [ ] Add Confluence publication or synchronization.
@@ -198,9 +202,7 @@ from starting early.
 
 ## Next recommended work
 
-1. Add GitHub Actions for requirement validation and HLD generation.
-2. Create an HLD draft PR automatically after the bounded AI loop passes.
-3. Enforce Solution Architect approval through CODEOWNERS and branch rules.
-4. Implement the post-HLD LLD gate.
-5. Add repository and schema context discovery for a multi-repository initiative.
-6. Add Jira and Confluence connectors after the repository-first flow is stable.
+1. Enforce Solution Architect approval through CODEOWNERS and branch rules.
+2. Implement the post-HLD LLD gate.
+3. Add repository and schema context discovery for a multi-repository initiative.
+4. Add Jira and Confluence connectors after the repository-first flow is stable.

@@ -18,6 +18,9 @@ case "$agent_provider" in
   codex)
     "$root/tooling/providers/codex.sh" "$initiative_id" "$agent_model"
     ;;
+  github-copilot)
+    "$root/tooling/providers/github-copilot.sh" "$initiative_id" "$agent_model"
+    ;;
   *)
     echo "No local adapter is installed for provider '$agent_provider'." >&2
     echo "Add ai-sdlc/tooling/providers/$agent_provider.sh without changing the lifecycle contract." >&2

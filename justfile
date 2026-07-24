@@ -15,6 +15,10 @@ ai-sdlc-new:
 ai-sdlc-expand initiative:
     python3 ./ai-sdlc/tooling/expand_initiative.py "ai-sdlc/initiatives/{{initiative}}"
 
+# Show the latest framework, initiative, design, and context versions.
+ai-sdlc-version-view:
+    python3 ./ai-sdlc/tooling/version_matrix.py
+
 # Show the requirement for human Product Owner review.
 ai-sdlc-review-requirement initiative:
     @echo "Review requirement: ai-sdlc/initiatives/{{initiative}}/requirement.md"

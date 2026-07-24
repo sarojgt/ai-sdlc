@@ -20,12 +20,15 @@ agent_providers:
     execution: local_cli
     approval_authority: none
   github-copilot:
-    adapter_command: "ai-sdlc-agent-github-copilot"
-    default_model: "provider-default"
+    adapter_command: "ai-sdlc/tooling/providers/github-copilot.sh"
+    default_model: "claude-haiku-4.5"
     model_selection: per_run
-    models: []
+    models:
+      - "claude-haiku-4.5"
+      - "gemini-3.5-flash"
+      - "gpt-5.4"
     capabilities: [requirements, hld, lld, implementation, review]
-    execution: repository_or_cloud_cli
+    execution: github_actions_cli
     approval_authority: none
   custom:
     adapter_command: "ai-sdlc-agent-custom"
