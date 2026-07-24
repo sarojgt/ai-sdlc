@@ -82,6 +82,8 @@ from starting early.
 - [x] Change-focused branch naming policy and validation added.
 - [x] Semantic release tag workflow added for merges to `main`.
 - [x] Scoped semantic versions added for initiatives, HLDs, LLDs, and context.
+- [x] HLD design baseline records exact parent versions and context hashes.
+- [x] Human-readable version matrix command and GitHub summary added.
 
 ## Current repository workflow
 

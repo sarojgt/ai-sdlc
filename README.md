@@ -67,6 +67,18 @@ versions: `initiative/<ID>/v...`, `initiative/<ID>/hld/v...`,
 `context/consistent/v...`. This keeps initiative and context history versioned
 without treating each design artifact as a framework release.
 
+To view the current versions:
+
+```text
+just ai-sdlc-version-view
+```
+
+Before HLD generation, the workflow creates
+`initiatives/<ID>/evidence/design-baseline.yaml`. It records the requirement
+hash, initiative tag, HLD/LLD parent tags, consistent and guardrail context
+tags, relative context hash, and source commit. The HLD references this file,
+so reviewers can verify exactly which versions informed the design.
+
 ## Branch naming standard
 
 Branches describe the change and use the same type and lifecycle scope:

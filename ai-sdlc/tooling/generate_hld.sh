@@ -22,6 +22,7 @@ if ! grep -q 'status: approved' "$target/requirement.md"; then
 fi
 
 mkdir -p "$target/evidence" "$target/generated"
+python3 "$root/tooling/build_design_baseline.py" "$initiative_id" > "$target/evidence/design-baseline.yaml"
 cp "$root/templates/agent-request.yaml" "$target/evidence/agent-request.yaml"
 cp "$root/templates/agent-run.yaml" "$target/evidence/agent-run.yaml"
 

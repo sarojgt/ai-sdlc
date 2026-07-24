@@ -212,6 +212,11 @@ just ai-sdlc-hld PAY-4567 codex gpt-5.6-luna
 The loop is bounded by `config/hld-loop-policy.yaml`. A passing AI review only
 creates a human architecture review request; it never approves the HLD.
 
+HLD generation also creates `evidence/design-baseline.yaml`, which records the
+exact requirement, initiative, HLD, LLD, and context versions and hashes used by
+the design. Run `just ai-sdlc-version-view` to render the current repository
+version matrix.
+
 An approved initiative PR can automatically flip `initiative.yaml` and
 `initiative.md` to `approved` and record the approval trail in
 `approvals.yaml`.

@@ -82,6 +82,10 @@ Before making a workflow or artifact change, read:
 - Shared enterprise knowledge is under `ai-sdlc/context/`.
 - Initiative-specific knowledge is under `initiatives/<ID>/context/relative/`.
 - The canonical HLD is `initiatives/<ID>/hld/hld.md`.
+- HLD generation must create and preserve
+  `initiatives/<ID>/evidence/design-baseline.yaml`.
+- The design baseline is the authoritative link between requirement, context,
+  HLD, LLD, tags, hashes, and source commit.
 - The LLD is locked until human architecture approval.
 - Keep diagrams embedded in the HLD when they are part of the human decision.
 - Use YAML only for metadata, validation, traceability, and execution evidence.

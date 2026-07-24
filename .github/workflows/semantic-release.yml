@@ -65,3 +65,8 @@ jobs:
           done <<'EOF'
           ${{ steps.version.outputs.artifact_tags }}
           EOF
+
+      - name: Publish version matrix summary
+        run: |
+          git fetch --tags --force
+          python3 ai-sdlc/tooling/version_matrix.py >> "$GITHUB_STEP_SUMMARY"

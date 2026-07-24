@@ -12,6 +12,7 @@ traceability:
   parents: ["REQ-{{ initiative.id }}"]
   satisfies: []
   impacts: []
+design_baseline: "../evidence/design-baseline.yaml"
 approvals:
   required: [architecture]
   records: []
