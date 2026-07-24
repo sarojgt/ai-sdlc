@@ -1,4 +1,4 @@
-name: Initiative Approval Sync
+name: Initiative Post-Merge Processing
 
 on:
   pull_request_review:
@@ -7,122 +7,164 @@ on:
   pull_request:
     types:
       - closed
+    paths:
+      - "ai-sdlc/initiatives/**"
   workflow_dispatch:
     inputs:
       initiative_dir:
-        description: Initiative directory to backfill, for example ai-sdlc/initiatives/DEMO-005
-        required: false
+        description: Initiative directory, for example ai-sdlc/initiatives/DEMO-005
+        required: true
         type: string
       pull_request_number:
-        description: Optional PR number to backfill from GitHub history
+        description: Optional merged PR number used to recover human approval metadata
         required: false
         type: string
 
 permissions:
   contents: write
-  pull-requests: read
+  pull-requests: write
+
+concurrency:
+  group: initiative-post-merge-${{ github.event.pull_request.number || inputs.pull_request_number || inputs.initiative_dir }}
+  cancel-in-progress: false
 
 jobs:
-  sync-approval:
+  prepare:
     if: >
-      (github.event_name == 'pull_request_review' && github.event.review.state == 'approved') ||
-      (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.event.pull_request.head.repo.full_name == github.repository) ||
-      (github.event_name == 'workflow_dispatch')
+      (github.event_name == 'pull_request_review' &&
+       github.event.review.state == 'approved' &&
+       github.event.pull_request.head.repo.full_name == github.repository) ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.merged == true &&
+       github.event.pull_request.head.repo.full_name == github.repository) ||
+      github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    outputs:
+      initiative_dir: ${{ steps.scope.outputs.initiative_dir }}
+      initiative_name: ${{ steps.scope.outputs.initiative_name }}
+      approved: ${{ steps.scope.outputs.approved }}
+      reviewer: ${{ steps.scope.outputs.reviewer }}
+      review_id: ${{ steps.scope.outputs.review_id }}
+      submitted_at: ${{ steps.scope.outputs.submitted_at }}
     steps:
-      - name: Checkout PR branch
+      - name: Checkout default branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref || github.event.repository.default_branch }}
+          ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
 
-      - name: Determine initiative scope
+      - name: Determine initiative and approval scope
         id: scope
-        run: |
-          set -euo pipefail
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.initiative_dir || '' }}" ]; then
-            initiative_dir="${{ inputs.initiative_dir }}"
-          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "workflow_dispatch requires initiative_dir." >&2
-            exit 1
-          else
-            changed_files="$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" -- ai-sdlc/initiatives)"
-            initiative_dirs="$(
-              printf '%s\n' "$changed_files" \
-                | awk -F/ '/^ai-sdlc\/initiatives\/[^/]+\// {print $1"/"$2"/"$3}' \
-                | sort -u
-            )"
-            count="$(printf '%s\n' "$initiative_dirs" | sed '/^$/d' | wc -l | tr -d ' ')"
-            if [ "$count" -ne 1 ]; then
-              echo "Expected exactly one initiative directory, found $count." >&2
-              printf '%s\n' "$initiative_dirs" >&2
-              exit 1
-            fi
-            initiative_dir="$(printf '%s\n' "$initiative_dirs" | sed -n '1p')"
-          fi
-          echo "initiative_dir=$initiative_dir" >> "$GITHUB_OUTPUT"
-
-      - name: Prepare publish branch
-        id: branch
-        run: |
-          set -euo pipefail
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            suffix="$(printf '%s' "${{ steps.scope.outputs.initiative_dir }}" | tr '/.' '-')"
-            if [ -n "${{ inputs.pull_request_number || '' }}" ]; then
-              suffix="$suffix-pr-${{ inputs.pull_request_number }}"
-            fi
-            publish_branch="backfill/initiative-approval-${suffix}"
-            git checkout -b "$publish_branch"
-          else
-            publish_branch="${{ github.event.pull_request.head.ref }}"
-          fi
-          echo "publish_branch=$publish_branch" >> "$GITHUB_OUTPUT"
-
-      - name: Resolve review metadata for backfill
-        id: review
-        if: github.event_name == 'workflow_dispatch'
+        uses: actions/github-script@v7
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          if [ -z "${{ inputs.pull_request_number || '' }}" ]; then
-            echo "review_user=github-actions[bot]" >> "$GITHUB_OUTPUT"
-            echo "review_id=workflow-dispatch" >> "$GITHUB_OUTPUT"
-            echo "submitted_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          pr_number="${{ inputs.pull_request_number }}"
-          review_json="$(gh api repos/${{ github.repository }}/pulls/$pr_number/reviews --jq '.[] | select(.state == "APPROVED") | {user: .user.login, id: .id, submitted_at: .submitted_at}' | head -1)"
-          if [ -z "$review_json" ]; then
-            echo "No approved review found for PR #$pr_number" >&2
-            exit 1
-          fi
-          review_user="$(printf '%s' "$review_json" | jq -r '.user')"
-          review_id="$(printf '%s' "$review_json" | jq -r '.id')"
-          submitted_at="$(printf '%s' "$review_json" | jq -r '.submitted_at')"
-          echo "review_user=$review_user" >> "$GITHUB_OUTPUT"
-          echo "review_id=$review_id" >> "$GITHUB_OUTPUT"
-          echo "submitted_at=$submitted_at" >> "$GITHUB_OUTPUT"
+          INITIATIVE_DIR: ${{ inputs.initiative_dir }}
+          PULL_REQUEST_NUMBER: ${{ inputs.pull_request_number }}
+        with:
+          script: |
+            const core = require('@actions/core');
+            const isDispatch = context.eventName === 'workflow_dispatch';
+            const pullNumber = isDispatch
+              ? Number(process.env.PULL_REQUEST_NUMBER || 0)
+              : context.payload.pull_request.number;
 
-      - name: Mark initiative approved
+            let initiativeDirs = [];
+            if (isDispatch) {
+              const initiativeDir = (process.env.INITIATIVE_DIR || '').trim();
+              if (!/^ai-sdlc\/initiatives\/[^/]+$/.test(initiativeDir)) {
+                core.setFailed('initiative_dir must match ai-sdlc/initiatives/<ID>');
+                return;
+              }
+              initiativeDirs = [initiativeDir];
+            } else {
+              const files = await github.paginate(github.rest.pulls.listFiles, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pullNumber,
+                per_page: 100,
+              });
+              initiativeDirs = [...new Set(files
+                .map(file => file.filename)
+                .filter(name => name.startsWith('ai-sdlc/initiatives/'))
+                .map(name => name.split('/').slice(0, 3).join('/'))
+              )];
+            }
+
+            if (initiativeDirs.length !== 1) {
+              core.setFailed(`Expected exactly one initiative directory, found ${initiativeDirs.length}: ${initiativeDirs.join(', ')}`);
+              return;
+            }
+
+            let approved = false;
+            let reviewer = '';
+            let reviewId = '';
+            let submittedAt = '';
+
+            if (pullNumber > 0) {
+              const reviews = await github.paginate(github.rest.pulls.listReviews, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pullNumber,
+                per_page: 100,
+              });
+
+              // Keep the latest review state per reviewer. Approval is valid only
+              // when at least one reviewer remains approved and nobody has a
+              // later changes_requested review.
+              const latestByReviewer = new Map();
+              for (const review of reviews
+                .filter(item => item.user && item.submitted_at)
+                .sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at))) {
+                latestByReviewer.set(review.user.login, review);
+              }
+              const latest = [...latestByReviewer.values()];
+              const blocking = latest.find(item => item.state === 'CHANGES_REQUESTED');
+              const accepted = latest
+                .filter(item => item.state === 'APPROVED')
+                .sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))[0];
+
+              if (accepted && !blocking) {
+                approved = true;
+                reviewer = accepted.user.login;
+                reviewId = String(accepted.id);
+                submittedAt = accepted.submitted_at;
+              }
+            }
+
+            core.setOutput('initiative_dir', initiativeDirs[0]);
+            core.setOutput('initiative_name', initiativeDirs[0].split('/').pop());
+            core.setOutput('approved', String(approved));
+            core.setOutput('reviewer', reviewer);
+            core.setOutput('review_id', reviewId);
+            core.setOutput('submitted_at', submittedAt);
+
+      - name: Expand reusable boilerplate
+        run: python3 ai-sdlc/tooling/expand_initiative.py "${{ steps.scope.outputs.initiative_dir }}"
+
+      - name: Sync human approval metadata
+        if: steps.scope.outputs.approved == 'true'
         run: |
           python3 ai-sdlc/tooling/sync_initiative_approval.py \
             "${{ steps.scope.outputs.initiative_dir }}" \
-            "${{ github.event.review.user.login || steps.review.outputs.review_user || github.actor }}" \
-            "${{ github.event.review.id || steps.review.outputs.review_id || github.run_id }}" \
-            "${{ github.event.review.submitted_at || steps.review.outputs.submitted_at || github.event.head_commit.timestamp || github.event.pull_request.merged_at }}"
+            "${{ steps.scope.outputs.reviewer }}" \
+            "${{ steps.scope.outputs.review_id }}" \
+            "${{ steps.scope.outputs.submitted_at }}"
 
-      - name: Commit approval sync
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "${{ steps.scope.outputs.initiative_dir }}/initiative.yaml" \
-                  "${{ steps.scope.outputs.initiative_dir }}/initiative.md" \
-                  "${{ steps.scope.outputs.initiative_dir }}/approvals.yaml"
-          if git diff --cached --quiet; then
-            echo "No approval sync changes detected."
-            exit 0
-          fi
-          git commit -m "mark ${{ steps.scope.outputs.initiative_dir }} approved"
-          git push -u origin "${{ steps.branch.outputs.publish_branch }}"
+      - name: Validate expanded initiative
+        run: bash ai-sdlc/tooling/validate_structure.sh "${{ steps.scope.outputs.initiative_dir }}"
+
+      - name: Create post-merge automation pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: automation/initiative-post-merge-${{ steps.scope.outputs.initiative_name }}
+          commit-message: "chore(ai-sdlc): process ${{ steps.scope.outputs.initiative_name }} after merge"
+          title: "chore(ai-sdlc): process ${{ steps.scope.outputs.initiative_name }} after intake merge"
+          body: |
+            Auto-generated from the merged initiative intake PR.
+
+            This PR adds the reusable initiative boilerplate and records human
+            approval metadata when the source PR has a valid approval.
+
+            AI does not grant approval. The approval metadata is derived only
+            from GitHub human review history.
+          labels: ai-sdlc, automation
+          delete-branch: true

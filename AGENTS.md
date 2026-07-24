@@ -3,6 +3,56 @@
 These instructions apply to any AI provider or coding agent working in this
 repository.
 
+## Repository boundary
+
+This repository contains the AI-SDLC operating model and initiative artifacts;
+it is not an application repository. Do not modify product source code,
+service code, database migrations, infrastructure, deployment manifests, or
+production configuration here. The implementation phase may create linked
+workstreams and PRs in the affected application repositories only after the
+approved HLD and LLD gates have passed.
+
+Use Markdown for human-facing artifacts. Use YAML only for metadata,
+validation, approvals, traceability, and execution evidence.
+
+## Lifecycle operating rules
+
+1. For a new requirement, create an intake initiative using the `intake`
+   profile.
+2. The intake PR may contain only the minimum initiative metadata, the
+   requirement Markdown, and initiative-relative context. Do not add HLD, LLD,
+   feedback, evidence, or boilerplate README files in that PR.
+3. After the intake PR is approved or merged, post-merge automation creates a
+   follow-up automation PR containing the reusable HLD and LLD templates plus
+   the remaining initiative scaffold.
+4. HLD generation may begin only after requirements approval and context
+   assembly. HLD review and its bounded AI feedback loop are allowed, but only
+   a human Solution Architect or ARB can approve architecture.
+5. LLD generation may begin only after the HLD approval record is present.
+6. No implementation, application-code change, merge, release, or deployment
+   may be performed by an agent from this repository without the corresponding
+   human gate.
+
+For the exact intake file allowlist and handoff behavior, read
+`ai-sdlc/design/initiative-intake-agent-guide.md`.
+
+## Commit and release conventions
+
+- Use Conventional Commit titles and commit messages:
+  `type(scope): description`.
+- Use lifecycle scopes such as `initiative`, `requirement`, `context`, `hld`,
+  `lld`, `approval`, and `traceability` for artifacts. Use `workflow`,
+  `policy`, `release`, `ai-sdlc`, or `repo` for framework changes.
+- Use `feat` for a new capability, `fix` for a correction, and the other
+  supported types documented in `ai-sdlc/config/conventional-commits.yaml`.
+- Mark breaking changes with `type(scope)!:` or a `BREAKING CHANGE:` footer.
+- Pull requests and commits are checked by GitHub Actions.
+- Merges to `main` create semantic release tags only for framework scopes:
+  breaking changes increment major, `feat` increments minor, and
+  `fix`/`perf`/`refactor`/`revert` increment patch. Initiative, requirement,
+  context, HLD, LLD, approval, and traceability artifacts do not version the
+  framework by themselves.
+
 ## Mission
 
 Help build and operate a vendor-neutral, human-governed AI-native SDLC. AI may

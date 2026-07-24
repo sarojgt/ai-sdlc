@@ -14,25 +14,35 @@ just ai-sdlc-new
 For scripted creation:
 
 ```text
-just ai-sdlc-init PAY-4567 "Payment status notification" team.payments PAY-4567
+just ai-sdlc-init PAY-4567 "Payment status notification" "Allow clients to receive timely payment status updates" "Clients cannot reliably see payment status changes" team.payments PAY-4567 medium internal intake
 ```
 
-The generated structure is:
+Use the `intake` profile for a small business-review PR. After merge, the
+post-merge automation adds the reusable boilerplate and synchronizes valid
+human approval metadata in a follow-up PR.
+
+The generated structure after scaffold expansion is:
 
 ```text
 <initiative-id>/
   initiative.md
   requirement.md
+  initiative.yaml
+  traceability.yaml
+  approvals.yaml
+  context-manifest.yaml
   context/relative/
   hld/
+    hld.md              # human-readable HLD template
   lld/
+    lld.md              # human-readable LLD template, locked until HLD approval
   feedback/
   approvals/
   evidence/
 ```
 
-Add Markdown files only where the initiative needs them. The framework creates
-README files in the directories so their purpose is visible in GitHub.
+The intake PR is intentionally smaller; it stops at the core files needed for
+business review and traceability.
 
 Do not edit the reusable templates to customize a single initiative. Change
 the instance or improve the shared template deliberately.

@@ -41,6 +41,10 @@ shared context are Markdown in GitHub. Confluence, Jira, vector search, and
 other enterprise integrations can be added later without changing the
 initiative artifact structure or human approval gates.
 
+New intake PRs should stay small: capture the requirement and the minimum
+initiative metadata first, then let the post-merge automation expand the
+reusable boilerplate and synchronize approval metadata in one follow-up PR.
+
 ## Directory map
 
 ```text
@@ -121,25 +125,36 @@ just ai-sdlc-init \
   team.payments \
   PAY-4567 \
   medium \
-  internal
+  internal \
+  intake
 ```
 
 The direct command captures the title, business outcome, problem statement,
-owner, source work-item, risk tier, and data classification. Use
-`just ai-sdlc-new` for the guided interactive intake, then complete the full
-Markdown requirement template before requesting business approval.
+owner, source work-item, risk tier, data classification, and bootstrap
+profile. Use `intake` for the small business-review PR and `full` only when
+you explicitly want the scaffold up front. `just ai-sdlc-new` uses the same
+intake-first flow interactively.
 
-This copies the reusable templates into `ai-sdlc/initiatives/PAY-4567/`. The generated directory is the instance; the templates and configuration remain shared by every initiative.
+This copies the reusable templates into `ai-sdlc/initiatives/PAY-4567/`. The
+generated directory is the instance; the templates and configuration remain
+shared by every initiative.
 
-The generated initiative includes empty, documented areas for relative
-context, HLD, engineering design, feedback, approvals, and evidence. Add only
-the files relevant to the initiative; the workflow does not require every
-possible document.
+The intake profile creates only the core files needed for business review.
+After the PR is approved or merged, one post-merge workflow expands the
+reusable boilerplate, including HLD and LLD templates, and synchronizes valid
+human requirement approval in a single follow-up PR.
+
+For assistant-driven intake, see
+[Initiative Intake Agent Guide](design/initiative-intake-agent-guide.md).
 
 ```text
 initiatives/PAY-4567/
   initiative.md
   requirement.md
+  initiative.yaml
+  traceability.yaml
+  approvals.yaml
+  context-manifest.yaml
   context/relative/
   hld/
   lld/

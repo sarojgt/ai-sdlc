@@ -39,6 +39,18 @@ def main() -> int:
         if not path.exists():
             fail(f"Missing required file: {path}")
 
+    # The post-merge workflow runs again when its own automation PR is merged.
+    # Treat an already-approved initiative as idempotent so that event cannot
+    # create an endless chain of approval-sync PRs.
+    approvals_text = approvals_yaml.read_text()
+    requirements_approved = re.search(
+        r"(?ms)^\s*- gate:\s*requirements\s*$.*?^\s+decision:\s*approved\s*$",
+        approvals_text,
+    )
+    if requirements_approved:
+        print(f"Initiative {initiative_dir.name} is already approved; no sync needed")
+        return 0
+
     content_hash = hashlib.sha256(initiative_yaml.read_bytes()).hexdigest()
 
     yaml_text = initiative_yaml.read_text()
@@ -65,7 +77,6 @@ def main() -> int:
     )
     initiative_md.write_text(md_text)
 
-    approvals_text = approvals_yaml.read_text()
     approvals_text = replace_first(
         approvals_text,
         r"^(\s*decision:\s*)pending$",

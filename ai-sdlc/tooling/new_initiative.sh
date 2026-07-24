@@ -22,6 +22,8 @@ risk_tier="$(ask 'Risk tier [low|medium|high|critical]')"
 risk_tier="${risk_tier:-medium}"
 data_classification="$(ask 'Data classification [public|internal|confidential|restricted]')"
 data_classification="${data_classification:-internal}"
+profile="$(ask 'Bootstrap profile [intake|full]')"
+profile="${profile:-intake}"
 
 case "$risk_tier" in
   low|medium|high|critical) ;;
@@ -33,8 +35,13 @@ case "$data_classification" in
   *) echo "Invalid data classification: $data_classification" >&2; exit 2 ;;
 esac
 
+case "$profile" in
+  intake|full) ;;
+  *) echo "Invalid profile: $profile" >&2; exit 2 ;;
+esac
+
 script_dir="$(cd "$(dirname "$0")" && pwd)"
-"$script_dir/bootstrap_initiative.sh" "$initiative_id" "$title" "$business_outcome" "$problem_statement" "$owner" "$work_item_id" "$risk_tier" "$data_classification"
+"$script_dir/bootstrap_initiative.sh" "$initiative_id" "$title" "$business_outcome" "$problem_statement" "$owner" "$work_item_id" "$risk_tier" "$data_classification" "$profile"
 target="$script_dir/../initiatives/$initiative_id"
 
 export AI_SDLC_BUSINESS_OUTCOME="$business_outcome"

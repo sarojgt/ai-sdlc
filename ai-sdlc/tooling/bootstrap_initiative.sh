@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [ "$#" -lt 4 ]; then
-  echo "Usage: $0 <initiative-id> <title> <business-outcome> <problem-statement> [owner] [work-item-id] [risk-tier] [data-classification]" >&2
+  echo "Usage: $0 <initiative-id> <title> <business-outcome> <problem-statement> [owner] [work-item-id] [risk-tier] [data-classification] [profile]" >&2
   exit 2
 fi
 
@@ -15,6 +15,7 @@ work_item_id="${6:-$initiative_id}"
 provider="github"
 risk_tier="${7:-medium}"
 data_classification="${8:-internal}"
+profile="${9:-intake}"
 
 case "$initiative_id" in
   *[!A-Za-z0-9_-]*) echo "Initiative ID contains unsupported characters" >&2; exit 2 ;;
@@ -30,6 +31,11 @@ case "$data_classification" in
   *) echo "Invalid data classification: $data_classification" >&2; exit 2 ;;
 esac
 
+case "$profile" in
+  intake|full) ;;
+  *) echo "Invalid profile: $profile" >&2; exit 2 ;;
+esac
+
 root="$(cd "$(dirname "$0")/.." && pwd)"
 target="$root/initiatives/$initiative_id"
 template="$root/templates/initiative"
@@ -40,7 +46,27 @@ if [ -e "$target" ]; then
 fi
 
 mkdir -p "$target"
-cp -R "$template/." "$target/"
+
+copy_files() {
+  for relative in "$@"; do
+    src="$template/$relative"
+    dst="$target/$relative"
+    mkdir -p "$(dirname "$dst")"
+    cp "$src" "$dst"
+  done
+}
+
+if [ "$profile" = "full" ]; then
+  cp -R "$template/." "$target/"
+else
+  copy_files \
+    "initiative.yaml" \
+    "initiative.md" \
+    "requirement.md" \
+    "traceability.yaml" \
+    "approvals.yaml" \
+    "context-manifest.yaml"
+fi
 
 find "$target" -type f -print0 | while IFS= read -r -d '' file; do
   sed -i '' \
