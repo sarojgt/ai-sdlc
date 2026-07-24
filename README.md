@@ -45,6 +45,21 @@ The maintained implementation and delivery checklist is in
 [docs/AI-SDLC-STATUS.md](docs/AI-SDLC-STATUS.md). It records completed work,
 current limitations, roadmap items, and the target end state.
 
+## Commit and semantic release standard
+
+Use Conventional Commits for PR titles and commits:
+
+```text
+feat(ai-sdlc): add a workflow capability       # minor release
+fix(ai-sdlc): correct a workflow defect         # patch release
+docs(ai-sdlc): improve the operating guide      # no release
+```
+
+Breaking changes use `feat!:` or a `BREAKING CHANGE:` footer and create a major
+release. Merges to `main` are evaluated by the semantic release workflow; when
+the commit range requires a release, it creates a `vMAJOR.MINOR.PATCH` tag and
+GitHub release with generated notes. The tag is the release version authority.
+
 ## End-to-end flow
 
 ```text

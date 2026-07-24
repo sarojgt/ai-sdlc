@@ -36,6 +36,19 @@ validation, approvals, traceability, and execution evidence.
 For the exact intake file allowlist and handoff behavior, read
 `ai-sdlc/design/initiative-intake-agent-guide.md`.
 
+## Commit and release conventions
+
+- Use Conventional Commit titles and commit messages:
+  `type(scope): description`.
+- Use `feat` for a new capability, `fix` for a correction, and the other
+  supported types documented in `ai-sdlc/config/conventional-commits.yaml`.
+- Mark breaking changes with `type(scope)!:` or a `BREAKING CHANGE:` footer.
+- Pull requests and commits are checked by GitHub Actions.
+- Merges to `main` create semantic release tags: breaking changes increment
+  major, `feat` increments minor, and `fix`/`perf`/`refactor`/`revert` increment
+  patch. Documentation, test, CI, build, style, and chore changes do not
+  create a release by themselves.
+
 ## Mission
 
 Help build and operate a vendor-neutral, human-governed AI-native SDLC. AI may

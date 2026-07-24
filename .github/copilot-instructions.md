@@ -47,3 +47,10 @@ manually add that boilerplate to the intake PR.
 
 Read the root `AGENTS.md` and the initiative intake guide before changing
 workflow or initiative artifacts.
+
+## Commit and PR format
+
+Use Conventional Commits for both the PR title and commits:
+`feat(ai-sdlc): description`, `fix(ai-sdlc): description`, or
+`docs(ai-sdlc): description`. Breaking changes use `!` or a `BREAKING CHANGE:`
+footer. Do not use free-form titles such as `Update files` or `Add changes`.

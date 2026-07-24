@@ -156,8 +156,8 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           branch: automation/initiative-post-merge-${{ steps.scope.outputs.initiative_name }}
-          commit-message: "process ${{ steps.scope.outputs.initiative_name }} after merge"
-          title: "Process ${{ steps.scope.outputs.initiative_name }} after intake merge"
+          commit-message: "chore(ai-sdlc): process ${{ steps.scope.outputs.initiative_name }} after merge"
+          title: "chore(ai-sdlc): process ${{ steps.scope.outputs.initiative_name }} after intake merge"
           body: |
             Auto-generated from the merged initiative intake PR.
 

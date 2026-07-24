@@ -1,5 +1,17 @@
 ## AI-SDLC change
 
+Use a Conventional Commit title, for example:
+
+```text
+feat(ai-sdlc): add a new initiative workflow
+fix(ai-sdlc): prevent approval sync loops
+docs(ai-sdlc): clarify intake instructions
+```
+
+Valid types include `feat`, `fix`, `perf`, `refactor`, `revert`, `docs`,
+`test`, `chore`, `ci`, `build`, and `style`. Add `!` or a `BREAKING CHANGE:`
+footer for a breaking change.
+
 - Initiative: `DEMO-001`
 - Artifact type: `design | implementation | release`
 - Requirement IDs:
