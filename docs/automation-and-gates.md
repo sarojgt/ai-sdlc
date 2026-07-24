@@ -336,8 +336,10 @@ Build these first:
 7. `approval-service` — append-only human approval records and invalidation.
 8. `rerun-router` — maps feedback type to affected artifacts and jobs.
 9. `notification-service` — reviewer requests, escalations, failures, and reminders.
-10. `initiative-approval-sync` — auto-mark initiative PRs approved when the required human review lands.
-11. `initiative-approval-backfill` — repair older initiatives with manual workflow dispatch.
+10. `initiative-approval-sync` — process a merged initiative PR, expand its
+    boilerplate, and record valid human requirements approval in one automation PR.
+11. `initiative-approval-backfill` — repair older initiatives with manual
+    workflow dispatch through the same post-merge processor.
 12. `audit-export` — complete initiative evidence for governance and release review.
 
 ## Automation maturity levels

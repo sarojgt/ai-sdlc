@@ -13,7 +13,15 @@ else
   exit 1
 fi
 
-required_files=(
+state="$(awk '
+  /^workflow:/ { in_workflow=1; next }
+  in_workflow && /^[[:space:]]*state:/ {
+    print $2
+    exit
+  }
+' "$initiative/initiative.yaml")"
+
+core_files=(
   "$root/schemas/das.schema.yaml"
   "$root/config/gates.yaml"
   "$root/config/roles.yaml"
@@ -21,20 +29,58 @@ required_files=(
   "$initiative/initiative.yaml"
   "$initiative/context-manifest.yaml"
   "$initiative/requirement.md"
-  "$initiative/hld/hld.md"
-  "$initiative/lld/lld.md"
+  "$initiative/initiative.md"
   "$initiative/approvals.yaml"
   "$initiative/traceability.yaml"
 )
 
-for file in "${required_files[@]}"; do
+for file in "${core_files[@]}"; do
   test -f "$file" || { echo "Missing required file: $file" >&2; exit 1; }
 done
 
 grep -q 'implementation_locked_until: architecture.approved' "$initiative/initiative.yaml"
-grep -q 'type: hld' "$initiative/hld/hld.md"
-grep -q 'type: lld' "$initiative/lld/lld.md"
-grep -q 'decision: pending' "$initiative/approvals.yaml"
+
+# Requirements approval may be synchronized by the post-merge workflow. The
+# HLD and LLD gates must remain pending until their separate human gates pass.
+approval_decisions="$(awk '
+  /^  - gate:/ { gate=$3 }
+  /^[[:space:]]+decision:/ { print gate ":" $2 }
+' "$initiative/approvals.yaml")"
+grep -q '^hld:pending$' <<< "$approval_decisions"
+grep -q '^lld:pending$' <<< "$approval_decisions"
+
+case "$state" in
+  intake)
+    ;;
+  scaffolded|approved)
+    scaffold_files=(
+      "$initiative/context/relative/README.md"
+      "$initiative/hld/README.md"
+      "$initiative/lld/README.md"
+      "$initiative/feedback/README.md"
+      "$initiative/approvals/README.md"
+      "$initiative/evidence/README.md"
+    )
+    for file in "${scaffold_files[@]}"; do
+      test -f "$file" || { echo "Missing scaffold file: $file" >&2; exit 1; }
+    done
+    ;;
+  hld_draft|hld_review|hld_approved|lld_draft|lld_review|lld_approved|implementation_ready|implementing|pr_review|release_ready|deployed|learning)
+    scaffold_files=(
+      "$initiative/context/relative/README.md"
+      "$initiative/hld/README.md"
+      "$initiative/lld/README.md"
+      "$initiative/feedback/README.md"
+      "$initiative/approvals/README.md"
+      "$initiative/evidence/README.md"
+      "$initiative/hld/hld.md"
+      "$initiative/lld/lld.md"
+    )
+    for file in "${scaffold_files[@]}"; do
+      test -f "$file" || { echo "Missing lifecycle file: $file" >&2; exit 1; }
+    done
+    ;;
+esac
 
 echo "AI-SDLC framework structure is valid."
 echo "Next implementation step: replace placeholder checks with DAS/hash/approval validation."

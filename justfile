@@ -4,12 +4,16 @@ default:
     @just --list
 
 # Create a new initiative instance from the reusable templates.
-ai-sdlc-init id title business_outcome problem_statement owner="team.example" work_item="" risk_tier="medium" data_classification="internal":
-    ./ai-sdlc/tooling/bootstrap_initiative.sh "{{id}}" "{{title}}" "{{business_outcome}}" "{{problem_statement}}" "{{owner}}" "{{work_item}}" "{{risk_tier}}" "{{data_classification}}"
+ai-sdlc-init id title business_outcome problem_statement owner="team.example" work_item="" risk_tier="medium" data_classification="internal" profile="intake":
+    ./ai-sdlc/tooling/bootstrap_initiative.sh "{{id}}" "{{title}}" "{{business_outcome}}" "{{problem_statement}}" "{{owner}}" "{{work_item}}" "{{risk_tier}}" "{{data_classification}}" "{{profile}}"
 
 # Interactively collect a requirement and create a new initiative instance.
 ai-sdlc-new:
     ./ai-sdlc/tooling/new_initiative.sh
+
+# Expand an approved intake into the reusable boilerplate scaffold.
+ai-sdlc-expand initiative:
+    python3 ./ai-sdlc/tooling/expand_initiative.py "ai-sdlc/initiatives/{{initiative}}"
 
 # Show the requirement for human Product Owner review.
 ai-sdlc-review-requirement initiative:

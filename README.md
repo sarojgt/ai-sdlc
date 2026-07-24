@@ -49,8 +49,10 @@ current limitations, roadmap items, and the target end state.
 
 ```text
 Business requirement
-  → initiative and Markdown requirement
+  → small intake initiative PR
   → business approval
+  → merge trigger
+  → automated boilerplate scaffold PR
   → context assembly and impact assessment
   → AI-generated HLD with standards-based recommendation
   → bounded AI review loop
@@ -81,12 +83,15 @@ just ai-sdlc-init \
   team.payments \
   PAY-4567 \
   medium \
-  internal
+  internal \
+  intake
 ```
 
 The direct command requires a title, business outcome, problem statement,
-owner, source work-item, risk tier, and data classification. Use
-`just ai-sdlc-new` when a fuller guided intake is preferable.
+owner, source work-item, risk tier, data classification, and profile.
+Use `intake` for a small business-review PR and `full` only when you
+explicitly want the entire scaffold up front. `just ai-sdlc-new` uses the same
+intake-first flow interactively.
 
 Complete:
 
@@ -94,6 +99,11 @@ Complete:
 ai-sdlc/initiatives/PAY-4567/requirement.md
 ai-sdlc/initiatives/PAY-4567/context/relative/
 ```
+
+The intake PR is intentionally small. After merge, one post-merge automation
+workflow expands the initiative with reusable boilerplate and, when the merged
+PR has a valid human approval, synchronizes the requirement approval metadata
+in a single follow-up PR.
 
 The requirement captures business outcome, problem, stakeholders, scope,
 business rules, functional and non-functional requirements, data, integrations,

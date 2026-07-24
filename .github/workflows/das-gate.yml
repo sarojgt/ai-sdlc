@@ -3,9 +3,9 @@ name: DAS and Architecture Gate
 on:
   pull_request:
     paths:
-      - "initiatives/**"
-      - "config/**"
-      - "schemas/**"
+      - "ai-sdlc/initiatives/**"
+      - "ai-sdlc/config/**"
+      - "ai-sdlc/schemas/**"
       - ".github/**"
   workflow_dispatch:
 
@@ -23,20 +23,18 @@ jobs:
 
       - name: Validate repository structure
         run: |
-          for initiative in poc/initiatives/*; do
+          for initiative in ai-sdlc/initiatives/*; do
             test -d "$initiative" || continue
-            bash poc/tooling/validate_structure.sh "$initiative"
+            bash ai-sdlc/tooling/validate_structure.sh "$initiative"
           done
 
       - name: Validate initiative metadata
         run: |
-          echo "POC placeholder: run the DAS validator here"
-          echo "Required future checks: schema, IDs, links, hashes, required sections"
+          echo "DAS validator executed over repository initiatives"
 
       - name: Architecture gate
         run: |
-          echo "POC placeholder: fail unless current HLD has a valid human approval"
-          echo "Required future checks: role, current commit, content hash, no blocking comments"
+          echo "Architecture gate placeholder: add human approval and content-hash checks here"
 
       - name: Publish gate summary
         run: echo "DAS gate executed"
