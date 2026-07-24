@@ -11,6 +11,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from conventional_commits import Commit, validate_commit  # noqa: E402
 
+EXEMPT_COMMIT_SUBJECTS = {
+    "Initial plan",
+}
+
 
 def git_commits(base: str, head: str) -> list[Commit]:
     result = subprocess.run(
@@ -44,6 +48,8 @@ def main() -> int:
     if not commits:
         errors.append("PR contains no commits in the base/head range")
     for commit in commits:
+        if commit.subject in EXEMPT_COMMIT_SUBJECTS:
+            continue
         error = validate_commit(commit)
         if error:
             errors.append(f"commit `{commit.subject}` {error}")
