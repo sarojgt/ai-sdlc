@@ -52,6 +52,8 @@ def main() -> int:
         errors.append("PR contains no commits in the base/head range")
     for commit in commits:
         if commit.subject in EXEMPT_COMMIT_SUBJECTS:
+            # Emit to stderr so CI logs preserve visibility without changing the
+            # normal success output contract on stdout.
             print(f"Skipping exempt legacy commit subject: `{commit.subject}`", file=sys.stderr)
             continue
         error = validate_commit(commit)
