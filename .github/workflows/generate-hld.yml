@@ -140,7 +140,7 @@ jobs:
           GENERATOR_MODEL: ${{ inputs.generator_model || 'claude-haiku-4.5' }}
           REVIEWER_MODEL: ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}
           GITHUB_TOKEN: ${{ github.token }}
-          COPILOT_GITHUB_TOKEN: ${{ github.token }}
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN || github.token }}
         run: |
           set -euo pipefail
           chmod +x ai-sdlc/tooling/providers/github-copilot.sh

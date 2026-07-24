@@ -219,6 +219,12 @@ where both models are the same. The existing bounded loop enforces iteration,
 time, unchanged-output, and repeated-feedback limits before creating a draft
 HLD PR.
 
+Authentication uses the built-in GitHub Actions token by default. If the
+organization has not enabled Copilot CLI billing for Actions, configure an
+Actions secret named `COPILOT_GITHUB_TOKEN` containing a personal access token
+with Copilot Requests permission. The secret is used only for Copilot requests;
+the workflow token still creates the draft PR.
+
 Future: GitHub Issue and Actions intake triggers, Jira intake
 and traceability, Confluence context synchronization, multi-repository
 orchestration, and implementation/deployment evidence automation.

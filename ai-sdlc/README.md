@@ -46,7 +46,9 @@ scaffold is merged. It can also be started manually with an initiative ID and
 separate Copilot generator and reviewer models. Demo defaults are the lower-cost
 `claude-haiku-4.5` generator and `gemini-3.5-flash` reviewer. The workflow uses
 the same bounded `hld_loop.sh` as local execution and refuses identical model
-selections.
+selections. It uses the Actions `GITHUB_TOKEN` by default, with an optional
+`COPILOT_GITHUB_TOKEN` Actions secret as a personal-token fallback when the
+organization has not enabled Copilot CLI for Actions.
 
 New intake PRs should stay small: capture the requirement and the minimum
 initiative metadata first, then let the post-merge automation expand the
