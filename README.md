@@ -208,9 +208,18 @@ test strategy, and migration details.
 ## Current versus target integration
 
 Current: GitHub/repository artifacts, Markdown requirements and HLDs, `just`
-commands, provider adapters, and human review.
+commands, provider adapters, GitHub Actions HLD orchestration, and human
+review.
 
-Future: GitHub Issue and Actions triggers, automatic draft HLD PRs, Jira intake
+The HLD workflow can run automatically after an approved initiative scaffold
+is merged, or manually from GitHub Actions. It uses GitHub Copilot CLI with
+separate generator and reviewer models, defaults to the lower-cost
+`claude-haiku-4.5` generator and `gemini-3.5-flash` reviewer, and rejects a run
+where both models are the same. The existing bounded loop enforces iteration,
+time, unchanged-output, and repeated-feedback limits before creating a draft
+HLD PR.
+
+Future: GitHub Issue and Actions intake triggers, Jira intake
 and traceability, Confluence context synchronization, multi-repository
 orchestration, and implementation/deployment evidence automation.
 

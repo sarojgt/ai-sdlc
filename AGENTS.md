@@ -112,6 +112,9 @@ hide incomplete context.
 - Preserve unrelated worktree changes.
 - Use the configured provider adapter rather than embedding provider-specific
   assumptions in templates or lifecycle rules.
+- GitHub automation may invoke the Copilot CLI adapter for HLD generation and
+  review. Generator and reviewer models must be explicitly recorded and must
+  be different; the existing bounded loop is the lifecycle orchestrator.
 
 ## Current project state
 

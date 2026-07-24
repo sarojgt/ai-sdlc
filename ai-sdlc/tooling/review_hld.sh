@@ -16,6 +16,9 @@ case "$reviewer_provider" in
   codex)
     "$root/tooling/providers/codex-review.sh" "$initiative_id" "$reviewer_model" "$iteration"
     ;;
+  github-copilot)
+    "$root/tooling/providers/github-copilot-review.sh" "$initiative_id" "$reviewer_model" "$iteration"
+    ;;
   *)
     echo "No HLD reviewer adapter is installed for provider '$reviewer_provider'." >&2
     exit 20

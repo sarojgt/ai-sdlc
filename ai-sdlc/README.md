@@ -41,6 +41,13 @@ shared context are Markdown in GitHub. Confluence, Jira, vector search, and
 other enterprise integrations can be added later without changing the
 initiative artifact structure or human approval gates.
 
+The GitHub workflow automatically starts after a validated approved initiative
+scaffold is merged. It can also be started manually with an initiative ID and
+separate Copilot generator and reviewer models. Demo defaults are the lower-cost
+`claude-haiku-4.5` generator and `gemini-3.5-flash` reviewer. The workflow uses
+the same bounded `hld_loop.sh` as local execution and refuses identical model
+selections.
+
 New intake PRs should stay small: capture the requirement and the minimum
 initiative metadata first, then let the post-merge automation expand the
 reusable boilerplate and synchronize approval metadata in one follow-up PR.
