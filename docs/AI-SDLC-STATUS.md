@@ -81,6 +81,7 @@ from starting early.
 - [x] Conventional Commit policy and PR title guidance added.
 - [x] Change-focused branch naming policy and validation added.
 - [x] Semantic release tag workflow added for merges to `main`.
+- [x] Scoped semantic versions added for initiatives, HLDs, LLDs, and context.
 
 ## Current repository workflow
 

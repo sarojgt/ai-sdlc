@@ -53,11 +53,11 @@ For the exact intake file allowlist and handoff behavior, read
   supported types documented in `ai-sdlc/config/conventional-commits.yaml`.
 - Mark breaking changes with `type(scope)!:` or a `BREAKING CHANGE:` footer.
 - Pull requests and commits are checked by GitHub Actions.
-- Merges to `main` create semantic release tags only for framework scopes:
-  breaking changes increment major, `feat` increments minor, and
-  `fix`/`perf`/`refactor`/`revert` increment patch. Initiative, requirement,
-  context, HLD, LLD, approval, and traceability artifacts do not version the
-  framework by themselves.
+- Merges to `main` create semantic release tags for both tracks. Framework
+  scopes create the global version; initiative, requirement, context, HLD, LLD,
+  approval, and traceability scopes create their scoped artifact version.
+  Breaking changes increment major, `feat` increments minor, and
+  `fix`/`perf`/`refactor`/`revert` increment patch on each applicable track.
 
 ## Mission
 

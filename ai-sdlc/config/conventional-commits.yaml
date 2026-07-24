@@ -54,7 +54,14 @@ breaking_change:
 release_scope_policy:
   framework_release_scopes: [workflow, policy, release, ai-sdlc, repo]
   artifact_only_scopes: [initiative, requirement, context, hld, lld, approval, traceability]
-  explanation: "Artifact commits describe the initiative lifecycle but do not version the AI-SDLC framework itself."
+  explanation: "Artifact commits do not version the framework tag; they version their own scoped artifact tag."
+artifact_versioning:
+  initiative_tag: "initiative/<ID>/vMAJOR.MINOR.PATCH"
+  hld_tag: "initiative/<ID>/hld/vMAJOR.MINOR.PATCH"
+  lld_tag: "initiative/<ID>/lld/vMAJOR.MINOR.PATCH"
+  relative_context_tag: "initiative/<ID>/context/vMAJOR.MINOR.PATCH"
+  consistent_context_tag: "context/consistent/vMAJOR.MINOR.PATCH"
+  guardrails_context_tag: "context/guardrails/vMAJOR.MINOR.PATCH"
 branch_naming:
   format: "type/scope-short-description"
   examples:

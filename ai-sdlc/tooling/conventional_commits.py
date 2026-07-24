@@ -74,10 +74,17 @@ class Commit:
         return match.group("type") if match else None
 
     def release_bump(self) -> str:
+        """Return the bump for the AI-SDLC framework release track."""
         if self.breaking:
             return "major"
         if self.scope in ARTIFACT_ONLY_SCOPES:
             return "none"
+        return TYPES.get(self.commit_type or "", "none")
+
+    def artifact_release_bump(self) -> str:
+        """Return the bump for an initiative, design, or context track."""
+        if self.breaking:
+            return "major"
         return TYPES.get(self.commit_type or "", "none")
 
     @property

@@ -26,22 +26,42 @@ jobs:
       - name: Calculate next version
         id: version
         run: |
-          tag="$(python3 ai-sdlc/tooling/semantic_version.py | tail -n 1)"
-          if [ -z "$tag" ] || ! printf '%s' "$tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+          framework_tag="$(python3 ai-sdlc/tooling/semantic_version.py | tail -n 1)"
+          if ! printf '%s' "$framework_tag" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            framework_tag=""
+          fi
+          artifact_tags="$(python3 ai-sdlc/tooling/semantic_artifact_version.py)"
+          {
+            echo "framework_tag=$framework_tag"
+            echo "artifact_tags<<EOF"
+            echo "$artifact_tags"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          if [ -n "$framework_tag" ] || [ -n "$artifact_tags" ]; then
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          else
             echo "release=false" >> "$GITHUB_OUTPUT"
             echo "No semantic release required."
-            exit 0
           fi
-          echo "release=true" >> "$GITHUB_OUTPUT"
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "Next release: $tag"
 
-      - name: Create GitHub release and tag
+      - name: Create semantic releases and tags
         if: steps.version.outputs.release == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${{ steps.version.outputs.tag }}" \
-            --target "${GITHUB_SHA}" \
-            --title "${{ steps.version.outputs.tag }}" \
-            --generate-notes
+          framework_tag="${{ steps.version.outputs.framework_tag }}"
+          if [ -n "$framework_tag" ]; then
+            gh release create "$framework_tag" \
+              --target "${GITHUB_SHA}" \
+              --title "$framework_tag" \
+              --generate-notes
+          fi
+          while IFS='|' read -r track tag bump; do
+            [ -n "$tag" ] || continue
+            gh release create "$tag" \
+              --target "${GITHUB_SHA}" \
+              --title "$tag" \
+              --generate-notes
+          done <<'EOF'
+          ${{ steps.version.outputs.artifact_tags }}
+          EOF

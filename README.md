@@ -59,11 +59,13 @@ docs(policy): improve the operating guide          # no release
 ```
 
 Breaking changes use `feat!:` or a `BREAKING CHANGE:` footer and create a major
-release. Merges to `main` are evaluated by the semantic release workflow. Only
-framework scopes (`workflow`, `policy`, `release`, `ai-sdlc`, and `repo`) create
-AI-SDLC framework versions. Artifact scopes describe initiative work but do not
-version the framework itself. When a release is required, the workflow creates
-a `vMAJOR.MINOR.PATCH` tag and GitHub release with generated notes.
+release. Merges to `main` are evaluated by the semantic release workflow.
+Framework scopes (`workflow`, `policy`, `release`, `ai-sdlc`, and `repo`) create
+the global `vMAJOR.MINOR.PATCH` version. Artifact scopes also create independent
+versions: `initiative/<ID>/v...`, `initiative/<ID>/hld/v...`,
+`initiative/<ID>/lld/v...`, and context tags such as
+`context/consistent/v...`. This keeps initiative and context history versioned
+without treating each design artifact as a framework release.
 
 ## Branch naming standard
 

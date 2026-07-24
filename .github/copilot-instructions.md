@@ -60,3 +60,7 @@ Use Conventional Commits for both the PR title and commits:
 `feat(lld): description`, `fix(requirement): description`, or
 `fix(workflow): description`. Breaking changes use `!` or a `BREAKING CHANGE:`
 footer. Do not use free-form titles such as `Update files` or `Add changes`.
+
+Artifact commits are versioned independently from framework releases. A
+`feat(initiative)`, `feat(hld)`, `feat(lld)`, or `feat(context)` commit creates
+the corresponding scoped artifact tag after merge to `main`.
