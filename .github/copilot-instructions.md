@@ -51,6 +51,7 @@ workflow or initiative artifacts.
 ## Commit and PR format
 
 Use Conventional Commits for both the PR title and commits:
-`feat(ai-sdlc): description`, `fix(ai-sdlc): description`, or
-`docs(ai-sdlc): description`. Breaking changes use `!` or a `BREAKING CHANGE:`
+`feat(initiative): description`, `feat(hld): description`,
+`feat(lld): description`, `fix(requirement): description`, or
+`fix(workflow): description`. Breaking changes use `!` or a `BREAKING CHANGE:`
 footer. Do not use free-form titles such as `Update files` or `Add changes`.

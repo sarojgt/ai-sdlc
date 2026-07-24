@@ -21,8 +21,33 @@ TYPES = {
     "style": "none",
 }
 
+SCOPES = {
+    "initiative",
+    "requirement",
+    "context",
+    "hld",
+    "lld",
+    "approval",
+    "traceability",
+    "workflow",
+    "policy",
+    "release",
+    "ai-sdlc",
+    "repo",
+}
+
+ARTIFACT_ONLY_SCOPES = {
+    "initiative",
+    "requirement",
+    "context",
+    "hld",
+    "lld",
+    "approval",
+    "traceability",
+}
+
 HEADER = re.compile(
-    r"^(?P<type>[a-z]+)(?:\((?P<scope>[A-Za-z0-9._/-]+)\))?(?P<breaking>!)?:\s+(?P<description>\S.*)$"
+    r"^(?P<type>[a-z]+)\((?P<scope>[A-Za-z0-9._/-]+)\)(?P<breaking>!)?:\s+(?P<description>\S.*)$"
 )
 
 
@@ -45,7 +70,14 @@ class Commit:
     def release_bump(self) -> str:
         if self.breaking:
             return "major"
+        if self.scope in ARTIFACT_ONLY_SCOPES:
+            return "none"
         return TYPES.get(self.commit_type or "", "none")
+
+    @property
+    def scope(self) -> str | None:
+        match = HEADER.match(self.subject)
+        return match.group("scope") if match else None
 
 
 def validate_commit(commit: Commit) -> str | None:
@@ -54,6 +86,8 @@ def validate_commit(commit: Commit) -> str | None:
         return "must match `type(scope)!: description` with a supported type"
     if match.group("type") not in TYPES:
         return f"uses unsupported type `{match.group('type')}`"
+    if match.group("scope") not in SCOPES:
+        return f"uses unsupported scope `{match.group('scope')}`"
     return None
 
 

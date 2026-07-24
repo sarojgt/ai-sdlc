@@ -40,14 +40,18 @@ For the exact intake file allowlist and handoff behavior, read
 
 - Use Conventional Commit titles and commit messages:
   `type(scope): description`.
+- Use lifecycle scopes such as `initiative`, `requirement`, `context`, `hld`,
+  `lld`, `approval`, and `traceability` for artifacts. Use `workflow`,
+  `policy`, `release`, `ai-sdlc`, or `repo` for framework changes.
 - Use `feat` for a new capability, `fix` for a correction, and the other
   supported types documented in `ai-sdlc/config/conventional-commits.yaml`.
 - Mark breaking changes with `type(scope)!:` or a `BREAKING CHANGE:` footer.
 - Pull requests and commits are checked by GitHub Actions.
-- Merges to `main` create semantic release tags: breaking changes increment
-  major, `feat` increments minor, and `fix`/`perf`/`refactor`/`revert` increment
-  patch. Documentation, test, CI, build, style, and chore changes do not
-  create a release by themselves.
+- Merges to `main` create semantic release tags only for framework scopes:
+  breaking changes increment major, `feat` increments minor, and
+  `fix`/`perf`/`refactor`/`revert` increment patch. Initiative, requirement,
+  context, HLD, LLD, approval, and traceability artifacts do not version the
+  framework by themselves.
 
 ## Mission
 

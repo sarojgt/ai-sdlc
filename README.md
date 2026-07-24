@@ -50,15 +50,20 @@ current limitations, roadmap items, and the target end state.
 Use Conventional Commits for PR titles and commits:
 
 ```text
-feat(ai-sdlc): add a workflow capability       # minor release
-fix(ai-sdlc): correct a workflow defect         # patch release
-docs(ai-sdlc): improve the operating guide      # no release
+feat(initiative): add a card blocking requirement # artifact only
+feat(hld): add the architecture design            # artifact only
+feat(lld): add the engineering design             # artifact only
+fix(workflow): correct an automation defect       # patch release
+feat(workflow): add a workflow capability         # minor release
+docs(policy): improve the operating guide          # no release
 ```
 
 Breaking changes use `feat!:` or a `BREAKING CHANGE:` footer and create a major
-release. Merges to `main` are evaluated by the semantic release workflow; when
-the commit range requires a release, it creates a `vMAJOR.MINOR.PATCH` tag and
-GitHub release with generated notes. The tag is the release version authority.
+release. Merges to `main` are evaluated by the semantic release workflow. Only
+framework scopes (`workflow`, `policy`, `release`, `ai-sdlc`, and `repo`) create
+AI-SDLC framework versions. Artifact scopes describe initiative work but do not
+version the framework itself. When a release is required, the workflow creates
+a `vMAJOR.MINOR.PATCH` tag and GitHub release with generated notes.
 
 ## End-to-end flow
 

@@ -3,9 +3,9 @@
 Use a Conventional Commit title, for example:
 
 ```text
-feat(ai-sdlc): add a new initiative workflow
-fix(ai-sdlc): prevent approval sync loops
-docs(ai-sdlc): clarify intake instructions
+feat(initiative): add a new requirement initiative
+feat(hld): add the high-level design
+fix(workflow): prevent approval sync loops
 ```
 
 Valid types include `feat`, `fix`, `perf`, `refactor`, `revert`, `docs`,

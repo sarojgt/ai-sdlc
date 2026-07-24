@@ -1,6 +1,19 @@
 version: "1.0"
 description: "Company Conventional Commit policy for AI-SDLC changes"
 format: "type(scope)!: description"
+scopes:
+  - initiative
+  - requirement
+  - context
+  - hld
+  - lld
+  - approval
+  - traceability
+  - workflow
+  - policy
+  - release
+  - ai-sdlc
+  - repo
 types:
   feat:
     release: minor
@@ -38,3 +51,7 @@ types:
 breaking_change:
   release: major
   syntax: "BREAKING CHANGE: explanation or type(scope)!: description"
+release_scope_policy:
+  framework_release_scopes: [workflow, policy, release, ai-sdlc, repo]
+  artifact_only_scopes: [initiative, requirement, context, hld, lld, approval, traceability]
+  explanation: "Artifact commits describe the initiative lifecycle but do not version the AI-SDLC framework itself."
