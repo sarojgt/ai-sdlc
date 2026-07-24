@@ -50,6 +50,11 @@ workflow or initiative artifacts.
 
 ## Commit and PR format
 
+Use change-focused branch names such as
+`feat/initiative-card-blocking`, `feat/hld-card-blocking`, or
+`fix/workflow-approval-sync`. Never use an AI provider or agent name such as
+`agent/`, `copilot/`, `codex/`, or `claude/` as the branch prefix.
+
 Use Conventional Commits for both the PR title and commits:
 `feat(initiative): description`, `feat(hld): description`,
 `feat(lld): description`, `fix(requirement): description`, or

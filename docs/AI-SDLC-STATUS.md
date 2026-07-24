@@ -79,6 +79,7 @@ from starting early.
 - [x] Post-merge scaffold creates reusable HLD and LLD Markdown templates.
 - [x] Cross-agent repository and Copilot instructions define artifact boundaries.
 - [x] Conventional Commit policy and PR title guidance added.
+- [x] Change-focused branch naming policy and validation added.
 - [x] Semantic release tag workflow added for merges to `main`.
 
 ## Current repository workflow

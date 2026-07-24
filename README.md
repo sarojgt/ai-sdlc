@@ -65,6 +65,22 @@ AI-SDLC framework versions. Artifact scopes describe initiative work but do not
 version the framework itself. When a release is required, the workflow creates
 a `vMAJOR.MINOR.PATCH` tag and GitHub release with generated notes.
 
+## Branch naming standard
+
+Branches describe the change and use the same type and lifecycle scope:
+
+```text
+feat/initiative-card-blocking
+feat/hld-card-blocking
+fix/workflow-approval-sync
+docs/policy-branch-naming
+ci/release-semantic-tags
+```
+
+Do not use provider or agent names such as `agent/`, `copilot/`, `codex/`, or
+`claude/` in branch names. GitHub validates the branch, PR title, and commit
+messages together.
+
 ## End-to-end flow
 
 ```text

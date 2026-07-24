@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from conventional_commits import Commit, validate_commit  # noqa: E402
+from conventional_commits import Commit, validate_branch_name, validate_commit  # noqa: E402
 
 # Legacy Copilot progress commits were created before this repository enforced
 # Conventional Commits. Keep this exemption narrow and remove it after all open
@@ -40,9 +40,14 @@ def main() -> int:
     parser.add_argument("--pr-title", required=True)
     parser.add_argument("--base", required=True)
     parser.add_argument("--head", required=True)
+    parser.add_argument("--branch", required=True)
     args = parser.parse_args()
 
     errors = []
+    branch_error = validate_branch_name(args.branch)
+    if branch_error:
+        errors.append(f"branch `{args.branch}` {branch_error}")
+
     title_error = validate_commit(Commit(args.pr_title))
     if title_error:
         errors.append(f"PR title `{args.pr_title}` {title_error}")

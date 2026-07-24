@@ -55,3 +55,12 @@ release_scope_policy:
   framework_release_scopes: [workflow, policy, release, ai-sdlc, repo]
   artifact_only_scopes: [initiative, requirement, context, hld, lld, approval, traceability]
   explanation: "Artifact commits describe the initiative lifecycle but do not version the AI-SDLC framework itself."
+branch_naming:
+  format: "type/scope-short-description"
+  examples:
+    - "feat/initiative-card-blocking"
+    - "feat/hld-card-blocking"
+    - "fix/workflow-approval-sync"
+    - "docs/policy-branch-naming"
+    - "ci/release-semantic-tags"
+  prohibited_prefixes: [agent, copilot, codex, claude, gemini, qwen, ai]

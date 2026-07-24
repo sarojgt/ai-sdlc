@@ -8,6 +8,10 @@ feat(hld): add the high-level design
 fix(workflow): prevent approval sync loops
 ```
 
+Branch naming must follow `type/scope-short-description`, for example
+`feat/initiative-card-blocking` or `fix/workflow-approval-sync`. Do not use an
+AI provider or agent name in the branch prefix.
+
 Valid types include `feat`, `fix`, `perf`, `refactor`, `revert`, `docs`,
 `test`, `chore`, `ci`, `build`, and `style`. Add `!` or a `BREAKING CHANGE:`
 footer for a breaking change.

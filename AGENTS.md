@@ -38,6 +38,12 @@ For the exact intake file allowlist and handoff behavior, read
 
 ## Commit and release conventions
 
+- Use change-focused branch names in the form
+  `type/scope-short-description`, for example
+  `feat/initiative-card-blocking`, `feat/hld-card-blocking`,
+  `fix/workflow-approval-sync`, or `ci/release-semantic-tags`.
+- Never use an AI provider or agent name as the branch prefix, including
+  `agent/`, `copilot/`, `codex/`, `claude/`, `gemini/`, or `qwen/`.
 - Use Conventional Commit titles and commit messages:
   `type(scope): description`.
 - Use lifecycle scopes such as `initiative`, `requirement`, `context`, `hld`,
