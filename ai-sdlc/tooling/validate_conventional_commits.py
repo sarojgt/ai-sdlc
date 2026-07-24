@@ -11,6 +11,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from conventional_commits import Commit, validate_commit  # noqa: E402
 
+# Legacy Copilot progress commits were created before this repository enforced
+# Conventional Commits. Keep this exemption narrow and remove it after all open
+# branches with these subjects are merged or closed.
+EXEMPT_COMMIT_SUBJECTS = {
+    "Initial plan",
+}
+
 
 def git_commits(base: str, head: str) -> list[Commit]:
     result = subprocess.run(
@@ -44,6 +51,11 @@ def main() -> int:
     if not commits:
         errors.append("PR contains no commits in the base/head range")
     for commit in commits:
+        if commit.subject in EXEMPT_COMMIT_SUBJECTS:
+            # Emit to stderr so CI logs preserve visibility without changing the
+            # normal success output contract on stdout.
+            print(f"Skipping exempt legacy commit subject: `{commit.subject}`", file=sys.stderr)
+            continue
         error = validate_commit(commit)
         if error:
             errors.append(f"commit `{commit.subject}` {error}")
