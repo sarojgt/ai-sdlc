@@ -33,7 +33,9 @@ The generated structure after scaffold expansion is:
   context-manifest.yaml
   context/relative/
   hld/
+    hld.md              # human-readable HLD template
   lld/
+    lld.md              # human-readable LLD template, locked until HLD approval
   feedback/
   approvals/
   evidence/

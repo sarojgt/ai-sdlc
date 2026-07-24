@@ -140,8 +140,9 @@ generated directory is the instance; the templates and configuration remain
 shared by every initiative.
 
 The intake profile creates only the core files needed for business review.
-After the PR merges, one post-merge workflow expands the reusable boilerplate
-and synchronizes valid human requirement approval in a single follow-up PR.
+After the PR is approved or merged, one post-merge workflow expands the
+reusable boilerplate, including HLD and LLD templates, and synchronizes valid
+human requirement approval in a single follow-up PR.
 
 For assistant-driven intake, see
 [Initiative Intake Agent Guide](design/initiative-intake-agent-guide.md).

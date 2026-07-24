@@ -60,5 +60,7 @@ just ai-sdlc-init \
 
 ## Handoff
 
-After the intake PR is merged, the post-merge workflow creates a follow-up PR
-to add the reusable folder structure and README guides.
+After the intake PR is approved or merged, the post-merge workflow creates a
+follow-up PR to add the reusable folder structure, HLD template, LLD template,
+and README guides. The workflow may also synchronize valid human requirement
+approval metadata. Do not add these files manually to the intake PR.

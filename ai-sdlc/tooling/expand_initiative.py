@@ -91,6 +91,11 @@ the workflow and should not normally be authored manually.
 """,
 }
 
+TEMPLATE_FILES = {
+    "hld/hld.md": "hld/hld.md",
+    "lld/lld.md": "lld/lld.md",
+}
+
 
 def fail(message: str) -> None:
     print(message, file=sys.stderr)
@@ -114,6 +119,33 @@ def update_workflow_state(initiative_yaml: Path, expected: str, new_value: str) 
     return True
 
 
+def metadata(initiative_yaml: Path) -> dict[str, str]:
+    text = initiative_yaml.read_text()
+    values = {}
+    for key in ("title", "owner"):
+        match = re.search(rf'^\s+{key}:\s*"([^"]*)"\s*$', text, flags=re.MULTILINE)
+        if match:
+            values[key] = match.group(1)
+    initiative_match = re.search(r'^\s+id:\s*"([^"]+)"\s*$', text, flags=re.MULTILINE)
+    if initiative_match:
+        values["id"] = initiative_match.group(1)
+    return values
+
+
+def render_template(source: Path, target: Path, values: dict[str, str]) -> None:
+    text = source.read_text()
+    replacements = {
+        "{{ initiative.id }}": values.get("id", target.parent.parent.parent.name),
+        "{{ initiative.title }}": values.get("title", "Untitled initiative"),
+        "{{ roles.solution_architect }}": "team.solution-architecture",
+        "{{ roles.senior_engineer }}": "team.engineering",
+    }
+    for placeholder, value in replacements.items():
+        text = text.replace(placeholder, value)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(text)
+
+
 def main() -> int:
     if len(sys.argv) != 2:
         fail("Usage: expand_initiative.py <initiative-dir>")
@@ -132,6 +164,18 @@ def main() -> int:
         created_any = True
 
     initiative_yaml = initiative_dir / "initiative.yaml"
+    template_root = initiative_dir.parent.parent / "templates" / "initiative"
+    values = metadata(initiative_yaml) if initiative_yaml.exists() else {}
+    for relative, template_relative in TEMPLATE_FILES.items():
+        path = initiative_dir / relative
+        if path.exists():
+            continue
+        source = template_root / template_relative
+        if not source.exists():
+            fail(f"Initiative template not found: {source}")
+        render_template(source, path, values)
+        created_any = True
+
     if initiative_yaml.exists() and update_workflow_state(initiative_yaml, "intake", "scaffolded"):
         created_any = True
 

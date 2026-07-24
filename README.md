@@ -101,9 +101,9 @@ ai-sdlc/initiatives/PAY-4567/context/relative/
 ```
 
 The intake PR is intentionally small. After merge, one post-merge automation
-workflow expands the initiative with reusable boilerplate and, when the merged
-PR has a valid human approval, synchronizes the requirement approval metadata
-in a single follow-up PR.
+workflow expands the initiative with reusable boilerplate, including HLD and
+LLD templates, and synchronizes valid human approval metadata in a single
+follow-up PR.
 
 The requirement captures business outcome, problem, stakeholders, scope,
 business rules, functional and non-functional requirements, data, integrations,
