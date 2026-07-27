@@ -152,8 +152,9 @@ jobs:
         run: bash ai-sdlc/tooling/validate_structure.sh "${{ steps.scope.outputs.initiative_dir }}"
 
       - name: Create post-merge automation pull request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ github.token }}
           branch: automation/initiative-post-merge-${{ steps.scope.outputs.initiative_name }}
           commit-message: "chore(ai-sdlc): process ${{ steps.scope.outputs.initiative_name }} after merge"
           title: "chore(ai-sdlc): process ${{ steps.scope.outputs.initiative_name }} after intake merge"
