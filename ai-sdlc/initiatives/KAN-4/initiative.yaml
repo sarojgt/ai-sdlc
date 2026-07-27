@@ -19,4 +19,4 @@ policy:
   data_classification: "confidential"
   implementation_locked_until: architecture.approved
 workflow:
-  state: intake
+  state: scaffolded
