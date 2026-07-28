@@ -84,6 +84,10 @@ from starting early.
 - [x] Scoped semantic versions added for initiatives, HLDs, LLDs, and context.
 - [x] HLD design baseline records exact parent versions and context hashes.
 - [x] Human-readable version matrix command and GitHub summary added.
+- [x] GitHub workflow actions upgraded for the Node 24 runner transition.
+- [x] Initiative processing restricted to merged pull requests.
+- [x] HLD and initiative bootstrap scripts work with BSD and GNU `sed`.
+- [x] Copilot provider adapters are executable through local and CI entry points.
 
 ## Current repository workflow
 
