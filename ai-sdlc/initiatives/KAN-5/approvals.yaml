@@ -1,0 +1,29 @@
+das_version: "0.1"
+initiative: "KAN-5"
+records:
+  - gate: requirements
+    decision: approved
+    principal: "sarojgt"
+    role: product_owner
+    artifact_id: "REQ-KAN-5"
+    artifact_version: 1
+    content_sha256: "eba26369852e2bd9105dad0158dcb97a5e90457b435d8176c9846a83d1be5b0d"
+    timestamp: "2026-07-28T11:31:37Z"
+    review_commit: "489dd24b543c224b2f5399b69220b792a40de858"
+  - gate: hld
+    decision: pending
+    principal: ""
+    role: solution_architect
+    artifact_id: "HLD-KAN-5"
+    artifact_version: 1
+    content_sha256: ""
+    timestamp: ""
+    review_commit: ""
+  - gate: lld
+    decision: pending
+    principal: ""
+    role: senior_engineer
+    artifact_id: "LLD-KAN-5"
+    artifact_version: 1
+    content_sha256: ""
+    timestamp: ""

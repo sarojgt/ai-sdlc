@@ -1,0 +1,12 @@
+das_version: "0.1"
+initiative: "KAN-5"
+links:
+  - from: "jira:KAN-5"
+    to: "REQ-KAN-5"
+    relation: specifies
+  - from: "REQ-KAN-5"
+    to: "HLD-KAN-5"
+    relation: designed-by
+  - from: "HLD-KAN-5"
+    to: "LLD-KAN-5"
+    relation: detailed-by

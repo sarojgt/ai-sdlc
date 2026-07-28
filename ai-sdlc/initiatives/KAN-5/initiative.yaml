@@ -1,0 +1,21 @@
+das_version: "0.1"
+artifact:
+  id: "KAN-5"
+  type: initiative
+  version: 1
+  status: approved
+  title: "Add API endpoint for temporary card blocking"
+  initiative: "KAN-5"
+  owner: "team.cards"
+source:
+  provider: "jira"
+  work_item_id: "KAN-5"
+scope:
+  domains: []
+  repositories: []
+policy:
+  risk_tier: "high"
+  data_classification: "confidential"
+  implementation_locked_until: architecture.approved
+workflow:
+  state: approved
