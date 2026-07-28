@@ -138,6 +138,8 @@ from starting early.
 
 - [x] Business approval represented in the requirement artifact.
 - [x] Architecture approval represented in HLD metadata and approval records.
+- [x] HLD approval synchronized from the current-head Solution Architect / ARB
+      GitHub review.
 - [~] Security, senior engineering, and release gates defined conceptually.
 - [~] Enforce CODEOWNERS and protected-branch rules in GitHub; repository
       CODEOWNERS paths are configured, but enterprise team names and branch

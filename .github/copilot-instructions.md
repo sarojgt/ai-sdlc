@@ -67,6 +67,8 @@ manually add that boilerplate to the intake PR.
 - Record missing facts as context gaps; do not invent enterprise components.
 - Run bounded AI review loops only where configured.
 - Stop for human Solution Architect or ARB approval before LLD.
+- HLD approval must come from the current-head GitHub review by the HLD
+  CODEOWNER; AI review cannot approve architecture.
 - Stop for senior engineering approval before implementation work.
 
 The HLD must remain a concise architecture decision document, not an LLD. It

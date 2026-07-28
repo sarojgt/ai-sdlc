@@ -257,6 +257,12 @@ Only after the HLD approval record is present should the LLD flow be enabled.
 The LLD contains detailed APIs, schemas, classes, implementation sequencing,
 test strategy, and migration details.
 
+HLD approval follows the same review-derived pattern as requirements. The HLD
+PR must receive a current-head approval from the Solution Architect / ARB
+CODEOWNER. The HLD approval workflow records that review in `approvals.yaml`,
+marks the HLD approved, and moves the initiative to `hld_approved`. AI review
+is advisory only and cannot satisfy this gate.
+
 ## Current versus target integration
 
 Current: GitHub/repository artifacts, Markdown requirements and HLDs, `just`

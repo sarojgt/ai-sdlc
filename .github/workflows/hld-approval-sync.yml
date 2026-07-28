@@ -1,0 +1,155 @@
+name: HLD Approval Sync
+
+on:
+  pull_request:
+    types: [closed]
+    paths:
+      - "ai-sdlc/initiatives/**/hld/**"
+  workflow_dispatch:
+    inputs:
+      initiative_dir:
+        description: Initiative directory, for example ai-sdlc/initiatives/DEMO-005
+        required: true
+        type: string
+      pull_request_number:
+        description: HLD PR number used to recover the architect review
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    if: >
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.merged == true &&
+       startsWith(github.event.pull_request.head.ref, 'feat/hld-')) ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 1
+
+      - name: Resolve HLD review
+        id: scope
+        uses: actions/github-script@v9
+        env:
+          INITIATIVE_DIR: ${{ inputs.initiative_dir }}
+          PULL_REQUEST_NUMBER: ${{ inputs.pull_request_number || github.event.pull_request.number }}
+        with:
+          script: |
+            const pullNumber = Number(process.env.PULL_REQUEST_NUMBER || 0);
+            let initiativeDir = (process.env.INITIATIVE_DIR || '').trim();
+            let pullRequest;
+            if (pullNumber > 0) {
+              pullRequest = (await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pullNumber,
+              })).data;
+            }
+            if (!initiativeDir) {
+              const files = await github.paginate(github.rest.pulls.listFiles, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pullNumber,
+                per_page: 100,
+              });
+              const initiatives = [...new Set(files.map(file => file.filename)
+                .filter(name => name.startsWith('ai-sdlc/initiatives/'))
+                .map(name => name.split('/').slice(0, 3).join('/')))];
+              if (initiatives.length !== 1) {
+                core.setFailed(`Expected exactly one initiative, found ${initiatives.join(', ')}`);
+                return;
+              }
+              initiativeDir = initiatives[0];
+            }
+
+            let approved = false;
+            let reviewer = '';
+            let reviewId = '';
+            let submittedAt = '';
+            let reviewCommit = '';
+            if (pullRequest) {
+              const reviews = await github.paginate(github.rest.pulls.listReviews, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pullNumber,
+                per_page: 100,
+              });
+              const latestByReviewer = new Map();
+              for (const review of reviews
+                .filter(item => item.user && item.submitted_at)
+                .sort((a, b) => new Date(a.submitted_at) - new Date(b.submitted_at))) {
+                latestByReviewer.set(review.user.login, review);
+              }
+              const latest = [...latestByReviewer.values()];
+              const blocking = latest.find(item => item.state === 'CHANGES_REQUESTED');
+              const accepted = latest
+                .filter(item => item.state === 'APPROVED')
+                .sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))[0];
+              if (accepted && !blocking && accepted.commit_id === pullRequest.head.sha) {
+                approved = true;
+                reviewer = accepted.user.login;
+                reviewId = String(accepted.id);
+                submittedAt = accepted.submitted_at;
+                reviewCommit = accepted.commit_id;
+              }
+            }
+            core.setOutput('initiative_dir', initiativeDir);
+            core.setOutput('initiative_name', initiativeDir.split('/').pop());
+            core.setOutput('reviewer', reviewer);
+            core.setOutput('review_id', reviewId);
+            core.setOutput('submitted_at', submittedAt);
+            core.setOutput('approved', String(approved));
+            core.setOutput('review_commit', reviewCommit);
+            core.setOutput('head_commit', pullRequest ? pullRequest.head.sha : '');
+
+      - name: Synchronize architecture approval
+        run: |
+          python3 ai-sdlc/tooling/sync_hld_approval.py \
+            "${{ steps.scope.outputs.initiative_dir }}" \
+            "${{ steps.scope.outputs.reviewer }}" \
+            "${{ steps.scope.outputs.review_id }}" \
+            "${{ steps.scope.outputs.submitted_at }}" \
+            "${{ steps.scope.outputs.approved }}" \
+            "${{ steps.scope.outputs.review_commit }}" \
+            "${{ steps.scope.outputs.head_commit }}"
+
+      - name: Validate approved HLD state
+        run: bash ai-sdlc/tooling/validate_structure.sh "${{ steps.scope.outputs.initiative_dir }}"
+
+      - name: Resolve policy-compliant approval branch
+        id: branch
+        env:
+          INITIATIVE_NAME: ${{ steps.scope.outputs.initiative_name }}
+        run: |
+          set -euo pipefail
+          normalized="$(printf '%s' "$INITIATIVE_NAME" | tr '[:upper:]' '[:lower:]' | tr '_' '-')"
+          echo "name=chore/hld-approval-$normalized" >> "$GITHUB_OUTPUT"
+
+      - name: Create approval metadata pull request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
+          branch: ${{ steps.branch.outputs.name }}
+          commit-message: "chore(approval): record HLD approval for ${{ steps.scope.outputs.initiative_name }}"
+          title: "chore(approval): record HLD approval for ${{ steps.scope.outputs.initiative_name }}"
+          body: |
+            Records the human Solution Architect / ARB review from the merged HLD PR.
+            This automation does not grant architecture approval.
+          labels: ai-sdlc, automation
+          delete-branch: true
+
+      - name: Enable approval metadata auto-merge
+        if: steps.create_pr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
+          PR_NUMBER: ${{ steps.create_pr.outputs.pull-request-number }}
+        run: gh pr merge "$PR_NUMBER" --auto --squash --repo "$GITHUB_REPOSITORY"

@@ -71,7 +71,14 @@ approval_decisions="$(awk '
   /^  - gate:/ { gate=$3 }
   /^[[:space:]]+decision:/ { print gate ":" $2 }
 ' "$initiative/approvals.yaml")"
-grep -q '^hld:pending$' <<< "$approval_decisions"
+case "$state" in
+  hld_approved|lld_draft|lld_review|lld_approved|implementation_ready|implementing|pr_review|release_ready|deployed|learning)
+    grep -q '^hld:approved$' <<< "$approval_decisions"
+    ;;
+  *)
+    grep -q '^hld:pending$' <<< "$approval_decisions"
+    ;;
+esac
 grep -q '^lld:pending$' <<< "$approval_decisions"
 
 case "$state" in
