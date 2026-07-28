@@ -65,6 +65,8 @@ def main() -> int:
         text = template.read_text()
         text = text.replace("{{ initiative.id }}", data.get("id", initiative_dir.name))
         text = text.replace("{{ initiative.title }}", data.get("title", "Untitled initiative"))
+        text = text.replace("{{ roles.solution_architect }}", "team.solution-architecture")
+        text = text.replace("{{ roles.senior_engineer }}", "team.engineering")
         target.write_text(text)
 
     readme = target_dir / "README.md"
