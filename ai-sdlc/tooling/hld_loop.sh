@@ -22,6 +22,17 @@ policy_value() {
 max_iterations="${AI_SDLC_HLD_LOOP_MAX_ITERATIONS:-$(policy_value max_iterations)}"
 max_elapsed_minutes="$(policy_value max_elapsed_minutes)"
 
+sha256() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$@"
+  elif command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$@"
+  else
+    echo "No SHA-256 command found (expected sha256sum or shasum)." >&2
+    return 1
+  fi
+}
+
 test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
 grep -q 'status: approved' "$target/requirement.md" || {
   echo "Requirement is not approved. HLD loop cannot start." >&2
@@ -45,8 +56,8 @@ started_at="$(date +%s)"
 
 hld_hash() {
   find "$target/hld" -type f -print | sort | while IFS= read -r file; do
-    shasum -a 256 "$file"
-  done | shasum -a 256 | awk '{print $1}'
+    sha256 "$file"
+  done | sha256 | awk '{print $1}'
 }
 
 mkdir -p "$target/feedback" "$target/evidence"
@@ -82,7 +93,7 @@ for iteration in $(seq 1 "$max_iterations"); do
     exit 30
   }
 
-  feedback_hash="$(sed -e '/^reviewer:/d' -e '/^model:/d' -e '/^iteration:/d' "$review_file" | shasum -a 256 | awk '{print $1}')"
+  feedback_hash="$(sed -e '/^reviewer:/d' -e '/^model:/d' -e '/^iteration:/d' "$review_file" | sha256 | awk '{print $1}')"
   if [ -n "$previous_feedback_hash" ] && [ "$feedback_hash" = "$previous_feedback_hash" ]; then
     echo "Repeated AI feedback detected; escalating to human Solution Architect." >&2
     exit 10

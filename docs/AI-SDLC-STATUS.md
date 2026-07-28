@@ -91,6 +91,9 @@ from starting early.
 - [x] Copilot cloud-agent setup workflow prepares the repository toolchain and
       validates lifecycle/provider interfaces with read-only permissions.
 - [x] `just` recipes use a portable Bash shell for GitHub-hosted runners.
+- [x] HLD loop hashing supports Linux `sha256sum` and macOS `shasum`.
+- [x] Generated evidence links use repository-relative paths instead of local
+      machine paths.
 
 ## Current repository workflow
 

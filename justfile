@@ -56,7 +56,7 @@ ai-sdlc-validate-all:
 
 # Show the reusable AI-SDLC framework structure.
 ai-sdlc-tree:
-    find ai-sdlc -maxdepth 3 -type f | sort
+    find ai-sdlc -type f | awk -F/ 'NF <= 4' | sort
 
 # Show the current initiative lifecycle documentation.
 ai-sdlc-docs:
