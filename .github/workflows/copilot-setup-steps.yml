@@ -1,0 +1,71 @@
+name: Copilot Setup Steps
+
+# GitHub Copilot cloud agent discovers this workflow by its path and job name.
+# Keep setup deterministic and read-only: lifecycle decisions remain in the
+# repository workflows and human review gates.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Install just command runner
+        uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Verify repository toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v bash
+          command -v ruby
+          command -v python3
+          command -v node
+          command -v just
+          bash --version | head -n 1
+          ruby --version
+          python3 --version
+          node --version
+          just --version
+
+      - name: Validate AI-SDLC artifacts and workflow contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          just ai-sdlc-validate-all
+          python3 -m py_compile ai-sdlc/tooling/*.py
+          ruby -e 'require "yaml"; Dir[".github/workflows/*.yml"].each { |f| YAML.load_file(f) }; puts "Workflow YAML parsed"'
+
+      - name: Verify provider and lifecycle interfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -x ai-sdlc/tooling/run_agent.sh
+          test -x ai-sdlc/tooling/hld_loop.sh
+          test -x ai-sdlc/tooling/providers/codex.sh
+          test -x ai-sdlc/tooling/providers/github-copilot.sh
+          test -x ai-sdlc/tooling/providers/github-copilot-review.sh

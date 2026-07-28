@@ -31,6 +31,37 @@ Required for GitHub publishing and PR automation:
 - Authenticated GitHub CLI session with repository write access
 - A configured `origin` remote pointing to the target repository
 
+### GitHub Copilot cloud-agent setup
+
+The repository includes
+[`.github/workflows/copilot-setup-steps.yml`](.github/workflows/copilot-setup-steps.yml)
+for GitHub Copilot's cloud agent. It prepares the Ubuntu environment with the
+repository's Python, Node.js, Ruby, and `just` tooling, then validates the
+AI-SDLC artifact and provider interfaces. It uses read-only repository
+permissions and never generates or approves architecture.
+
+Copilot should also follow
+[`.github/copilot-instructions.md`](.github/copilot-instructions.md) and the
+root [`AGENTS.md`](AGENTS.md). Those files define the artifact-only boundary,
+intake-first flow, human HLD gate, context rules, Conventional Commit titles,
+branch naming, narrow PR scope, and required handoff information. Keep this
+setup workflow on the default branch so Copilot can discover it; the workflow
+must retain the single job name `copilot-setup-steps`.
+
+For a Copilot task, state the lifecycle operation explicitly, for example:
+
+```text
+Create only the intake initiative PR for PAY-1234 in this repository.
+Follow AGENTS.md and .github/copilot-instructions.md. Do not create HLD/LLD
+or modify product code. Use branch feat/initiative-pay-1234 and PR title
+feat(initiative): capture PAY-1234 requirement.
+```
+
+For HLD work, the requirement must already be approved. Ask Copilot to use the
+configured HLD workflow/provider adapter, record generator and reviewer models,
+run the bounded review loop, and open a draft HLD PR for human Solution
+Architect/ARB review. A passing AI review is not an architecture approval.
+
 Optional provider integrations may require their own CLI, SDK, credentials, or
 MCP connector. Claude, Gemini, Copilot, Qwen, local models, Jira, and Confluence
 are not required for the repository-first flow.
