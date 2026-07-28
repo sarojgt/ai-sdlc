@@ -149,9 +149,10 @@ generated directory is the instance; the templates and configuration remain
 shared by every initiative.
 
 The intake profile creates only `requirement.md` for business review. After the
-PR is approved or merged, one post-merge workflow creates the metadata and
-expands the reusable boilerplate, including HLD and LLD templates, then
-synchronizes valid human requirement approval in a single follow-up PR.
+PR is approved or merged, one post-merge workflow creates initiative metadata
+and the context manifest, then synchronizes valid human requirement approval in
+a single follow-up PR. HLD and LLD artifacts are created only by their gated
+lifecycle workflows.
 
 For assistant-driven intake, see
 [Initiative Intake Agent Guide](design/initiative-intake-agent-guide.md).

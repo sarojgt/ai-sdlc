@@ -133,7 +133,7 @@ Business requirement
   → small intake initiative PR
   → business approval
   → merge trigger
-  → automated boilerplate scaffold PR
+  → automated metadata/context PR
   → context assembly and impact assessment
   → AI-generated HLD with standards-based recommendation
   → bounded AI review loop
@@ -183,8 +183,9 @@ ai-sdlc/initiatives/PAY-4567/context/relative/
 
 The intake PR contains only `requirement.md` and optional initiative-relative
 context. After merge, one post-merge automation workflow creates the initiative
-metadata and expands the reusable boilerplate, including HLD and LLD templates,
-in a single follow-up PR. It also synchronizes valid human approval metadata.
+metadata and context manifest in a single follow-up PR. HLD and LLD artifacts
+are created later by their respective gated workflows. It also synchronizes
+valid human approval metadata.
 
 The requirement captures business outcome, problem, stakeholders, scope,
 business rules, functional and non-functional requirements, data, integrations,

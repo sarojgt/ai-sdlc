@@ -44,9 +44,11 @@ technical detail.
 
 ## After intake approval or merge
 
-The post-merge GitHub Action creates a follow-up automation PR with the
-remaining scaffold, including human-readable HLD and LLD templates. Do not
-manually add that boilerplate to the intake PR.
+The post-merge GitHub Action creates a follow-up automation PR with initiative
+metadata and the context manifest. The HLD workflow creates HLD, feedback, and
+evidence artifacts when HLD generation begins. The LLD workflow creates LLD
+artifacts only after HLD approval. Do not manually add that boilerplate to the
+intake PR.
 
 ## HLD and LLD behavior
 

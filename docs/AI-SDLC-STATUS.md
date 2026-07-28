@@ -76,7 +76,8 @@ from starting early.
 - [x] Process merged initiative PRs through one post-merge automation PR.
 - [x] Auto-mark requirements approved from valid human review history.
 - [x] Manual backfill path for missed initiative processing.
-- [x] Post-merge scaffold creates reusable HLD and LLD Markdown templates.
+- [x] Post-merge processing creates initiative metadata and context manifest;
+      HLD and LLD artifacts are created lazily by gated lifecycle workflows.
 - [x] Cross-agent repository and Copilot instructions define artifact boundaries.
 - [x] Conventional Commit policy and PR title guidance added.
 - [x] Change-focused branch naming policy and validation added.

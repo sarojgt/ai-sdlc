@@ -16,6 +16,10 @@ ai-sdlc-new:
 ai-sdlc-expand initiative:
     python3 ./ai-sdlc/tooling/expand_initiative.py "ai-sdlc/initiatives/{{initiative}}"
 
+# Create design artifacts only when the corresponding lifecycle stage begins.
+ai-sdlc-init-design initiative artifact:
+    python3 ./ai-sdlc/tooling/initialize_design_artifacts.py "ai-sdlc/initiatives/{{initiative}}" "{{artifact}}"
+
 # Show the latest framework, initiative, design, and context versions.
 ai-sdlc-version-view:
     python3 ./ai-sdlc/tooling/version_matrix.py

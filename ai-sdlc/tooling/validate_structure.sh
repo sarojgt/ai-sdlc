@@ -66,29 +66,16 @@ case "$state" in
   intake)
     ;;
   scaffolded|approved)
-    scaffold_files=(
-      "$initiative/context/relative/README.md"
-      "$initiative/hld/README.md"
-      "$initiative/lld/README.md"
-      "$initiative/feedback/README.md"
-      "$initiative/approvals/README.md"
-      "$initiative/evidence/README.md"
-    )
-    for file in "${scaffold_files[@]}"; do
-      test -f "$file" || { echo "Missing scaffold file: $file" >&2; exit 1; }
-    done
+    # Design, feedback, evidence, and relative-context directories are created
+    # lazily by their lifecycle workflows.
     ;;
   hld_draft|hld_review|hld_approved|lld_draft|lld_review|lld_approved|implementation_ready|implementing|pr_review|release_ready|deployed|learning)
-    scaffold_files=(
-      "$initiative/context/relative/README.md"
-      "$initiative/hld/README.md"
-      "$initiative/lld/README.md"
-      "$initiative/feedback/README.md"
-      "$initiative/approvals/README.md"
-      "$initiative/evidence/README.md"
-      "$initiative/hld/hld.md"
-      "$initiative/lld/lld.md"
-    )
+    scaffold_files=("$initiative/hld/hld.md")
+    case "$state" in
+      lld_draft|lld_review|lld_approved|implementation_ready|implementing|pr_review|release_ready|deployed|learning)
+        scaffold_files+=("$initiative/lld/lld.md")
+        ;;
+    esac
     for file in "${scaffold_files[@]}"; do
       test -f "$file" || { echo "Missing lifecycle file: $file" >&2; exit 1; }
     done

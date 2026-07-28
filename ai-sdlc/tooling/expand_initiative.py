@@ -6,6 +6,8 @@ import sys
 from pathlib import Path
 
 
+# These descriptions are retained for reference by design tooling. Artifact
+# directories are now created lazily by initialize_design_artifacts.py.
 README_TEXT = {
     "context/relative/README.md": """# Relative Context
 
@@ -97,8 +99,6 @@ TEMPLATE_FILES = {
     "approvals.yaml": "approvals.yaml",
     "traceability.yaml": "traceability.yaml",
     "context-manifest.yaml": "context-manifest.yaml",
-    "hld/hld.md": "hld/hld.md",
-    "lld/lld.md": "lld/lld.md",
 }
 
 
@@ -188,14 +188,6 @@ def main() -> int:
         fail(f"Initiative directory not found: {initiative_dir}")
 
     created_any = False
-    for relative, content in README_TEXT.items():
-        path = initiative_dir / relative
-        if path.exists():
-            continue
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content)
-        created_any = True
-
     initiative_yaml = initiative_dir / "initiative.yaml"
     requirement_md = initiative_dir / "requirement.md"
     template_root = initiative_dir.parent.parent / "templates" / "initiative"

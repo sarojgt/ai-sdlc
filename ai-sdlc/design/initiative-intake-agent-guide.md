@@ -58,7 +58,8 @@ just ai-sdlc-init \
 ## Handoff
 
 After the intake PR is approved or merged, the post-merge workflow creates a
-follow-up PR to add initiative metadata, the reusable folder structure, HLD
-template, LLD template, and README guides. The workflow may also synchronize
-valid human requirement approval metadata. Do not add these files manually to
-the intake PR.
+follow-up PR to add initiative metadata and the context manifest. The HLD
+workflow creates HLD, evidence, and feedback artifacts when it starts; the LLD
+workflow creates LLD artifacts only after HLD approval. The workflow may also
+synchronize valid human requirement approval metadata. Do not add these files
+manually to the intake PR.

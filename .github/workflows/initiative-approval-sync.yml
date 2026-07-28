@@ -155,8 +155,10 @@ jobs:
           body: |
             Auto-generated from the merged initiative intake PR.
 
-            This PR adds the reusable initiative boilerplate and records human
-            approval metadata when the source PR has a valid approval.
+            This PR adds initiative metadata and the context manifest. HLD,
+            LLD, feedback, and evidence artifacts are created later by their
+            gated lifecycle workflows. Human approval metadata is recorded only
+            when the source PR has a valid human approval.
 
             AI does not grant approval. The approval metadata is derived only
             from GitHub human review history.
