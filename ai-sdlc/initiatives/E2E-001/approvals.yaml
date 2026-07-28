@@ -1,0 +1,27 @@
+das_version: "0.1"
+initiative: "E2E-001"
+records:
+  - gate: requirements
+    decision: pending
+    principal: ""
+    role: product_owner
+    artifact_id: "REQ-E2E-001"
+    artifact_version: 1
+    content_sha256: ""
+    timestamp: ""
+  - gate: hld
+    decision: pending
+    principal: ""
+    role: solution_architect
+    artifact_id: "HLD-E2E-001"
+    artifact_version: 1
+    content_sha256: ""
+    timestamp: ""
+  - gate: lld
+    decision: pending
+    principal: ""
+    role: senior_engineer
+    artifact_id: "LLD-E2E-001"
+    artifact_version: 1
+    content_sha256: ""
+    timestamp: ""
