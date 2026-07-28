@@ -88,6 +88,8 @@ from starting early.
 - [x] Initiative processing restricted to merged pull requests.
 - [x] HLD and initiative bootstrap scripts work with BSD and GNU `sed`.
 - [x] Copilot provider adapters are executable through local and CI entry points.
+- [x] Copilot cloud-agent setup workflow prepares the repository toolchain and
+      validates lifecycle/provider interfaces with read-only permissions.
 
 ## Current repository workflow
 
@@ -140,6 +142,7 @@ from starting early.
 - [x] Dry-run support available.
 - [ ] Add GitHub Issue → initiative automation.
 - [x] Add automatic and manual HLD workflow triggers.
+- [x] Add Copilot cloud-agent setup instructions and repository working agreement.
 - [x] Add draft HLD PR creation.
 - [~] Add AI review comments to the HLD PR.
 - [ ] Add human feedback webhook/command reruns.
