@@ -145,11 +145,21 @@ jobs:
       - name: Validate expanded initiative
         run: bash ai-sdlc/tooling/validate_structure.sh "${{ steps.scope.outputs.initiative_dir }}"
 
+      - name: Resolve policy-compliant automation branch
+        id: branch
+        env:
+          INITIATIVE_NAME: ${{ steps.scope.outputs.initiative_name }}
+        run: |
+          set -euo pipefail
+          normalized="$(printf '%s' "$INITIATIVE_NAME" | tr '[:upper:]' '[:lower:]' | tr '_' '-')"
+          echo "name=chore/initiative-post-merge-$normalized" >> "$GITHUB_OUTPUT"
+
       - name: Create post-merge automation pull request
+        id: create_pr
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ github.token }}
-          branch: automation/initiative-post-merge-${{ steps.scope.outputs.initiative_name }}
+          token: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
+          branch: ${{ steps.branch.outputs.name }}
           commit-message: "chore(ai-sdlc): process ${{ steps.scope.outputs.initiative_name }} after merge"
           title: "chore(ai-sdlc): process ${{ steps.scope.outputs.initiative_name }} after intake merge"
           body: |
@@ -164,3 +174,12 @@ jobs:
             from GitHub human review history.
           labels: ai-sdlc, automation
           delete-branch: true
+
+      - name: Enable scaffold PR auto-merge
+        if: steps.create_pr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
+          PR_NUMBER: ${{ steps.create_pr.outputs.pull-request-number }}
+        run: |
+          set -euo pipefail
+          gh pr merge "$PR_NUMBER" --auto --squash --repo "$GITHUB_REPOSITORY"
