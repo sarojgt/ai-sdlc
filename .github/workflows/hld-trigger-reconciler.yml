@@ -1,0 +1,107 @@
+name: Reconcile HLD Triggers
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+    inputs:
+      initiative_id:
+        description: Optional initiative ID to reconcile immediately
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+  actions: write
+
+concurrency:
+  group: hld-trigger-reconciliation
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 1
+
+      - name: Dispatch HLD generation for merged scaffold PRs
+        env:
+          GH_TOKEN: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
+          REPOSITORY: ${{ github.repository }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          REQUESTED_INITIATIVE: ${{ inputs.initiative_id }}
+          GENERATOR_MODEL: claude-haiku-4.5
+          REVIEWER_MODEL: gemini-3.5-flash
+        run: |
+          set -euo pipefail
+
+          candidates=()
+          if [ -n "$REQUESTED_INITIATIVE" ]; then
+            candidates+=("$REQUESTED_INITIATIVE")
+          else
+            for directory in ai-sdlc/initiatives/*; do
+              [ -d "$directory" ] || continue
+              initiative_id="${directory##*/}"
+              normalized="$(printf '%s' "$initiative_id" | tr '[:upper:]' '[:lower:]' | tr '_' '-')"
+
+              # A scaffold is eligible only after its own automation PR has
+              # merged. This avoids starting HLD generation after the intake
+              # PR, before metadata and approval synchronization are complete.
+              merged_scaffold="$(gh pr list \
+                --repo "$REPOSITORY" \
+                --state merged \
+                --base "$DEFAULT_BRANCH" \
+                --head "chore/initiative-post-merge-$normalized" \
+                --json number \
+                --jq 'length')"
+              [ "$merged_scaffold" -gt 0 ] || continue
+
+              grep -q 'status: approved' "$directory/requirement.md" || continue
+              [ -f "$directory/approvals.yaml" ] || continue
+              grep -A 4 'gate: requirements' "$directory/approvals.yaml" | \
+                grep -q 'decision: approved' || continue
+              [ -f "$directory/evidence/hld-loop.yaml" ] && continue
+
+              candidates+=("$initiative_id")
+            done
+          fi
+
+          if [ "${#candidates[@]}" -eq 0 ]; then
+            echo "No merged, approved initiatives require HLD generation."
+            exit 0
+          fi
+
+          for initiative_id in "${candidates[@]}"; do
+            target="ai-sdlc/initiatives/$initiative_id"
+            test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
+            grep -q 'status: approved' "$target/requirement.md" || {
+              echo "$initiative_id: requirements are not approved; skipping."
+              continue
+            }
+            test -f "$target/approvals.yaml" || {
+              echo "$initiative_id: approval metadata is not available; skipping."
+              continue
+            }
+            grep -A 4 'gate: requirements' "$target/approvals.yaml" | \
+              grep -q 'decision: approved' || {
+              echo "$initiative_id: human requirements approval is not recorded; skipping."
+              continue
+            }
+            if [ -f "$target/evidence/hld-loop.yaml" ]; then
+              echo "$initiative_id: HLD loop evidence already exists; skipping."
+              continue
+            fi
+
+            echo "Dispatching HLD generation for $initiative_id"
+            gh workflow run generate-hld.yml \
+              --repo "$REPOSITORY" \
+              --ref "$DEFAULT_BRANCH" \
+              --field "initiative_id=$initiative_id" \
+              --field "generator_model=$GENERATOR_MODEL" \
+              --field "reviewer_model=$REVIEWER_MODEL"
+          done

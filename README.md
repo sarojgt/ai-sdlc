@@ -182,10 +182,23 @@ ai-sdlc/initiatives/PAY-4567/context/relative/
 ```
 
 The intake PR contains only `requirement.md` and optional initiative-relative
-context. After merge, one post-merge automation workflow creates the initiative
-metadata and context manifest in a single follow-up PR. HLD and LLD artifacts
-are created later by their respective gated workflows. It also synchronizes
-valid human approval metadata.
+context. The Product Owner approval is the GitHub PR review itself. After the
+PR is merged, the post-merge workflow reads the latest review, verifies that it
+was submitted against the merged PR head, and records the reviewer and content
+hash in `approvals.yaml`. No person needs to create a second approval PR. One
+automation-only follow-up PR creates the initiative metadata and context
+manifest. HLD and LLD artifacts are created later by their respective gated
+workflows.
+
+`CODEOWNERS` assigns the intake requirement and relative context to the
+business owner group. Configure the matching branch protection rule to require
+that review. Replace the repository-owner placeholder in `.github/CODEOWNERS`
+with the real Product Owner, Solution Architect, and Engineering teams when
+the repository is moved into the enterprise organisation.
+
+If a requirement or its relative context changes after approval, the previous
+requirements approval is automatically invalidated. The updated intake PR
+must receive a current-head human approval before HLD generation can start.
 
 The scaffold PR can be auto-merged after required checks pass. Enable
 repository auto-merge and configure the optional `AI_SDLC_AUTOMATION_TOKEN`
@@ -244,6 +257,12 @@ Only after the HLD approval record is present should the LLD flow be enabled.
 The LLD contains detailed APIs, schemas, classes, implementation sequencing,
 test strategy, and migration details.
 
+HLD approval follows the same review-derived pattern as requirements. The HLD
+PR must receive a current-head approval from the Solution Architect / ARB
+CODEOWNER. The HLD approval workflow records that review in `approvals.yaml`,
+marks the HLD approved, and moves the initiative to `hld_approved`. AI review
+is advisory only and cannot satisfy this gate.
+
 ## Current versus target integration
 
 Current: GitHub/repository artifacts, Markdown requirements and HLDs, `just`
@@ -251,7 +270,12 @@ commands, provider adapters, GitHub Actions HLD orchestration, and human
 review.
 
 The HLD workflow can run automatically after an approved initiative scaffold
-is merged, or manually from GitHub Actions. It uses GitHub Copilot CLI with
+is merged, or manually from GitHub Actions. The normal `pull_request.closed`
+trigger is complemented by the `Reconcile HLD Triggers` workflow, which checks
+every five minutes for merged scaffold PRs whose HLD has not started. This
+reconciliation is required because GitHub can suppress downstream workflow
+events when a PR is created or merged with the default `GITHUB_TOKEN`. It uses
+GitHub Copilot CLI with
 separate generator and reviewer models, defaults to the lower-cost
 `claude-haiku-4.5` generator and `gemini-3.5-flash` reviewer, and rejects a run
 where both models are the same. The existing bounded loop enforces iteration,

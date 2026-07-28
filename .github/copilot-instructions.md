@@ -44,11 +44,18 @@ technical detail.
 
 ## After intake approval or merge
 
-The post-merge GitHub Action creates a follow-up automation PR with initiative
-metadata and the context manifest. The HLD workflow creates HLD, feedback, and
-evidence artifacts when HLD generation begins. The LLD workflow creates LLD
-artifacts only after HLD approval. Do not manually add that boilerplate to the
-intake PR.
+The intake PR review is the business approval. Do not ask a person to edit
+`approvals.yaml` or create a second approval PR. The post-merge GitHub Action
+reads the review and records the reviewer, commit, timestamp, and content hash
+in the generated initiative metadata. It then creates a follow-up automation PR
+with the remaining metadata and context manifest.
+
+If `requirement.md` or `context/relative/**` changes after approval, the
+previous requirements approval is invalidated automatically. A new review of
+the current PR head is required before HLD generation can start. The HLD
+workflow creates HLD, feedback, and evidence artifacts when HLD generation
+begins. The LLD workflow creates LLD artifacts only after HLD approval. Do not
+manually add that boilerplate to the intake PR.
 
 ## HLD and LLD behavior
 
@@ -60,6 +67,8 @@ intake PR.
 - Record missing facts as context gaps; do not invent enterprise components.
 - Run bounded AI review loops only where configured.
 - Stop for human Solution Architect or ARB approval before LLD.
+- HLD approval must come from the current-head GitHub review by the HLD
+  CODEOWNER; AI review cannot approve architecture.
 - Stop for senior engineering approval before implementation work.
 
 The HLD must remain a concise architecture decision document, not an LLD. It

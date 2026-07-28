@@ -138,11 +138,15 @@ from starting early.
 
 - [x] Business approval represented in the requirement artifact.
 - [x] Architecture approval represented in HLD metadata and approval records.
+- [x] HLD approval synchronized from the current-head Solution Architect / ARB
+      GitHub review.
 - [~] Security, senior engineering, and release gates defined conceptually.
-- [ ] Enforce CODEOWNERS and protected-branch rules in GitHub.
+- [~] Enforce CODEOWNERS and protected-branch rules in GitHub; repository
+      CODEOWNERS paths are configured, but enterprise team names and branch
+      rules still require repository administration.
 - [ ] Add required approval checks to HLD and LLD pull requests.
 - [ ] Add architecture review checklists.
-- [ ] Add approval invalidation when requirements or context change.
+- [x] Add approval invalidation when requirements or context change.
 
 ## Automation backlog
 
@@ -151,7 +155,8 @@ from starting early.
 - [x] Provider and model overrides supported.
 - [x] Dry-run support available.
 - [ ] Add GitHub Issue → initiative automation.
-- [x] Add automatic and manual HLD workflow triggers.
+- [x] Add automatic and manual HLD workflow triggers, including scheduled
+      reconciliation for workflow-created scaffold PRs.
 - [x] Add Copilot cloud-agent setup instructions and repository working agreement.
 - [x] Add draft HLD PR creation.
 - [~] Add AI review comments to the HLD PR.

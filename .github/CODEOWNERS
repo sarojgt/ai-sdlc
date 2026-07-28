@@ -1,7 +1,9 @@
-# Replace these placeholders with real GitHub teams.
-* @engineering-team
-/initiatives/**/requirement.md @product-owner-team
-/initiatives/**/hld/** @solution-architect-team
-/initiatives/**/lld/** @senior-engineering-team
-/initiatives/**/adrs/** @solution-architect-team
-/config/** @architecture-board-team @security-team
+# The repository owner is the functional owner for this repository-first
+# flow. Replace @sarojgt with the real GitHub teams when the repository moves
+# into the enterprise organisation.
+/ai-sdlc/initiatives/*/requirement.md @sarojgt
+/ai-sdlc/initiatives/*/context/relative/** @sarojgt
+/ai-sdlc/initiatives/*/hld/** @sarojgt
+/ai-sdlc/initiatives/*/lld/** @sarojgt
+/ai-sdlc/initiatives/*/adrs/** @sarojgt
+/ai-sdlc/config/** @sarojgt
