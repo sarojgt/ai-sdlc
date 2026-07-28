@@ -69,7 +69,9 @@ else
 fi
 
 find "$target" -type f -print0 | while IFS= read -r -d '' file; do
-  sed -i '' \
+  # Use a backup suffix so this works with BSD sed on macOS and GNU sed
+  # on GitHub-hosted Ubuntu runners.
+  sed -i.bak \
     -e "s/{{ initiative.id }}/$initiative_id/g" \
     -e "s/{{ initiative.title }}/$title/g" \
     -e "s/{{ initiative.owner }}/$owner/g" \
@@ -82,6 +84,7 @@ find "$target" -type f -print0 | while IFS= read -r -d '' file; do
     -e "s/{{ requirement.business_outcome }}/$business_outcome/g" \
     -e "s/{{ requirement.problem_statement }}/$problem_statement/g" \
     "$file"
+  rm -f "$file.bak"
 done
 
 echo "Created initiative: $target"

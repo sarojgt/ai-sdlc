@@ -27,7 +27,9 @@ cp "$root/templates/agent-request.yaml" "$target/evidence/agent-request.yaml"
 cp "$root/templates/agent-run.yaml" "$target/evidence/agent-run.yaml"
 
 for file in "$target/evidence/agent-request.yaml" "$target/evidence/agent-run.yaml"; do
-  sed -i '' \
+  # Use a backup suffix so this works with both BSD sed on macOS and GNU sed
+  # on GitHub-hosted Ubuntu runners.
+  sed -i.bak \
     -e "s/{{ initiative.id }}/$initiative_id/g" \
     -e "s/{{ task.type }}/hld/g" \
     -e "s/{{ task.sequence }}/$sequence/g" \
@@ -41,6 +43,7 @@ for file in "$target/evidence/agent-request.yaml" "$target/evidence/agent-run.ya
     -e "s/{{ agent.provider }}/$agent_provider/g" \
     -e "s/{{ agent.model }}/$agent_model/g" \
     "$file"
+  rm -f "$file.bak"
 done
 
 echo "HLD request prepared: $target/evidence/agent-request.yaml"
