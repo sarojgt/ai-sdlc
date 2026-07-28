@@ -90,6 +90,7 @@ from starting early.
 - [x] Copilot provider adapters are executable through local and CI entry points.
 - [x] Copilot cloud-agent setup workflow prepares the repository toolchain and
       validates lifecycle/provider interfaces with read-only permissions.
+- [x] `just` recipes use a portable Bash shell for GitHub-hosted runners.
 
 ## Current repository workflow
 

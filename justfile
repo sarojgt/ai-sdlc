@@ -1,4 +1,5 @@
-set shell := ["zsh", "-cu"]
+# Use Bash so recipes work on macOS, Linux, and GitHub-hosted Ubuntu runners.
+set shell := ["bash", "-cu"]
 
 default:
     @just --list
