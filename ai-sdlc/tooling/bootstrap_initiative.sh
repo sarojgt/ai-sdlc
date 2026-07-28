@@ -59,13 +59,10 @@ copy_files() {
 if [ "$profile" = "full" ]; then
   cp -R "$template/." "$target/"
 else
-  copy_files \
-    "initiative.yaml" \
-    "initiative.md" \
-    "requirement.md" \
-    "traceability.yaml" \
-    "approvals.yaml" \
-    "context-manifest.yaml"
+  # Keep the Product Owner intake PR human-sized. Metadata, approvals,
+  # traceability, and reusable design scaffolding are created after merge by
+  # expand_initiative.py.
+  copy_files "requirement.md"
 fi
 
 find "$target" -type f -print0 | while IFS= read -r -d '' file; do

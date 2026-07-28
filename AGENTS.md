@@ -19,12 +19,13 @@ validation, approvals, traceability, and execution evidence.
 
 1. For a new requirement, create an intake initiative using the `intake`
    profile.
-2. The intake PR may contain only the minimum initiative metadata, the
-   requirement Markdown, and initiative-relative context. Do not add HLD, LLD,
+2. The intake PR should contain only `requirement.md`, plus optional
+   initiative-relative context when supplied. Do not add metadata, HLD, LLD,
    feedback, evidence, or boilerplate README files in that PR.
 3. After the intake PR is approved or merged, post-merge automation creates a
-   follow-up automation PR containing the reusable HLD and LLD templates plus
-   the remaining initiative scaffold.
+   follow-up PR containing initiative metadata and the context manifest. HLD,
+   LLD, feedback, and evidence artifacts are created lazily by their lifecycle
+   workflows.
 4. HLD generation may begin only after requirements approval and context
    assembly. HLD review and its bounded AI feedback loop are allowed, but only
    a human Solution Architect or ARB can approve architecture.

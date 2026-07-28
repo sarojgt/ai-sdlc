@@ -61,7 +61,7 @@ hld_hash() {
 }
 
 mkdir -p "$target/feedback" "$target/evidence"
-mkdir -p "$target/hld"
+python3 "$root/tooling/initialize_design_artifacts.py" "$target" hld
 previous_feedback_hash=""
 
 for iteration in $(seq 1 "$max_iterations"); do

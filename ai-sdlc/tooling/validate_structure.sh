@@ -13,6 +13,31 @@ else
   exit 1
 fi
 
+# A Product Owner intake is intentionally requirement-only. The post-merge
+# expansion step creates initiative metadata, approvals, traceability, context
+# manifest, and the reusable design scaffold.
+if [ ! -f "$initiative/initiative.yaml" ]; then
+  test -f "$initiative/requirement.md" || {
+    echo "Requirement-only intake is missing requirement.md: $initiative" >&2
+    exit 1
+  }
+  while IFS= read -r -d '' file; do
+    relative="${file#"$initiative"/}"
+    case "$relative" in
+      requirement.md|context/relative/*)
+        ;;
+      *)
+        echo "Invalid intake file: $relative" >&2
+        echo "Allowed intake files are requirement.md and optional context/relative/**." >&2
+        exit 1
+        ;;
+    esac
+  done < <(find "$initiative" -type f -print0)
+  echo "AI-SDLC intake structure is valid."
+  echo "Next step: merge after Product Owner review so post-merge expansion can create the scaffold."
+  exit 0
+fi
+
 state="$(awk '
   /^workflow:/ { in_workflow=1; next }
   in_workflow && /^[[:space:]]*state:/ {
@@ -53,29 +78,16 @@ case "$state" in
   intake)
     ;;
   scaffolded|approved)
-    scaffold_files=(
-      "$initiative/context/relative/README.md"
-      "$initiative/hld/README.md"
-      "$initiative/lld/README.md"
-      "$initiative/feedback/README.md"
-      "$initiative/approvals/README.md"
-      "$initiative/evidence/README.md"
-    )
-    for file in "${scaffold_files[@]}"; do
-      test -f "$file" || { echo "Missing scaffold file: $file" >&2; exit 1; }
-    done
+    # Design, feedback, evidence, and relative-context directories are created
+    # lazily by their lifecycle workflows.
     ;;
   hld_draft|hld_review|hld_approved|lld_draft|lld_review|lld_approved|implementation_ready|implementing|pr_review|release_ready|deployed|learning)
-    scaffold_files=(
-      "$initiative/context/relative/README.md"
-      "$initiative/hld/README.md"
-      "$initiative/lld/README.md"
-      "$initiative/feedback/README.md"
-      "$initiative/approvals/README.md"
-      "$initiative/evidence/README.md"
-      "$initiative/hld/hld.md"
-      "$initiative/lld/lld.md"
-    )
+    scaffold_files=("$initiative/hld/hld.md")
+    case "$state" in
+      lld_draft|lld_review|lld_approved|implementation_ready|implementing|pr_review|release_ready|deployed|learning)
+        scaffold_files+=("$initiative/lld/lld.md")
+        ;;
+    esac
     for file in "${scaffold_files[@]}"; do
       test -f "$file" || { echo "Missing lifecycle file: $file" >&2; exit 1; }
     done

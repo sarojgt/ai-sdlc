@@ -25,18 +25,15 @@ evidence when an AI operation is run.
 
 ## New requirement intake
 
-Use the `intake` profile and create a small PR. The intake PR may contain only:
+Use the `intake` profile and create the smallest possible PR. The intake PR
+should contain only:
 
-- `initiative.md`
 - `requirement.md`
-- `initiative.yaml`
-- `traceability.yaml`
-- `approvals.yaml`
-- `context-manifest.yaml`
-- relevant files under `context/relative/`
+- optional relevant files under `context/relative/`
 
-Do not add `hld/`, `lld/`, `feedback/`, `approvals/`, `evidence/`, or unrelated
-workflow/configuration changes to the intake PR. Preserve the Jira or GitHub
+Do not add initiative metadata, `hld/`, `lld/`, `feedback/`, `approvals/`,
+`evidence/`, or unrelated workflow/configuration changes to the intake PR.
+The post-merge expansion creates metadata and preserves the Jira or GitHub
 source link for traceability.
 
 If a business requirement arrives through a GitHub issue or Jira-connected
@@ -47,9 +44,11 @@ technical detail.
 
 ## After intake approval or merge
 
-The post-merge GitHub Action creates a follow-up automation PR with the
-remaining scaffold, including human-readable HLD and LLD templates. Do not
-manually add that boilerplate to the intake PR.
+The post-merge GitHub Action creates a follow-up automation PR with initiative
+metadata and the context manifest. The HLD workflow creates HLD, feedback, and
+evidence artifacts when HLD generation begins. The LLD workflow creates LLD
+artifacts only after HLD approval. Do not manually add that boilerplate to the
+intake PR.
 
 ## HLD and LLD behavior
 

@@ -6,6 +6,8 @@ import sys
 from pathlib import Path
 
 
+# These descriptions are retained for reference by design tooling. Artifact
+# directories are now created lazily by initialize_design_artifacts.py.
 README_TEXT = {
     "context/relative/README.md": """# Relative Context
 
@@ -92,8 +94,11 @@ the workflow and should not normally be authored manually.
 }
 
 TEMPLATE_FILES = {
-    "hld/hld.md": "hld/hld.md",
-    "lld/lld.md": "lld/lld.md",
+    "initiative.md": "initiative.md",
+    "initiative.yaml": "initiative.yaml",
+    "approvals.yaml": "approvals.yaml",
+    "traceability.yaml": "traceability.yaml",
+    "context-manifest.yaml": "context-manifest.yaml",
 }
 
 
@@ -132,11 +137,39 @@ def metadata(initiative_yaml: Path) -> dict[str, str]:
     return values
 
 
+def requirement_metadata(requirement: Path) -> dict[str, str]:
+    text = requirement.read_text()
+    values = {}
+    patterns = {
+        "title": r'^\s+title:\s*"([^"]*)"\s*$',
+        "owner": r'^\s+owner:\s*"([^"]*)"\s*$',
+        "provider": r'^\s+provider:\s*"([^"]*)"\s*$',
+        "work_item_id": r'^\s+work_item_id:\s*"([^"]*)"\s*$',
+        "risk_tier": r'^\s+risk_tier:\s*"([^"]*)"\s*$',
+        "data_classification": r'^\s+data_classification:\s*"([^"]*)"\s*$',
+    }
+    for key, pattern in patterns.items():
+        match = re.search(pattern, text, flags=re.MULTILINE)
+        if match:
+            values[key] = match.group(1)
+    initiative_match = re.search(r'^\s+initiative:\s*"([^"]+)"\s*$', text, flags=re.MULTILINE)
+    if initiative_match:
+        values["id"] = initiative_match.group(1)
+    return values
+
+
 def render_template(source: Path, target: Path, values: dict[str, str]) -> None:
     text = source.read_text()
     replacements = {
         "{{ initiative.id }}": values.get("id", target.parent.parent.parent.name),
         "{{ initiative.title }}": values.get("title", "Untitled initiative"),
+        "{{ initiative.owner }}": values.get("owner", "team.example"),
+        "{{ initiative.domains }}": "[]",
+        "{{ initiative.repositories }}": "[]",
+        "{{ source.provider }}": values.get("provider", "github"),
+        "{{ source.work_item_id }}": values.get("work_item_id", values.get("id", "")),
+        "{{ policy.risk_tier }}": values.get("risk_tier", "medium"),
+        "{{ policy.data_classification }}": values.get("data_classification", "internal"),
         "{{ roles.solution_architect }}": "team.solution-architecture",
         "{{ roles.senior_engineer }}": "team.engineering",
     }
@@ -155,17 +188,12 @@ def main() -> int:
         fail(f"Initiative directory not found: {initiative_dir}")
 
     created_any = False
-    for relative, content in README_TEXT.items():
-        path = initiative_dir / relative
-        if path.exists():
-            continue
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content)
-        created_any = True
-
     initiative_yaml = initiative_dir / "initiative.yaml"
+    requirement_md = initiative_dir / "requirement.md"
     template_root = initiative_dir.parent.parent / "templates" / "initiative"
     values = metadata(initiative_yaml) if initiative_yaml.exists() else {}
+    if not values and requirement_md.exists():
+        values = requirement_metadata(requirement_md)
     for relative, template_relative in TEMPLATE_FILES.items():
         path = initiative_dir / relative
         if path.exists():
