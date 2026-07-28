@@ -21,6 +21,18 @@ if [ ! -f "$initiative/initiative.yaml" ]; then
     echo "Requirement-only intake is missing requirement.md: $initiative" >&2
     exit 1
   }
+  while IFS= read -r -d '' file; do
+    relative="${file#"$initiative"/}"
+    case "$relative" in
+      requirement.md|context/relative/*)
+        ;;
+      *)
+        echo "Invalid intake file: $relative" >&2
+        echo "Allowed intake files are requirement.md and optional context/relative/**." >&2
+        exit 1
+        ;;
+    esac
+  done < <(find "$initiative" -type f -print0)
   echo "AI-SDLC intake structure is valid."
   echo "Next step: merge after Product Owner review so post-merge expansion can create the scaffold."
   exit 0
