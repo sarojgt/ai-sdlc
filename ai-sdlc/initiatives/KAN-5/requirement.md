@@ -4,7 +4,7 @@ artifact:
   id: "REQ-KAN-5"
   type: requirement
   version: 1
-  status: draft
+  status: approved
   title: "Add API endpoint for temporary card blocking"
   initiative: "KAN-5"
   owner: "team.cards"
