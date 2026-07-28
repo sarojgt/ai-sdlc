@@ -1,0 +1,21 @@
+das_version: "0.1"
+artifact:
+  id: "E2E-002"
+  type: initiative
+  version: 1
+  status: draft
+  title: "Card search endpoint by customer name"
+  initiative: "E2E-002"
+  owner: "team.payments"
+source:
+  provider: "github"
+  work_item_id: "E2E-002"
+scope:
+  domains: []
+  repositories: []
+policy:
+  risk_tier: "medium"
+  data_classification: "confidential"
+  implementation_locked_until: architecture.approved
+workflow:
+  state: scaffolded

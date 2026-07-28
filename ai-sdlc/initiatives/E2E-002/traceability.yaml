@@ -1,0 +1,12 @@
+das_version: "0.1"
+initiative: "E2E-002"
+links:
+  - from: "github:E2E-002"
+    to: "REQ-E2E-002"
+    relation: specifies
+  - from: "REQ-E2E-002"
+    to: "HLD-E2E-002"
+    relation: designed-by
+  - from: "HLD-E2E-002"
+    to: "LLD-E2E-002"
+    relation: detailed-by
