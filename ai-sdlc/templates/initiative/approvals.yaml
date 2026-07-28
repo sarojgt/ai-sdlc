@@ -9,6 +9,7 @@ records:
     artifact_version: 1
     content_sha256: ""
     timestamp: ""
+    review_commit: ""
   - gate: hld
     decision: pending
     principal: ""

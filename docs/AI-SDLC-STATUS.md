@@ -139,10 +139,12 @@ from starting early.
 - [x] Business approval represented in the requirement artifact.
 - [x] Architecture approval represented in HLD metadata and approval records.
 - [~] Security, senior engineering, and release gates defined conceptually.
-- [ ] Enforce CODEOWNERS and protected-branch rules in GitHub.
+- [~] Enforce CODEOWNERS and protected-branch rules in GitHub; repository
+      CODEOWNERS paths are configured, but enterprise team names and branch
+      rules still require repository administration.
 - [ ] Add required approval checks to HLD and LLD pull requests.
 - [ ] Add architecture review checklists.
-- [ ] Add approval invalidation when requirements or context change.
+- [x] Add approval invalidation when requirements or context change.
 
 ## Automation backlog
 

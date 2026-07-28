@@ -182,10 +182,23 @@ ai-sdlc/initiatives/PAY-4567/context/relative/
 ```
 
 The intake PR contains only `requirement.md` and optional initiative-relative
-context. After merge, one post-merge automation workflow creates the initiative
-metadata and context manifest in a single follow-up PR. HLD and LLD artifacts
-are created later by their respective gated workflows. It also synchronizes
-valid human approval metadata.
+context. The Product Owner approval is the GitHub PR review itself. After the
+PR is merged, the post-merge workflow reads the latest review, verifies that it
+was submitted against the merged PR head, and records the reviewer and content
+hash in `approvals.yaml`. No person needs to create a second approval PR. One
+automation-only follow-up PR creates the initiative metadata and context
+manifest. HLD and LLD artifacts are created later by their respective gated
+workflows.
+
+`CODEOWNERS` assigns the intake requirement and relative context to the
+business owner group. Configure the matching branch protection rule to require
+that review. Replace the repository-owner placeholder in `.github/CODEOWNERS`
+with the real Product Owner, Solution Architect, and Engineering teams when
+the repository is moved into the enterprise organisation.
+
+If a requirement or its relative context changes after approval, the previous
+requirements approval is automatically invalidated. The updated intake PR
+must receive a current-head human approval before HLD generation can start.
 
 The scaffold PR can be auto-merged after required checks pass. Enable
 repository auto-merge and configure the optional `AI_SDLC_AUTOMATION_TOKEN`

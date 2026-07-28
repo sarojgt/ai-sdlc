@@ -40,6 +40,9 @@ jobs:
       reviewer: ${{ steps.scope.outputs.reviewer }}
       review_id: ${{ steps.scope.outputs.review_id }}
       submitted_at: ${{ steps.scope.outputs.submitted_at }}
+      review_commit: ${{ steps.scope.outputs.review_commit }}
+      head_commit: ${{ steps.scope.outputs.head_commit }}
+      intake_change: ${{ steps.scope.outputs.intake_change }}
     steps:
       - name: Checkout default branch
         uses: actions/checkout@v5
@@ -61,6 +64,7 @@ jobs:
               : context.payload.pull_request.number;
 
             let initiativeDirs = [];
+            let intakeChange = false;
             if (isDispatch) {
               const initiativeDir = (process.env.INITIATIVE_DIR || '').trim();
               if (!/^ai-sdlc\/initiatives\/[^/]+$/.test(initiativeDir)) {
@@ -80,6 +84,14 @@ jobs:
                 .filter(name => name.startsWith('ai-sdlc/initiatives/'))
                 .map(name => name.split('/').slice(0, 3).join('/'))
               )];
+              const paths = files.map(file => file.filename);
+              intakeChange = paths.some(name =>
+                /^ai-sdlc\/initiatives\/[^/]+\/requirement\.md$/.test(name) ||
+                /^ai-sdlc\/initiatives\/[^/]+\/context\/relative\//.test(name)
+              ) && paths.every(name =>
+                /^ai-sdlc\/initiatives\/[^/]+\/requirement\.md$/.test(name) ||
+                /^ai-sdlc\/initiatives\/[^/]+\/context\/relative\//.test(name)
+              );
             }
 
             if (initiativeDirs.length !== 1) {
@@ -91,8 +103,18 @@ jobs:
             let reviewer = '';
             let reviewId = '';
             let submittedAt = '';
+            let reviewCommit = '';
+            let headCommit = '';
 
             if (pullNumber > 0) {
+              const pullRequest = isDispatch
+                ? (await github.rest.pulls.get({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: pullNumber,
+                  })).data
+                : context.payload.pull_request;
+              headCommit = pullRequest.head.sha;
               const reviews = await github.paginate(github.rest.pulls.listReviews, {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -115,11 +137,12 @@ jobs:
                 .filter(item => item.state === 'APPROVED')
                 .sort((a, b) => new Date(b.submitted_at) - new Date(a.submitted_at))[0];
 
-              if (accepted && !blocking) {
+              if (accepted && !blocking && accepted.commit_id === headCommit) {
                 approved = true;
                 reviewer = accepted.user.login;
                 reviewId = String(accepted.id);
                 submittedAt = accepted.submitted_at;
+                reviewCommit = accepted.commit_id;
               }
             }
 
@@ -129,20 +152,28 @@ jobs:
             core.setOutput('reviewer', reviewer);
             core.setOutput('review_id', reviewId);
             core.setOutput('submitted_at', submittedAt);
+            core.setOutput('review_commit', reviewCommit);
+            core.setOutput('head_commit', headCommit);
+            core.setOutput('intake_change', String(isDispatch || intakeChange));
 
       - name: Expand reusable boilerplate
+        if: steps.scope.outputs.intake_change == 'true'
         run: python3 ai-sdlc/tooling/expand_initiative.py "${{ steps.scope.outputs.initiative_dir }}"
 
       - name: Sync human approval metadata
-        if: steps.scope.outputs.approved == 'true'
+        if: steps.scope.outputs.intake_change == 'true'
         run: |
           python3 ai-sdlc/tooling/sync_initiative_approval.py \
             "${{ steps.scope.outputs.initiative_dir }}" \
             "${{ steps.scope.outputs.reviewer }}" \
             "${{ steps.scope.outputs.review_id }}" \
-            "${{ steps.scope.outputs.submitted_at }}"
+            "${{ steps.scope.outputs.submitted_at }}" \
+            "${{ steps.scope.outputs.approved }}" \
+            "${{ steps.scope.outputs.review_commit }}" \
+            "${{ steps.scope.outputs.head_commit }}"
 
       - name: Validate expanded initiative
+        if: steps.scope.outputs.intake_change == 'true'
         run: bash ai-sdlc/tooling/validate_structure.sh "${{ steps.scope.outputs.initiative_dir }}"
 
       - name: Resolve policy-compliant automation branch
@@ -156,6 +187,7 @@ jobs:
 
       - name: Create post-merge automation pull request
         id: create_pr
+        if: steps.scope.outputs.intake_change == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
