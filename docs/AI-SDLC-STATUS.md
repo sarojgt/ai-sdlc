@@ -96,7 +96,10 @@ from starting early.
 - [x] Generated evidence links use repository-relative paths instead of local
       machine paths.
 - [x] Intake bootstrap creates only `requirement.md`; post-merge expansion
-      creates metadata and the reusable initiative scaffold.
+      creates metadata and context manifest, with design artifacts created
+      lazily by gated workflows.
+- [x] Scaffold automation uses policy-compliant lowercase branches and can
+      enable auto-merge for metadata-only follow-up PRs.
 
 ## Current repository workflow
 

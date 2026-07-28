@@ -155,10 +155,19 @@ jobs:
           bash ai-sdlc/tooling/validate_structure.sh \
             "ai-sdlc/initiatives/${{ needs.resolve.outputs.initiative_id }}"
 
+      - name: Resolve policy-compliant HLD branch
+        id: branch
+        env:
+          INITIATIVE_ID: ${{ needs.resolve.outputs.initiative_id }}
+        run: |
+          set -euo pipefail
+          normalized="$(printf '%s' "$INITIATIVE_ID" | tr '[:upper:]' '[:lower:]' | tr '_' '-')"
+          echo "name=feat/hld-$normalized" >> "$GITHUB_OUTPUT"
+
       - name: Create HLD review pull request
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ github.token }}
+          token: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
           commit-message: "feat(hld): generate HLD for ${{ needs.resolve.outputs.initiative_id }}"
           title: "feat(hld): generate HLD for ${{ needs.resolve.outputs.initiative_id }}"
           body: |
@@ -170,6 +179,6 @@ jobs:
 
             The bounded AI review loop passed. This PR remains pending human
             Solution Architect / ARB approval. AI has not approved architecture.
-          branch: "feat/hld-${{ needs.resolve.outputs.initiative_id }}"
+          branch: ${{ steps.branch.outputs.name }}
           delete-branch: false
           draft: true

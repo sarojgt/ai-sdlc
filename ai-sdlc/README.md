@@ -154,6 +154,12 @@ and the context manifest, then synchronizes valid human requirement approval in
 a single follow-up PR. HLD and LLD artifacts are created only by their gated
 lifecycle workflows.
 
+The metadata-only follow-up PR may be auto-merged after required checks pass.
+Enable repository auto-merge and configure `AI_SDLC_AUTOMATION_TOKEN` with
+`Contents: write` and `Pull requests: write` permissions when downstream
+workflow events must be triggered by the merge. HLD and LLD PRs remain human
+gated.
+
 For assistant-driven intake, see
 [Initiative Intake Agent Guide](design/initiative-intake-agent-guide.md).
 

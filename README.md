@@ -187,6 +187,13 @@ metadata and context manifest in a single follow-up PR. HLD and LLD artifacts
 are created later by their respective gated workflows. It also synchronizes
 valid human approval metadata.
 
+The scaffold PR can be auto-merged after required checks pass. Enable
+repository auto-merge and configure the optional `AI_SDLC_AUTOMATION_TOKEN`
+secret with `Contents: write` and `Pull requests: write` permissions. The
+workflow uses a policy-compliant `chore/initiative-post-merge-<id>` branch and
+explicitly enables squash auto-merge for this metadata-only PR. HLD and LLD PRs
+are not auto-merged.
+
 The requirement captures business outcome, problem, stakeholders, scope,
 business rules, functional and non-functional requirements, data, integrations,
 constraints, acceptance criteria, and initial impact hints.
