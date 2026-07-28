@@ -13,6 +13,19 @@ else
   exit 1
 fi
 
+# A Product Owner intake is intentionally requirement-only. The post-merge
+# expansion step creates initiative metadata, approvals, traceability, context
+# manifest, and the reusable design scaffold.
+if [ ! -f "$initiative/initiative.yaml" ]; then
+  test -f "$initiative/requirement.md" || {
+    echo "Requirement-only intake is missing requirement.md: $initiative" >&2
+    exit 1
+  }
+  echo "AI-SDLC intake structure is valid."
+  echo "Next step: merge after Product Owner review so post-merge expansion can create the scaffold."
+  exit 0
+fi
+
 state="$(awk '
   /^workflow:/ { in_workflow=1; next }
   in_workflow && /^[[:space:]]*state:/ {

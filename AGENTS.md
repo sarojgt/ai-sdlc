@@ -19,8 +19,8 @@ validation, approvals, traceability, and execution evidence.
 
 1. For a new requirement, create an intake initiative using the `intake`
    profile.
-2. The intake PR may contain only the minimum initiative metadata, the
-   requirement Markdown, and initiative-relative context. Do not add HLD, LLD,
+2. The intake PR should contain only `requirement.md`, plus optional
+   initiative-relative context when supplied. Do not add metadata, HLD, LLD,
    feedback, evidence, or boilerplate README files in that PR.
 3. After the intake PR is approved or merged, post-merge automation creates a
    follow-up automation PR containing the reusable HLD and LLD templates plus

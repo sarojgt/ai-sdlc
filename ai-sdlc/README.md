@@ -50,9 +50,9 @@ selections. It uses the Actions `GITHUB_TOKEN` by default, with an optional
 `COPILOT_GITHUB_TOKEN` Actions secret as a personal-token fallback when the
 organization has not enabled Copilot CLI for Actions.
 
-New intake PRs should stay small: capture the requirement and the minimum
-initiative metadata first, then let the post-merge automation expand the
-reusable boilerplate and synchronize approval metadata in one follow-up PR.
+New intake PRs should stay minimal: capture only `requirement.md` and optional
+initiative-relative context. The post-merge automation creates the initiative
+metadata, reusable boilerplate, and approval metadata in one follow-up PR.
 
 ## Directory map
 
@@ -148,10 +148,10 @@ This copies the reusable templates into `ai-sdlc/initiatives/PAY-4567/`. The
 generated directory is the instance; the templates and configuration remain
 shared by every initiative.
 
-The intake profile creates only the core files needed for business review.
-After the PR is approved or merged, one post-merge workflow expands the
-reusable boilerplate, including HLD and LLD templates, and synchronizes valid
-human requirement approval in a single follow-up PR.
+The intake profile creates only `requirement.md` for business review. After the
+PR is approved or merged, one post-merge workflow creates the metadata and
+expands the reusable boilerplate, including HLD and LLD templates, then
+synchronizes valid human requirement approval in a single follow-up PR.
 
 For assistant-driven intake, see
 [Initiative Intake Agent Guide](design/initiative-intake-agent-guide.md).

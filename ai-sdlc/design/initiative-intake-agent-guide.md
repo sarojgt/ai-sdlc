@@ -7,22 +7,17 @@ initiative PR.
 
 Create the smallest useful initiative PR for human business review.
 
-The intake PR should capture only the requirement and the minimum metadata
-needed to keep traceability intact. Do not create the full boilerplate in the
-initial PR.
+The intake PR should capture only the requirement. Traceability metadata is
+created by post-merge automation from the requirement front matter. Do not
+create the full boilerplate in the initial PR.
 
 ## Allowed files in the intake PR
 
-- `initiative.md`
 - `requirement.md`
-- `initiative.yaml`
-- `traceability.yaml`
-- `approvals.yaml`
-- `context-manifest.yaml`
+- Optional initiative-specific files under `context/relative/`
 
 ## Do not add in the intake PR
 
-- `context/relative/README.md`
 - `hld/README.md`
 - `hld/hld.md`
 - `lld/README.md`
@@ -30,6 +25,8 @@ initial PR.
 - `feedback/**`
 - `approvals/README.md`
 - `evidence/**`
+- Initiative metadata such as `initiative.md`, `initiative.yaml`,
+  `traceability.yaml`, `approvals.yaml`, or `context-manifest.yaml`
 - Any implementation code or workflow changes
 
 ## Required behavior
@@ -61,6 +58,7 @@ just ai-sdlc-init \
 ## Handoff
 
 After the intake PR is approved or merged, the post-merge workflow creates a
-follow-up PR to add the reusable folder structure, HLD template, LLD template,
-and README guides. The workflow may also synchronize valid human requirement
-approval metadata. Do not add these files manually to the intake PR.
+follow-up PR to add initiative metadata, the reusable folder structure, HLD
+template, LLD template, and README guides. The workflow may also synchronize
+valid human requirement approval metadata. Do not add these files manually to
+the intake PR.

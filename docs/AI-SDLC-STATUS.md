@@ -94,6 +94,8 @@ from starting early.
 - [x] HLD loop hashing supports Linux `sha256sum` and macOS `shasum`.
 - [x] Generated evidence links use repository-relative paths instead of local
       machine paths.
+- [x] Intake bootstrap creates only `requirement.md`; post-merge expansion
+      creates metadata and the reusable initiative scaffold.
 
 ## Current repository workflow
 
