@@ -251,7 +251,12 @@ commands, provider adapters, GitHub Actions HLD orchestration, and human
 review.
 
 The HLD workflow can run automatically after an approved initiative scaffold
-is merged, or manually from GitHub Actions. It uses GitHub Copilot CLI with
+is merged, or manually from GitHub Actions. The normal `pull_request.closed`
+trigger is complemented by the `Reconcile HLD Triggers` workflow, which checks
+every five minutes for merged scaffold PRs whose HLD has not started. This
+reconciliation is required because GitHub can suppress downstream workflow
+events when a PR is created or merged with the default `GITHUB_TOKEN`. It uses
+GitHub Copilot CLI with
 separate generator and reviewer models, defaults to the lower-cost
 `claude-haiku-4.5` generator and `gemini-3.5-flash` reviewer, and rejects a run
 where both models are the same. The existing bounded loop enforces iteration,

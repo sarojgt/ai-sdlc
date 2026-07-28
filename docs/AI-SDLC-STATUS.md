@@ -151,7 +151,8 @@ from starting early.
 - [x] Provider and model overrides supported.
 - [x] Dry-run support available.
 - [ ] Add GitHub Issue → initiative automation.
-- [x] Add automatic and manual HLD workflow triggers.
+- [x] Add automatic and manual HLD workflow triggers, including scheduled
+      reconciliation for workflow-created scaffold PRs.
 - [x] Add Copilot cloud-agent setup instructions and repository working agreement.
 - [x] Add draft HLD PR creation.
 - [~] Add AI review comments to the HLD PR.
