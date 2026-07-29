@@ -1,0 +1,22 @@
+baseline_version: "0.1"
+repository_commit: "12a1b41ca94bd995d8acf652f1c0f2e1e9fcfedc"
+framework_tag: "v0.3.3"
+initiative:
+  id: "KAN-5"
+  tag: "initiative/KAN-5/v0.1.0"
+requirement:
+  artifact: "REQ-KAN-5"
+  version_tag: "initiative/KAN-5/v0.1.0"
+  content_sha256: "1c60353c30497a80f2e618319d2fc5f666d4d69f3290dd9fc6af3f27834d6f0c"
+context:
+  manifest_sha256: "6faf9c4d48a36ffe23f06bded5332c6776882ea3994205663062a3ee0645d1e0"
+  consistent_tag: "unreleased"
+  guardrails_tag: "unreleased"
+  relative_tag: "unreleased"
+  relative_content_sha256: "missing"
+design:
+  hld_tag: "unreleased"
+  lld_tag: "unreleased"
+generation:
+  hld_uses_this_baseline: true
+  architecture_approval_required: true

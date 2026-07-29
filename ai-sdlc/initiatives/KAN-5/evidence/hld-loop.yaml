@@ -1,0 +1,10 @@
+hld_loop:
+  status: ai_review_passed
+  initiative: "KAN-5"
+  iterations: 1
+  profile: "medium"
+  generator_provider: "github-copilot"
+  generator_model: "gpt-5.6-terra"
+  reviewer_provider: "github-copilot"
+  reviewer_model: "gemini-3.5-flash"
+  human_architecture_approval_required: true

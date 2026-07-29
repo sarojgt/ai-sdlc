@@ -1,0 +1,23 @@
+hld_run:
+  run_id: "RUN-KAN-5-HLD-1"
+  initiative_id: "KAN-5"
+  task_type: hld
+  profile: "medium"
+  agent:
+    provider: "github-copilot"
+    model: "gpt-5.6-terra"
+  requirement:
+    artifact_id: "REQ-KAN-5"
+    version: "1"
+    content_sha256: "REQUIRED_HASH"
+  context:
+    pack_id: "CTX-KAN-5-v1"
+    pack_version: "1"
+    manifest: "context-manifest.yaml"
+    content_sha256: "REQUIRED_CONTEXT_HASH"
+  design_baseline: "evidence/design-baseline.yaml"
+  policy:
+    allowed_tools: [read_context, read_repository, render_diagram]
+    denied_tools: [approve_architecture, merge, deploy_production]
+  status: request-prepared
+  human_approval_required: true
