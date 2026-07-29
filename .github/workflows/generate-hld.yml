@@ -1,6 +1,11 @@
 name: Generate HLD with Copilot
 
 on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+    paths:
+      - "ai-sdlc/initiatives/**"
   workflow_dispatch:
     inputs:
       initiative_id:
@@ -57,7 +62,11 @@ concurrency:
 
 jobs:
   resolve:
-    if: github.event_name == 'workflow_dispatch'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.merged == true &&
+       startsWith(github.event.pull_request.head.ref, 'chore/initiative-post-merge-'))
     runs-on: ubuntu-latest
     outputs:
       initiative_id: ${{ steps.scope.outputs.initiative_id }}
@@ -74,11 +83,23 @@ jobs:
         env:
           DISPATCH_INITIATIVE: ${{ inputs.initiative_id }}
           FORCE_RUN: ${{ inputs.force || false }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number || 0 }}
           EVENT_NAME: ${{ github.event_name }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           initiative_id="$DISPATCH_INITIATIVE"
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            mapfile -t initiatives < <(
+              gh pr view "$PULL_REQUEST_NUMBER" --json files --jq '.files[].path' |
+                awk -F/ '/^ai-sdlc\/initiatives\/[^/]+\// {print $3}' | sort -u
+            )
+            if [ "${#initiatives[@]}" -ne 1 ]; then
+              echo "Expected exactly one initiative in the merged scaffold PR; found ${#initiatives[@]}" >&2
+              exit 1
+            fi
+            initiative_id="${initiatives[0]}"
+          fi
           target="ai-sdlc/initiatives/$initiative_id"
           test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
           grep -q 'status: approved' "$target/requirement.md" || {
