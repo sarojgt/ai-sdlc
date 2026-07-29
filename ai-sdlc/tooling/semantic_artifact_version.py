@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Calculate semantic tags for initiative, design, and context artifacts."""
+"""Calculate scoped artifact tags from the merged PR title and changed paths."""
 
 from __future__ import annotations
 
+import argparse
 import re
 import subprocess
 import sys
@@ -33,6 +34,13 @@ def commits(revision: str = "HEAD") -> list[tuple[Commit, list[str]]]:
         ).splitlines()
         result.append((Commit(subject.strip(), body.strip()), paths))
     return result
+
+
+def merged_change(title: str) -> list[tuple[Commit, list[str]]]:
+    paths = run(
+        "git", "diff-tree", "--no-commit-id", "--name-only", "-r", "-m", "HEAD"
+    ).splitlines()
+    return [(Commit(title), paths)]
 
 
 def tracks(paths: list[str], commit: Commit) -> set[str]:
@@ -82,6 +90,11 @@ def next_tag(track: str, tag: str | None, bump: str) -> str:
 
 def main() -> int:
     all_entries = commits()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--pr-title", help="Merged PR title used as the release intent")
+    args = parser.parse_args()
+    if args.pr_title:
+        all_entries = merged_change(args.pr_title)
     discovered_tracks: set[str] = set()
     for commit, paths in all_entries:
         discovered_tracks.update(tracks(paths, commit))

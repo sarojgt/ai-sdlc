@@ -53,7 +53,11 @@ For the exact intake file allowlist and handoff behavior, read
 - Use `feat` for a new capability, `fix` for a correction, and the other
   supported types documented in `ai-sdlc/config/conventional-commits.yaml`.
 - Mark breaking changes with `type(scope)!:` or a `BREAKING CHANGE:` footer.
-- Pull requests and commits are checked by GitHub Actions.
+- Pull request titles are required to follow the Conventional Commit format.
+  Branch names and commit messages should follow the same convention for
+  traceability, but are guidance rather than a blocking PR check. Semantic
+  release uses the merged PR title and changed paths; repository settings
+  should require squash merging.
 - Merges to `main` create semantic release tags for both tracks. Framework
   scopes create the global version; initiative, requirement, context, HLD, LLD,
   approval, and traceability scopes create their scoped artifact version.

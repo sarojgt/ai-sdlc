@@ -204,10 +204,13 @@ just ai-sdlc-hld PAY-4567 codex gpt-5.6-luna
 ```
 
 This command always runs the bounded AI HLD review loop. The default reviewer
-is `codex gpt-5.6-terra`; both generator and reviewer can be overridden:
+is `codex gpt-5.6-terra`; both generator and reviewer can be overridden. An
+optional profile controls how much detail is expected:
 
 ```text
 just ai-sdlc-hld PAY-4567 codex gpt-5.6-luna codex gpt-5.6-terra
+# Optional final argument: small, medium, or large
+just ai-sdlc-hld PAY-4567 codex gpt-5.6-luna codex gpt-5.6-terra small
 ```
 
 The HLD review skill can be run independently:
@@ -237,11 +240,18 @@ An approved initiative PR can automatically flip `initiative.yaml` and
 `initiative.md` to `approved` and record the approval trail in
 `approvals.yaml`.
 
+The `auto` profile is the default. The HLD agent must classify the change as
+small, medium, or large in the HLD metadata; the orchestrator then applies the
+matching detail and safety limits. Automatic runs allow up to 45 minutes and
+15 minutes per model call so context-heavy work is not cut off prematurely.
+Explicit `small`, `medium`, and `large` profiles remain available when a
+workflow owner intentionally overrides the default.
+
 After architect feedback:
 
 ```text
 just ai-sdlc-hld-feedback PAY-4567 claude claude-sonnet
-just ai-sdlc-hld PAY-4567 claude claude-sonnet
+AI_SDLC_HLD_RESUME=1 just ai-sdlc-hld PAY-4567 claude claude-sonnet
 ```
 
 The second command can use a different AI provider while preserving the same initiative, context, artifacts, and approval rules.
@@ -249,7 +259,9 @@ The second command can use a different AI provider while preserving the same ini
 ## Run a bounded AI HLD review loop
 
 An AI reviewer can critique the generated HLD before the human architect
-review. The generator and reviewer can use different models:
+review. The generator and reviewer can use different models. GitHub Actions
+accepts free-form model IDs because Copilot availability varies by plan,
+client, and organization policy:
 
 ```text
 just ai-sdlc-hld-loop \
@@ -270,7 +282,10 @@ Generate HLD
   → Stop when the review passes or a guardrail is reached
 ```
 
-Each review is saved as `feedback/ai-review-N.md`. The loop stops when:
+The latest review is saved as `feedback/ai-review.md`, replacing the previous
+review for that run. The loop checkpoint is `evidence/hld-loop.yaml`, so a
+timed-out or interrupted run can be resumed with `AI_SDLC_HLD_RESUME=1`.
+The loop stops when:
 
 - The reviewer returns `pass`.
 - The reviewer returns `escalate`.
@@ -289,6 +304,21 @@ Use a dry run to inspect the planned calls without invoking an agent:
 AI_SDLC_HLD_LOOP_DRY_RUN=1 just ai-sdlc-hld-loop \
   PAY-4567 codex gpt-5.6-luna codex gpt-5.6-terra
 ```
+
+Use `auto` as a model value when Copilot should choose the model. In GitHub,
+use **Actions → Generate HLD with Copilot → Run workflow** to type the
+generator model, a different reviewer model, profile, per-call timeout, and
+whether to resume. Automatic scaffold-merge runs use the configured defaults.
+The human-readable model catalog is in
+[`config/copilot-model-catalog.md`](config/copilot-model-catalog.md), including
+copyable model IDs and economical/balanced/advanced routing guidance. The
+machine-readable equivalent is `config/copilot-model-catalog.json`.
+It is a convenience catalog, not an allow-list; GitHub may add, retire, or
+restrict models without this repository changing. Unsupported or
+policy-blocked IDs fail during the Copilot call under the account's normal
+availability rules.
+Human comments are captured with `just ai-sdlc-hld-feedback`; they do not
+approve architecture and must be followed by an explicit bounded rerun.
 
 ## Current Confluence position
 

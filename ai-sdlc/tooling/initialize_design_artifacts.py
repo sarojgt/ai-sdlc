@@ -8,22 +8,6 @@ import sys
 from pathlib import Path
 
 
-DESIGN_READMES = {
-    "hld": """# High-Level Design
-
-Create and review this content only after the requirement is approved and the
-relevant context has been assembled. Architecture approval is recorded only by
-a human Solution Architect or ARB.
-""",
-    "lld": """# Engineering Design
-
-Create this content only after the HLD approval gate has passed. The LLD may
-contain detailed APIs, schemas, classes, implementation sequencing, testing,
-migration, and observability design.
-""",
-}
-
-
 def fail(message: str) -> None:
     print(message, file=sys.stderr)
     raise SystemExit(1)
@@ -67,11 +51,8 @@ def main() -> int:
         text = text.replace("{{ initiative.title }}", data.get("title", "Untitled initiative"))
         text = text.replace("{{ roles.solution_architect }}", "team.solution-architecture")
         text = text.replace("{{ roles.senior_engineer }}", "team.engineering")
+        text = text.replace("{{ hld.profile }}", "auto")
         target.write_text(text)
-
-    readme = target_dir / "README.md"
-    if not readme.exists():
-        readme.write_text(DESIGN_READMES[artifact])
 
     print(f"Initialized {artifact.upper()} artifacts for {initiative_dir.name}")
     return 0

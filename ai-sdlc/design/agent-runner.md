@@ -59,7 +59,7 @@ ai-sdlc-agent-custom
 Each adapter accepts the same input and produces the same output:
 
 ```text
-stdin:  agent-request.yaml
+stdin:  hld-run.yaml
 stdout: progress and structured run events
 files:  generated artifacts in generated/
 output: agent-response.yaml
@@ -133,7 +133,7 @@ The command should:
 2. Verify the requirement is approved.
 3. Build or refresh the relative context pack.
 4. Load consistent context, guardrails, and the `hld-generation` skill.
-5. Write `agent-request.yaml`.
+5. Write `evidence/hld-run.yaml`.
 6. Run the selected adapter.
 7. Validate the response and generated HLD.
 8. Run secret and policy checks.
@@ -187,7 +187,8 @@ HLD generation may use an independent reviewer model before human review:
 just ai-sdlc-hld-loop PAY-4567 codex gpt-5.6-luna codex gpt-5.6-terra
 ```
 
-The reviewer writes `feedback/ai-review-N.md` with one of these decisions:
+The reviewer writes the latest decision to `feedback/ai-review.md` with one of
+these decisions:
 
 ```text
 pass

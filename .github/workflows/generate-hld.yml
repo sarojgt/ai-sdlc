@@ -3,6 +3,7 @@ name: Generate HLD with Copilot
 on:
   pull_request:
     types: [closed]
+    branches: [main]
     paths:
       - "ai-sdlc/initiatives/**"
   workflow_dispatch:
@@ -12,17 +13,34 @@ on:
         required: true
         type: string
       generator_model:
-        description: Copilot model used to generate the HLD
-        required: true
+        description: "Generator model ID or auto. Catalog: https://github.com/sarojgt/ai-sdlc/blob/main/ai-sdlc/config/copilot-model-catalog.md"
+        required: false
+        type: string
         default: claude-haiku-4.5
-        type: string
       reviewer_model:
-        description: Different Copilot model used to review the HLD
-        required: true
-        default: gemini-3.5-flash
+        description: "Reviewer model ID; must differ from generator. Catalog: https://github.com/sarojgt/ai-sdlc/blob/main/ai-sdlc/config/copilot-model-catalog.md"
+        required: false
         type: string
+        default: gemini-3.5-flash
+      hld_profile:
+        description: HLD detail profile
+        required: false
+        type: choice
+        options: [auto, small, medium, large]
+        default: auto
+      agent_timeout_minutes:
+        description: Timeout for each generator or reviewer call
+        required: false
+        type: choice
+        options: [10, 15, 20, 30]
+        default: 15
       force:
         description: Rerun even if HLD loop evidence already exists
+        required: false
+        default: false
+        type: boolean
+      resume:
+        description: Resume from the latest HLD checkpoint
         required: false
         default: false
         type: boolean
@@ -38,7 +56,11 @@ concurrency:
 
 jobs:
   resolve:
-    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.merged == true &&
+       startsWith(github.event.pull_request.head.ref, 'chore/initiative-post-merge-'))
     runs-on: ubuntu-latest
     outputs:
       initiative_id: ${{ steps.scope.outputs.initiative_id }}
@@ -62,14 +84,16 @@ jobs:
           set -euo pipefail
           initiative_id="$DISPATCH_INITIATIVE"
           if [ "$EVENT_NAME" = "pull_request" ]; then
-            mapfile -t initiatives < <(gh pr view "$PULL_REQUEST_NUMBER" --json files --jq '.files[].path' | awk -F/ '/^ai-sdlc\/initiatives\/[^/]+\// {print $3}' | sort -u)
+            mapfile -t initiatives < <(
+              gh pr view "$PULL_REQUEST_NUMBER" --json files --jq '.files[].path' |
+                awk -F/ '/^ai-sdlc\/initiatives\/[^/]+\// {print $3}' | sort -u
+            )
             if [ "${#initiatives[@]}" -ne 1 ]; then
-              echo "Expected exactly one initiative in the merged PR; found ${#initiatives[@]}" >&2
+              echo "Expected exactly one initiative in the merged scaffold PR; found ${#initiatives[@]}" >&2
               exit 1
             fi
             initiative_id="${initiatives[0]}"
           fi
-
           target="ai-sdlc/initiatives/$initiative_id"
           test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
           grep -q 'status: approved' "$target/requirement.md" || {
@@ -100,7 +124,7 @@ jobs:
     needs: resolve
     if: needs.resolve.outputs.should_run == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     steps:
       - name: Checkout default branch
         uses: actions/checkout@v5
@@ -139,16 +163,22 @@ jobs:
         env:
           GENERATOR_MODEL: ${{ inputs.generator_model || 'claude-haiku-4.5' }}
           REVIEWER_MODEL: ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}
+          HLD_PROFILE: ${{ inputs.hld_profile || 'auto' }}
+          AGENT_TIMEOUT_MINUTES: ${{ inputs.agent_timeout_minutes || '15' }}
+          RESUME: ${{ inputs.resume || false }}
           GITHUB_TOKEN: ${{ github.token }}
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN || github.token }}
         run: |
           set -euo pipefail
+          export AI_SDLC_HLD_PROFILE="$HLD_PROFILE"
+          export AI_SDLC_AGENT_TIMEOUT_SECONDS="$((AGENT_TIMEOUT_MINUTES * 60))"
+          export AI_SDLC_HLD_RESUME="$RESUME"
           chmod +x ai-sdlc/tooling/providers/github-copilot.sh
           chmod +x ai-sdlc/tooling/providers/github-copilot-review.sh
           ./ai-sdlc/tooling/hld_loop.sh \
             "${{ needs.resolve.outputs.initiative_id }}" \
             github-copilot "$GENERATOR_MODEL" \
-            github-copilot "$REVIEWER_MODEL"
+            github-copilot "$REVIEWER_MODEL" "$HLD_PROFILE"
 
       - name: Validate generated initiative
         run: |

@@ -90,7 +90,10 @@ docs(policy): improve the operating guide          # no release
 ```
 
 Breaking changes use `feat!:` or a `BREAKING CHANGE:` footer and create a major
-release. Merges to `main` are evaluated by the semantic release workflow.
+release. Merges to `main` are evaluated by the semantic release workflow using
+the merged PR title as the release intent. Repository settings should require
+squash merging so one PR title maps to one release event; commit messages and
+branch names are guidance only.
 Framework scopes (`workflow`, `policy`, `release`, `ai-sdlc`, and `repo`) create
 the global `vMAJOR.MINOR.PATCH` version. Artifact scopes also create independent
 versions: `initiative/<ID>/v...`, `initiative/<ID>/hld/v...`,
@@ -123,8 +126,9 @@ ci/release-semantic-tags
 ```
 
 Do not use provider or agent names such as `agent/`, `copilot/`, `codex/`, or
-`claude/` in branch names. GitHub validates the branch, PR title, and commit
-messages together.
+`claude/` in branch names. The required GitHub check validates the PR title;
+branch names and commit messages remain the recommended convention and are
+used by semantic release when they follow the standard.
 
 ## End-to-end flow
 

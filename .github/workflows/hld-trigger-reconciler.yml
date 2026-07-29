@@ -37,6 +37,8 @@ jobs:
           REQUESTED_INITIATIVE: ${{ inputs.initiative_id }}
           GENERATOR_MODEL: claude-haiku-4.5
           REVIEWER_MODEL: gemini-3.5-flash
+          HLD_PROFILE: auto
+          AGENT_TIMEOUT_MINUTES: 15
         run: |
           set -euo pipefail
 
@@ -103,5 +105,7 @@ jobs:
               --ref "$DEFAULT_BRANCH" \
               --field "initiative_id=$initiative_id" \
               --field "generator_model=$GENERATOR_MODEL" \
-              --field "reviewer_model=$REVIEWER_MODEL"
+              --field "reviewer_model=$REVIEWER_MODEL" \
+              --field "hld_profile=$HLD_PROFILE" \
+              --field "agent_timeout_minutes=$AGENT_TIMEOUT_MINUTES"
           done

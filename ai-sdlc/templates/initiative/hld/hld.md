@@ -8,6 +8,8 @@ artifact:
   title: "{{ initiative.title }}"
   initiative: "{{ initiative.id }}"
   owner: "{{ roles.solution_architect }}"
+  profile: "{{ hld.profile }}"
+  change_size: ""
 traceability:
   parents: ["REQ-{{ initiative.id }}"]
   satisfies: []
@@ -23,6 +25,10 @@ policy:
 # HLD: {{ initiative.title }}
 
 ## 1. Impact assessment
+
+Classify the change as **small**, **medium**, or **large**. Complete only the
+rows that materially affect this initiative; do not restate standard platform
+capabilities that are already provided by the target deployment pattern.
 
 | Dimension | Assessment | Evidence or context gap |
 |---|---|---|
@@ -40,13 +46,23 @@ policy:
 
 ## 2. Problem and outcome
 
+State the problem, intended outcome, and measurable success signal in a few
+sentences.
+
 ## 3. Scope and boundaries
 
 ## 4. Confirmed context and context gaps
 
+Separate confirmed facts from proposed changes. Record missing facts as a
+`CONTEXT GAP` with an owner and retrieval action; do not fill gaps with guesses.
+
 ## 5. Current-state and target approach
 
 ## 6. Options and trade-offs
+
+For a small change, show one recommended option and alternatives only when a
+material trade-off exists. Medium and large changes may include a short option
+comparison and link to supporting detail.
 
 ## 7. Recommendation and decision points
 
@@ -64,15 +80,22 @@ pattern mismatch, or meaningful constraint.
 
 ## 8. Security, NFRs, and operations
 
+Cover only the NFRs and operational concerns changed or specifically relevant
+to this initiative.
+
 ## 9. Delivery, rollout, and rollback
 
 ## 10. Diagrams
 
-<!-- Embed only the diagrams useful for this change as Mermaid fenced blocks. -->
+<!-- Embed only useful, renderable Mermaid diagrams. Small changes normally need
+     one context/flow diagram and at most one deployment or component view. -->
 
 ## 11. Risks, ADRs, and open questions
 
 ## 12. Traceability
+
+Link the requirement, selected context, affected systems, related repositories,
+and follow-on LLD. Keep evidence in YAML; keep the human decision here.
 
 ## Architecture approval
 

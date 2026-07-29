@@ -62,6 +62,11 @@ from starting early.
 - [x] Bounded AI HLD feedback loop implemented.
 - [x] Loop limits include iteration, elapsed time, repeated feedback, and
       unchanged-output protection.
+- [x] HLD profiles provide automatic small/medium/large classification, detail
+      limits, and per-call timeouts; automatic selection is the default.
+- [x] HLD loop checkpoints and explicit resume support added for interrupted
+      or timed-out runs.
+- [x] HLD request and run metadata consolidated into one `hld-run.yaml` file.
 - [x] AI progress messages added during long-running generation and review.
 - [x] HLD impact assessment added for size, complexity/risk, services,
       repositories, integrations, data, security, deployment, and governance.
@@ -79,7 +84,9 @@ from starting early.
 - [x] Post-merge processing creates initiative metadata and context manifest;
       HLD and LLD artifacts are created lazily by gated lifecycle workflows.
 - [x] Cross-agent repository and Copilot instructions define artifact boundaries.
-- [x] Conventional Commit policy and PR title guidance added.
+- [x] PR-title Conventional Commit gate and branch/commit guidance added.
+- [x] Semantic release derives release intent from the merged PR title and
+      scoped artifact tracks from changed paths.
 - [x] Change-focused branch naming policy and validation added.
 - [x] Semantic release tag workflow added for merges to `main`.
 - [x] Scoped semantic versions added for initiatives, HLDs, LLDs, and context.
@@ -152,7 +159,15 @@ from starting early.
 
 - [x] `just` command interface established.
 - [x] HLD generation and bounded loop commands established.
+- [x] GitHub HLD dispatch exposes model, profile, timeout, force, and resume
+      inputs; automatic reconciliation uses safe defaults.
 - [x] Provider and model overrides supported.
+- [x] GitHub model inputs accept free-form IDs and `auto`; the repository list
+      is informational because Copilot availability is plan and policy dependent.
+- [x] Versioned Copilot model catalog added with economical demo candidates and
+      balanced/advanced routing guidance.
+- [x] Human-readable Markdown model catalog added with copyable IDs and workflow
+      reference link.
 - [x] Dry-run support available.
 - [ ] Add GitHub Issue → initiative automation.
 - [x] Add automatic and manual HLD workflow triggers, including scheduled
@@ -160,7 +175,8 @@ from starting early.
 - [x] Add Copilot cloud-agent setup instructions and repository working agreement.
 - [x] Add draft HLD PR creation.
 - [~] Add AI review comments to the HLD PR.
-- [ ] Add human feedback webhook/command reruns.
+- [~] Add human feedback webhook/command reruns; command and checkpoint resume
+      are available, GitHub comment automation remains pending.
 - [ ] Add Jira issue and status synchronization.
 - [ ] Add Confluence publication or synchronization.
 - [ ] Add cross-repository work-plan orchestration.

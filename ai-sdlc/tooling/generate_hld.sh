@@ -23,10 +23,9 @@ fi
 
 mkdir -p "$target/evidence" "$target/generated"
 python3 "$root/tooling/build_design_baseline.py" "$initiative_id" > "$target/evidence/design-baseline.yaml"
-cp "$root/templates/agent-request.yaml" "$target/evidence/agent-request.yaml"
-cp "$root/templates/agent-run.yaml" "$target/evidence/agent-run.yaml"
+cp "$root/templates/hld-run.yaml" "$target/evidence/hld-run.yaml"
 
-for file in "$target/evidence/agent-request.yaml" "$target/evidence/agent-run.yaml"; do
+for file in "$target/evidence/hld-run.yaml"; do
   # Use a backup suffix so this works with both BSD sed on macOS and GNU sed
   # on GitHub-hosted Ubuntu runners.
   sed -i.bak \
@@ -40,13 +39,14 @@ for file in "$target/evidence/agent-request.yaml" "$target/evidence/agent-run.ya
     -e "s/{{ context.hash }}/REQUIRED_CONTEXT_HASH/g" \
     -e "s/{{ policy.risk_tier }}/medium/g" \
     -e "s/{{ task.output_schema }}/hld.v0.1/g" \
+    -e "s/{{ hld.profile }}/${AI_SDLC_HLD_PROFILE:-small}/g" \
     -e "s/{{ agent.provider }}/$agent_provider/g" \
     -e "s/{{ agent.model }}/$agent_model/g" \
     "$file"
   rm -f "$file.bak"
 done
 
-echo "HLD request prepared: $target/evidence/agent-request.yaml"
+echo "HLD run prepared: $target/evidence/hld-run.yaml"
 echo "Agent provider: $agent_provider"
 echo "Agent model: $agent_model"
 

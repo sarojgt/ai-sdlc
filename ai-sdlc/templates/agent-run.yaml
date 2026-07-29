@@ -1,8 +1,0 @@
-run_id: "RUN-{{ initiative.id }}-HLD-{{ task.sequence }}"
-initiative_id: "{{ initiative.id }}"
-task_type: hld
-agent_provider: "{{ agent.provider }}"
-agent_model: "{{ agent.model }}"
-status: request-prepared
-approval_authority: none
-next_action: invoke-configured-agent-adapter
