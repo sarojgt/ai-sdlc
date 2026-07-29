@@ -114,6 +114,16 @@ jobs:
             github-copilot "${{ steps.models.outputs.generator_model }}" \
             github-copilot "${{ steps.models.outputs.reviewer_model }}" auto
 
+      - name: Install Mermaid renderer
+        run: npm install --global @mermaid-js/mermaid-cli
+
+      - name: Validate HLD contract and diagrams
+        run: |
+          initiative_id="${{ github.event.pull_request.head.ref }}"
+          initiative_id="${initiative_id#feat/hld-}"
+          python3 ai-sdlc/tooling/validate_hld_artifacts.py \
+            "ai-sdlc/initiatives/$initiative_id"
+
       - name: Commit feedback-driven HLD update
         env:
           GH_TOKEN: ${{ github.token }}

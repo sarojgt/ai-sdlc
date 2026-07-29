@@ -73,6 +73,7 @@ metadata, reusable boilerplate, and approval metadata in one follow-up PR.
 ai-sdlc/
   context/                 # shared business, architecture, and guardrail context
   config/                  # roles, context sources, lifecycle gates
+  prompts/hld/             # versioned assessment, generation, and review prompts
   design/                  # framework architecture and workflow design
   schemas/                 # machine validation contracts
   templates/initiative/    # reusable artifact templates
@@ -231,6 +232,12 @@ The HLD review skill can be run independently:
 ```text
 just ai-sdlc-skill hld-review PAY-4567 codex gpt-5.6-terra
 ```
+
+Provider adapters load the versioned prompts from `prompts/hld/` rather than
+embedding lifecycle instructions in shell scripts. This keeps provider
+selection and orchestration separate from prompt iteration. The AI review file
+contains findings and validation only; `ready_for_human_review` is advisory and
+never means architecture approval.
 
 If generation fails after `hld/hld.md` has been created, resume with the
 existing artifact instead of regenerating it:

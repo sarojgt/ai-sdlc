@@ -52,6 +52,8 @@ from starting early.
 - [x] Vendor-neutral provider adapter concept established.
 - [x] Codex provider adapter implemented with configurable model selection.
 - [x] Provider-neutral adapter boundary documented for future providers.
+- [x] HLD assessment, generation, and review prompts externalized as versioned
+      repository Markdown instead of inline shell strings.
 - [x] Human-readable Markdown as the primary artifact format.
 - [x] YAML metadata and evidence model established.
 - [x] DAS metadata and schema foundation added.
@@ -80,6 +82,8 @@ from starting early.
       and approved patterns.
 - [x] HLD alternatives are limited to meaningful trade-offs or constraints.
 - [x] Mermaid diagrams embedded in the primary HLD document.
+- [x] HLD structure, evidence consistency, duplication, and Mermaid validation
+      checks added before an HLD PR is published.
 - [x] Canonical HLD path standardized as `initiatives/<ID>/hld/hld.md`.
 - [x] Older demo initiatives archived under `ai-sdlc/examples/archive/`.
 - [x] Incidental `.DS_Store` and graph workspace artifacts removed/ignored.
@@ -182,6 +186,8 @@ from starting early.
 - [x] Add Copilot cloud-agent setup instructions and repository working agreement.
 - [x] Add draft HLD PR creation.
 - [~] Add AI review comments to the HLD PR.
+- [x] HLD resume publishing preserves existing branch commits without a
+      force-push.
 - [~] Add human feedback webhook/command reruns; command and checkpoint resume
       are available, and guarded inline HLD review-comment reruns are now
       implemented.
