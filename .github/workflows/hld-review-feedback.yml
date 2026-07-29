@@ -1,0 +1,141 @@
+name: Rerun HLD from Architect Review Comment
+
+on:
+  pull_request_review_comment:
+    types: [created, edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+  copilot-requests: write
+
+concurrency:
+  group: hld-review-feedback-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  rerun:
+    if: >-
+      github.event.pull_request.base.ref == 'main' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'feat/hld-') &&
+      github.event.comment.author_association != 'NONE' &&
+      github.event.comment.author_association != 'FIRST_TIMER' &&
+      github.event.comment.author_association != 'FIRST_TIME_CONTRIBUTOR' &&
+      github.event.comment.user.type != 'Bot' &&
+      startsWith(github.event.comment.path, 'ai-sdlc/initiatives/') &&
+      contains(github.event.comment.path, '/hld/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout HLD branch
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Install GitHub Copilot CLI
+        run: npm install -g @github/copilot
+
+      - name: Record architect feedback
+        env:
+          INITIATIVE_ID: ${{ github.event.pull_request.head.ref }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          COMMENT_PATH: ${{ github.event.comment.path }}
+          COMMENT_LINE: ${{ github.event.comment.line || github.event.comment.original_line || 0 }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          set -euo pipefail
+          initiative_id="${INITIATIVE_ID#feat/hld-}"
+          mkdir -p "ai-sdlc/initiatives/$initiative_id/feedback"
+          export INITIATIVE_ID COMMENT_ID COMMENT_AUTHOR COMMENT_PATH COMMENT_LINE COMMENT_BODY
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          initiative = os.environ["INITIATIVE_ID"].removeprefix("feat/hld-")
+          feedback = Path(f"ai-sdlc/initiatives/{initiative}/feedback/human-review.md")
+          body = os.environ.get("COMMENT_BODY", "").strip()
+          entry = (
+              f"\n## GitHub inline review comment {os.environ['COMMENT_ID']}\n\n"
+              f"- Reviewer: `{os.environ['COMMENT_AUTHOR']}`\n"
+              f"- Path: `{os.environ['COMMENT_PATH']}`\n"
+              f"- Line: `{os.environ['COMMENT_LINE']}`\n"
+              f"- Source: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}#discussion_r{os.environ['COMMENT_ID']}\n\n"
+              f"{body}\n"
+          )
+          with feedback.open("a", encoding="utf-8") as handle:
+              handle.write(entry)
+          print(f"Recorded architect feedback in {feedback}")
+          PY
+
+      - name: Resolve HLD models
+        id: models
+        run: |
+          set -euo pipefail
+          initiative_id="${{ github.event.pull_request.head.ref }}"
+          initiative_id="${initiative_id#feat/hld-}"
+          evidence="ai-sdlc/initiatives/$initiative_id/evidence/hld-loop.yaml"
+          generator_model="$(sed -n 's/^  generator_model: *"\{0,1\}\([^" ]*\).*/\1/p' "$evidence" | head -1)"
+          reviewer_model="$(sed -n 's/^  reviewer_model: *"\{0,1\}\([^" ]*\).*/\1/p' "$evidence" | head -1)"
+          generator_model="${generator_model:-claude-haiku-4.5}"
+          reviewer_model="${reviewer_model:-gemini-3.5-flash}"
+          if [ "$generator_model" = "$reviewer_model" ]; then
+            echo "Existing generator and reviewer models are identical; using the safe independent reviewer default." >&2
+            reviewer_model="gemini-3.5-flash"
+          fi
+          echo "generator_model=$generator_model" >> "$GITHUB_OUTPUT"
+          echo "reviewer_model=$reviewer_model" >> "$GITHUB_OUTPUT"
+
+      - name: Rerun bounded HLD review loop
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN || github.token }}
+          AI_SDLC_HLD_PROFILE: auto
+          AI_SDLC_AGENT_TIMEOUT_SECONDS: 900
+          AI_SDLC_HLD_RESUME: 1
+        run: |
+          set -euo pipefail
+          initiative_id="${{ github.event.pull_request.head.ref }}"
+          initiative_id="${initiative_id#feat/hld-}"
+          ./ai-sdlc/tooling/hld_loop.sh \
+            "$initiative_id" \
+            github-copilot "${{ steps.models.outputs.generator_model }}" \
+            github-copilot "${{ steps.models.outputs.reviewer_model }}" auto
+
+      - name: Commit feedback-driven HLD update
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INITIATIVE_ID: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "ai-sdlc/initiatives/${INITIATIVE_ID#feat/hld-}/feedback/human-review.md" \
+            "ai-sdlc/initiatives/${INITIATIVE_ID#feat/hld-}/hld" \
+            "ai-sdlc/initiatives/${INITIATIVE_ID#feat/hld-}/evidence"
+          if git diff --cached --quiet; then
+            echo "No HLD changes were produced."
+            exit 0
+          fi
+          git commit -m "fix(hld): address architect review feedback"
+          git push origin "${INITIATIVE_ID}"
+
+      - name: Report rerun status
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr comment "$PR_NUMBER" --body "HLD feedback automation processed inline review comment #${{ github.event.comment.id }}. The bounded generator/reviewer loop ran on the existing HLD branch. Human Solution Architect approval is still required."

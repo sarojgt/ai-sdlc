@@ -319,6 +319,10 @@ policy-blocked IDs fail during the Copilot call under the account's normal
 availability rules.
 Human comments are captured with `just ai-sdlc-hld-feedback`; they do not
 approve architecture and must be followed by an explicit bounded rerun.
+Inline comments on an HLD PR are also captured automatically by the guarded
+`Rerun HLD from Architect Review Comment` workflow. It records the comment in
+`feedback/human-review.md`, reruns the bounded loop on the same HLD branch, and
+updates the same PR. Human Solution Architect approval is still required.
 
 ## Current Confluence position
 

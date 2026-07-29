@@ -18,6 +18,11 @@ jobs:
     name: conventional-commits
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository policy
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
       - name: Validate PR title
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}

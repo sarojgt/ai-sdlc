@@ -29,7 +29,7 @@ def values(initiative_dir: Path) -> dict[str, str]:
 
 
 def main() -> int:
-    if len(sys.argv) != 3 or sys.argv[2] not in DESIGN_READMES:
+    if len(sys.argv) != 3 or sys.argv[2] not in {"hld", "lld"}:
         fail("Usage: initialize_design_artifacts.py <initiative-dir> <hld|lld>")
 
     initiative_dir = Path(sys.argv[1]).resolve()
