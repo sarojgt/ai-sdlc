@@ -309,10 +309,12 @@ Use `auto` as a model value when Copilot should choose the model. In GitHub,
 use **Actions → Generate HLD with Copilot → Run workflow** to type the
 generator model, a different reviewer model, profile, per-call timeout, and
 whether to resume. Automatic scaffold-merge runs use the configured defaults.
-The model list in `config/agent-providers.yaml` is a convenience catalog, not
-an allow-list; GitHub may add, retire, or restrict models without this
-repository changing. Unsupported or policy-blocked IDs fail during the
-Copilot call under the account's normal availability rules.
+The detailed model catalog is in `config/copilot-model-catalog.json`, including
+internal economical/balanced/advanced routing guidance and demo candidates.
+It is a convenience catalog, not an allow-list; GitHub may add, retire, or
+restrict models without this repository changing. Unsupported or
+policy-blocked IDs fail during the Copilot call under the account's normal
+availability rules.
 Human comments are captured with `just ai-sdlc-hld-feedback`; they do not
 approve architecture and must be followed by an explicit bounded rerun.
 

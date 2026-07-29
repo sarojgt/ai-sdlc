@@ -162,6 +162,8 @@ from starting early.
 - [x] Provider and model overrides supported.
 - [x] GitHub model inputs accept free-form IDs and `auto`; the repository list
       is informational because Copilot availability is plan and policy dependent.
+- [x] Versioned Copilot model catalog added with economical demo candidates and
+      balanced/advanced routing guidance.
 - [x] Dry-run support available.
 - [ ] Add GitHub Issue → initiative automation.
 - [x] Add automatic and manual HLD workflow triggers, including scheduled
