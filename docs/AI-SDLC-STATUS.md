@@ -166,7 +166,7 @@ from starting early.
 - [x] `just` command interface established.
 - [x] HLD generation and bounded loop commands established.
 - [x] GitHub HLD dispatch exposes model, profile, timeout, force, and resume
-      inputs; automatic reconciliation uses safe defaults.
+      inputs; manual reconciliation uses safe defaults for recovery.
 - [x] Provider and model overrides supported.
 - [x] GitHub model inputs accept free-form IDs and `auto`; the repository list
       is informational because Copilot availability is plan and policy dependent.
@@ -176,8 +176,9 @@ from starting early.
       reference link.
 - [x] Dry-run support available.
 - [ ] Add GitHub Issue → initiative automation.
-- [x] Add automatic and manual HLD workflow triggers, including scheduled
-      reconciliation for workflow-created scaffold PRs.
+- [x] Add automatic and manual HLD workflow triggers; scheduled polling was
+      removed to prevent unexpected model runs, while manual reconciliation is
+      retained for recovery.
 - [x] Add Copilot cloud-agent setup instructions and repository working agreement.
 - [x] Add draft HLD PR creation.
 - [~] Add AI review comments to the HLD PR.
