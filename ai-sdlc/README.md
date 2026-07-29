@@ -309,8 +309,10 @@ Use `auto` as a model value when Copilot should choose the model. In GitHub,
 use **Actions → Generate HLD with Copilot → Run workflow** to type the
 generator model, a different reviewer model, profile, per-call timeout, and
 whether to resume. Automatic scaffold-merge runs use the configured defaults.
-The detailed model catalog is in `config/copilot-model-catalog.json`, including
-internal economical/balanced/advanced routing guidance and demo candidates.
+The human-readable model catalog is in
+[`config/copilot-model-catalog.md`](config/copilot-model-catalog.md), including
+copyable model IDs and economical/balanced/advanced routing guidance. The
+machine-readable equivalent is `config/copilot-model-catalog.json`.
 It is a convenience catalog, not an allow-list; GitHub may add, retire, or
 restrict models without this repository changing. Unsupported or
 policy-blocked IDs fail during the Copilot call under the account's normal

@@ -164,6 +164,8 @@ from starting early.
       is informational because Copilot availability is plan and policy dependent.
 - [x] Versioned Copilot model catalog added with economical demo candidates and
       balanced/advanced routing guidance.
+- [x] Human-readable Markdown model catalog added with copyable IDs and workflow
+      reference link.
 - [x] Dry-run support available.
 - [ ] Add GitHub Issue → initiative automation.
 - [x] Add automatic and manual HLD workflow triggers, including scheduled
