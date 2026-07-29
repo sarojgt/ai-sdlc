@@ -176,7 +176,8 @@ from starting early.
 - [x] Add draft HLD PR creation.
 - [~] Add AI review comments to the HLD PR.
 - [~] Add human feedback webhook/command reruns; command and checkpoint resume
-      are available, GitHub comment automation remains pending.
+      are available, and guarded inline HLD review-comment reruns are now
+      implemented.
 - [ ] Add Jira issue and status synchronization.
 - [ ] Add Confluence publication or synchronization.
 - [ ] Add cross-repository work-plan orchestration.
