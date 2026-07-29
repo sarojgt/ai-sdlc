@@ -50,6 +50,12 @@ selections. It uses the Actions `GITHUB_TOKEN` by default, with an optional
 `COPILOT_GITHUB_TOKEN` Actions secret as a personal-token fallback when the
 organization has not enabled Copilot CLI for Actions.
 
+The reconciliation workflow is intentionally manual and has no scheduled
+polling trigger. This prevents repeated model runs and token consumption. The
+normal automatic path is the single `pull_request`-closed event for a merged
+approved scaffold PR; use manual reconciliation only to recover a missed
+handoff.
+
 With the `auto` profile, the loop first runs a lightweight impact assessment
 and records `evidence/hld-assessment.yaml`. That assessment selects the detail
 profile before the full HLD is generated. The profile guides the amount of

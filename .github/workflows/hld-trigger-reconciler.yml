@@ -1,8 +1,8 @@
 name: Reconcile HLD Triggers
 
 on:
-  schedule:
-    - cron: "*/5 * * * *"
+  # Deliberately manual: a scheduled scan can repeatedly dispatch expensive
+  # model runs for every approved initiative that lacks HLD evidence.
   workflow_dispatch:
     inputs:
       initiative_id:
