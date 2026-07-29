@@ -118,15 +118,46 @@ hld_hash() {
 }
 
 detect_profile() {
-  local size
-  size="$(awk -F: '$1 == "change_size" {gsub(/[[:space:]\042\047]/, "", $2); print tolower($2); exit}' "$target/hld/hld.md")"
-  if [ -z "$size" ]; then
-    size="$(awk -F'|' 'tolower($2) ~ /change size/ {gsub(/[[:space:]]/, "", $3); print tolower($3); exit}' "$target/hld/hld.md")"
-  fi
-  case "$size" in
-    small|medium|large) printf '%s\n' "$size" ;;
-    *) return 1 ;;
-  esac
+  python3 - "$target/hld/hld.md" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text(encoding="utf-8")
+patterns = (
+    r"^\s*change_size\s*:\s*[\"']?(small|medium|large)[\"']?\s*$",
+    r"^\s*\|\s*change\s+size\s*\|\s*(small|medium|large)\s*\|",
+    r"^\s*\*\*change\s+size\*\*\s*[:|]\s*(small|medium|large)\b",
+    r"^\s*change\s+size\s*[:|]\s*(small|medium|large)\b",
+)
+for line in text.splitlines():
+    for pattern in patterns:
+        match = re.search(pattern, line, re.IGNORECASE)
+        if match:
+            print(match.group(1).lower())
+            raise SystemExit(0)
+raise SystemExit(1)
+PY
+}
+
+record_profile() {
+  python3 - "$target/hld/hld.md" "$profile" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+profile = sys.argv[2]
+text = path.read_text(encoding="utf-8")
+line = f'  change_size: "{profile}"'
+if re.search(r"^change_size:\s*", text, flags=re.MULTILINE):
+    text = re.sub(r"^(\s*)change_size:\s*.*$", lambda match: match.group(1) + line.strip(), text, count=1, flags=re.MULTILINE)
+elif re.search(r"^  profile:\s*", text, flags=re.MULTILINE):
+    text = re.sub(r"^(  profile:.*)$", r"\1\n" + line, text, count=1, flags=re.MULTILINE)
+else:
+    text = text.replace("---\n", "---\n" + line + "\n", 1)
+path.write_text(text, encoding="utf-8")
+PY
 }
 
 previous_feedback_hash=""
@@ -165,6 +196,7 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
     max_elapsed_minutes="$(profile_value max_elapsed_minutes)"
     max_hld_lines="$(profile_value max_hld_lines)"
     export AI_SDLC_HLD_PROFILE="$profile"
+    record_profile
     echo "AI-selected HLD profile: $profile"
   fi
   hld_lines="$(wc -l < "$target/hld/hld.md" | tr -d ' ')"
