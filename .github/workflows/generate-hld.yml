@@ -13,12 +13,12 @@ on:
         required: true
         type: string
       generator_model:
-        description: "Model ID or auto. Catalog: https://github.com/sarojgt/ai-sdlc/blob/main/ai-sdlc/config/copilot-model-catalog.json"
+        description: "Generator model ID or auto. Catalog: https://github.com/sarojgt/ai-sdlc/blob/main/ai-sdlc/config/copilot-model-catalog.json"
         required: false
         type: string
         default: claude-haiku-4.5
       reviewer_model:
-        description: "Different model ID. Catalog: https://github.com/sarojgt/ai-sdlc/blob/main/ai-sdlc/config/copilot-model-catalog.json"
+        description: "Reviewer model ID; must differ from generator. Catalog: https://github.com/sarojgt/ai-sdlc/blob/main/ai-sdlc/config/copilot-model-catalog.json"
         required: false
         type: string
         default: gemini-3.5-flash
