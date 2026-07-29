@@ -32,14 +32,14 @@ on:
         description: HLD detail profile
         required: false
         type: choice
-        options: [small, medium, large]
-        default: small
+        options: [auto, small, medium, large]
+        default: auto
       agent_timeout_minutes:
         description: Timeout for each generator or reviewer call
         required: false
         type: choice
-        options: [3, 5, 8, 10]
-        default: 5
+        options: [10, 15, 20, 30]
+        default: 15
       force:
         description: Rerun even if HLD loop evidence already exists
         required: false
@@ -169,8 +169,8 @@ jobs:
         env:
           GENERATOR_MODEL: ${{ inputs.generator_model || 'claude-haiku-4.5' }}
           REVIEWER_MODEL: ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}
-          HLD_PROFILE: ${{ inputs.hld_profile || 'small' }}
-          AGENT_TIMEOUT_MINUTES: ${{ inputs.agent_timeout_minutes || '5' }}
+          HLD_PROFILE: ${{ inputs.hld_profile || 'auto' }}
+          AGENT_TIMEOUT_MINUTES: ${{ inputs.agent_timeout_minutes || '15' }}
           RESUME: ${{ inputs.resume || false }}
           GITHUB_TOKEN: ${{ github.token }}
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN || github.token }}

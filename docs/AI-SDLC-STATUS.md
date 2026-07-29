@@ -62,8 +62,8 @@ from starting early.
 - [x] Bounded AI HLD feedback loop implemented.
 - [x] Loop limits include iteration, elapsed time, repeated feedback, and
       unchanged-output protection.
-- [x] HLD profiles provide small/medium/large detail limits, per-call timeouts,
-      and a concise default for small changes.
+- [x] HLD profiles provide automatic small/medium/large classification, detail
+      limits, and per-call timeouts; automatic selection is the default.
 - [x] HLD loop checkpoints and explicit resume support added for interrupted
       or timed-out runs.
 - [x] HLD request and run metadata consolidated into one `hld-run.yaml` file.

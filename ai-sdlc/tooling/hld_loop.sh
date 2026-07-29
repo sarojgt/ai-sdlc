@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [ "$#" -lt 5 ]; then
-  echo "Usage: $0 <initiative-id> <generator-provider> <generator-model> <reviewer-provider> <reviewer-model> [small|medium|large]" >&2
+  echo "Usage: $0 <initiative-id> <generator-provider> <generator-model> <reviewer-provider> <reviewer-model> [auto|small|medium|large]" >&2
   exit 2
 fi
 
@@ -11,7 +11,7 @@ generator_provider="$2"
 generator_model="$3"
 reviewer_provider="$4"
 reviewer_model="$5"
-profile="${6:-${AI_SDLC_HLD_PROFILE:-small}}"
+profile="${6:-${AI_SDLC_HLD_PROFILE:-auto}}"
 root="$(cd "$(dirname "$0")/.." && pwd)"
 target="$root/initiatives/$initiative_id"
 policy_file="$root/config/hld-loop-policy.yaml"
@@ -30,8 +30,8 @@ profile_value() {
 }
 
 case "$profile" in
-  small|medium|large) ;;
-  *) echo "Unsupported HLD profile: $profile (expected small, medium, or large)" >&2; exit 2 ;;
+  auto|small|medium|large) ;;
+  *) echo "Unsupported HLD profile: $profile (expected auto, small, medium, or large)" >&2; exit 2 ;;
 esac
 
 max_iterations="${AI_SDLC_HLD_LOOP_MAX_ITERATIONS:-$(profile_value max_iterations)}"
@@ -117,6 +117,18 @@ hld_hash() {
   done | sha256 | awk '{print $1}'
 }
 
+detect_profile() {
+  local size
+  size="$(awk -F: '$1 == "change_size" {gsub(/[[:space:]\042\047]/, "", $2); print tolower($2); exit}' "$target/hld/hld.md")"
+  if [ -z "$size" ]; then
+    size="$(awk -F'|' 'tolower($2) ~ /change size/ {gsub(/[[:space:]]/, "", $3); print tolower($3); exit}' "$target/hld/hld.md")"
+  fi
+  case "$size" in
+    small|medium|large) printf '%s\n' "$size" ;;
+    *) return 1 ;;
+  esac
+}
+
 previous_feedback_hash=""
 
 if [ "${AI_SDLC_HLD_LOOP_DRY_RUN:-0}" = "1" ]; then
@@ -141,6 +153,20 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
   before_hld_hash="$(hld_hash)"
   "$root/tooling/generate_hld.sh" "$initiative_id" "$generator_provider" "$generator_model" "$iteration"
   after_hld_hash="$(hld_hash)"
+  if [ "$profile" = "auto" ]; then
+    selected_profile="$(detect_profile || true)"
+    if [ -z "$selected_profile" ]; then
+      echo "The HLD agent did not provide a valid change_size classification (small, medium, or large)." >&2
+      echo "Escalating for a classification correction; no human profile selection is required." >&2
+      exit 10
+    fi
+    profile="$selected_profile"
+    max_iterations="$(profile_value max_iterations)"
+    max_elapsed_minutes="$(profile_value max_elapsed_minutes)"
+    max_hld_lines="$(profile_value max_hld_lines)"
+    export AI_SDLC_HLD_PROFILE="$profile"
+    echo "AI-selected HLD profile: $profile"
+  fi
   hld_lines="$(wc -l < "$target/hld/hld.md" | tr -d ' ')"
   if [ "$hld_lines" -gt "$max_hld_lines" ]; then
     echo "HLD exceeds $profile profile limit: $hld_lines lines (maximum $max_hld_lines)." >&2

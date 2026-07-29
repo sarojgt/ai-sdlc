@@ -1,4 +1,11 @@
 hld_profiles:
+  auto:
+    max_iterations: 5
+    max_elapsed_minutes: 45
+    agent_timeout_minutes: 15
+    max_hld_lines: 1200
+    max_diagrams: 6
+    guidance: "First classify the change as small, medium, or large, then apply the matching level of detail. Do not guess missing facts."
   small:
     max_iterations: 2
     max_elapsed_minutes: 12

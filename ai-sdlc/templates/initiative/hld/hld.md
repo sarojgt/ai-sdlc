@@ -9,6 +9,7 @@ artifact:
   initiative: "{{ initiative.id }}"
   owner: "{{ roles.solution_architect }}"
   profile: "{{ hld.profile }}"
+  change_size: ""
 traceability:
   parents: ["REQ-{{ initiative.id }}"]
   satisfies: []

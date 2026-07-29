@@ -240,9 +240,12 @@ An approved initiative PR can automatically flip `initiative.yaml` and
 `initiative.md` to `approved` and record the approval trail in
 `approvals.yaml`.
 
-The `small` profile is the default and caps the loop at two iterations, twelve
-minutes, and 360 HLD lines. `medium` and `large` allow more detail only when
-the impact assessment justifies it. Each model call has its own timeout.
+The `auto` profile is the default. The HLD agent must classify the change as
+small, medium, or large in the HLD metadata; the orchestrator then applies the
+matching detail and safety limits. Automatic runs allow up to 45 minutes and
+15 minutes per model call so context-heavy work is not cut off prematurely.
+Explicit `small`, `medium`, and `large` profiles remain available when a
+workflow owner intentionally overrides the default.
 
 After architect feedback:
 
@@ -302,7 +305,8 @@ AI_SDLC_HLD_LOOP_DRY_RUN=1 just ai-sdlc-hld-loop \
 
 In GitHub, use **Actions → Generate HLD with Copilot → Run workflow** to select
 the generator model, different reviewer model, profile, per-call timeout, and
-whether to resume. Automatic reconciliation uses the safe `small` defaults.
+whether to resume. Automatic scaffold-merge runs use the `auto` profile and
+the longer default timeout; the five-minute reconciler remains a recovery path.
 Human comments are captured with `just ai-sdlc-hld-feedback`; they do not
 approve architecture and must be followed by an explicit bounded rerun.
 

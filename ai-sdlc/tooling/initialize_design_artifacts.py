@@ -51,7 +51,7 @@ def main() -> int:
         text = text.replace("{{ initiative.title }}", data.get("title", "Untitled initiative"))
         text = text.replace("{{ roles.solution_architect }}", "team.solution-architecture")
         text = text.replace("{{ roles.senior_engineer }}", "team.engineering")
-        text = text.replace("{{ hld.profile }}", "small")
+        text = text.replace("{{ hld.profile }}", "auto")
         target.write_text(text)
 
     print(f"Initialized {artifact.upper()} artifacts for {initiative_dir.name}")
