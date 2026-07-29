@@ -62,14 +62,20 @@ from starting early.
 - [x] Bounded AI HLD feedback loop implemented.
 - [x] Loop limits include iteration, elapsed time, repeated feedback, and
       unchanged-output protection.
-- [x] HLD profiles provide automatic small/medium/large classification, detail
-      limits, and per-call timeouts; automatic selection is the default.
+- [x] HLD profiles provide automatic small/medium/large classification,
+      proportional detail guidance, and per-call timeouts; automatic selection
+      is the default.
 - [x] HLD loop checkpoints and explicit resume support added for interrupted
       or timed-out runs.
 - [x] HLD request and run metadata consolidated into one `hld-run.yaml` file.
 - [x] AI progress messages added during long-running generation and review.
 - [x] HLD impact assessment added for size, complexity/risk, services,
       repositories, integrations, data, security, deployment, and governance.
+- [x] HLD preflight assessment selects the detail profile before full HLD
+      generation and can recover a classification for an existing HLD.
+- [x] Resume mode reuses an existing HLD after a post-generation failure.
+- [x] Profile guidance uses proportional detail and linked supporting
+      documents instead of a hard HLD line-count gate.
 - [x] HLD recommendation uses enterprise principles, guardrails, standards,
       and approved patterns.
 - [x] HLD alternatives are limited to meaningful trade-offs or constraints.

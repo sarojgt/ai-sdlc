@@ -34,6 +34,12 @@ on:
         type: choice
         options: [10, 15, 20, 30]
         default: 15
+      assessment_timeout_minutes:
+        description: Timeout for the automatic HLD impact assessment
+        required: false
+        type: choice
+        options: [5, 10, 15]
+        default: 5
       force:
         description: Rerun even if HLD loop evidence already exists
         required: false
@@ -165,6 +171,7 @@ jobs:
           REVIEWER_MODEL: ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}
           HLD_PROFILE: ${{ inputs.hld_profile || 'auto' }}
           AGENT_TIMEOUT_MINUTES: ${{ inputs.agent_timeout_minutes || '15' }}
+          ASSESSMENT_TIMEOUT_MINUTES: ${{ inputs.assessment_timeout_minutes || '5' }}
           RESUME: ${{ inputs.resume || false }}
           GITHUB_TOKEN: ${{ github.token }}
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN || github.token }}
@@ -172,6 +179,7 @@ jobs:
           set -euo pipefail
           export AI_SDLC_HLD_PROFILE="$HLD_PROFILE"
           export AI_SDLC_AGENT_TIMEOUT_SECONDS="$((AGENT_TIMEOUT_MINUTES * 60))"
+          export AI_SDLC_ASSESSMENT_TIMEOUT_SECONDS="$((ASSESSMENT_TIMEOUT_MINUTES * 60))"
           export AI_SDLC_HLD_RESUME="$RESUME"
           chmod +x ai-sdlc/tooling/providers/github-copilot.sh
           chmod +x ai-sdlc/tooling/providers/github-copilot-review.sh
