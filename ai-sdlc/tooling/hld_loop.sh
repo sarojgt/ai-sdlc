@@ -37,12 +37,7 @@ esac
 max_iterations="${AI_SDLC_HLD_LOOP_MAX_ITERATIONS:-$(profile_value max_iterations)}"
 max_elapsed_minutes="${AI_SDLC_HLD_MAX_ELAPSED_MINUTES:-$(profile_value max_elapsed_minutes)}"
 agent_timeout_seconds="${AI_SDLC_AGENT_TIMEOUT_SECONDS:-$(( $(profile_value agent_timeout_minutes) * 60 ))}"
-max_hld_lines="$(profile_value max_hld_lines)"
 export AI_SDLC_HLD_PROFILE="$profile" AI_SDLC_AGENT_TIMEOUT_SECONDS="$agent_timeout_seconds"
-
-case "$max_hld_lines" in
-  ''|*[!0-9]*) echo "max_hld_lines must be a positive integer" >&2; exit 2 ;;
-esac
 
 sha256() {
   if command -v sha256sum >/dev/null 2>&1; then
@@ -117,22 +112,29 @@ hld_hash() {
   done | sha256 | awk '{print $1}'
 }
 
-detect_profile() {
-  local size
-  size="$(awk -F: '$1 == "change_size" {gsub(/[[:space:]\042\047]/, "", $2); print tolower($2); exit}' "$target/hld/hld.md")"
-  if [ -z "$size" ]; then
-    size="$(awk -F'|' 'tolower($2) ~ /change size/ {gsub(/[[:space:]]/, "", $3); print tolower($3); exit}' "$target/hld/hld.md")"
-  fi
-  case "$size" in
-    small|medium|large) printf '%s\n' "$size" ;;
-    *) return 1 ;;
-  esac
+record_profile() {
+  python3 - "$target/hld/hld.md" "$profile" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+profile = sys.argv[2]
+text = path.read_text(encoding="utf-8")
+if re.search(r"^\s*change_size\s*:", text, flags=re.MULTILINE):
+    text = re.sub(r"^(\s*change_size\s*:\s*).*$", rf"\1{profile}", text, count=1, flags=re.MULTILINE)
+elif text.startswith("---\n"):
+    text = text.replace("---\n", f"---\nchange_size: {profile}\n", 1)
+else:
+    text = f"---\nchange_size: {profile}\n---\n\n" + text
+path.write_text(text, encoding="utf-8")
+PY
 }
 
 previous_feedback_hash=""
 
 if [ "${AI_SDLC_HLD_LOOP_DRY_RUN:-0}" = "1" ]; then
-  echo "DRY RUN: profile=$profile, max_iterations=$max_iterations, max_elapsed_minutes=$max_elapsed_minutes, agent_timeout_seconds=$agent_timeout_seconds, max_hld_lines=$max_hld_lines"
+  echo "DRY RUN: profile=$profile, max_iterations=$max_iterations, max_elapsed_minutes=$max_elapsed_minutes, agent_timeout_seconds=$agent_timeout_seconds"
   echo "DRY RUN: ./ai-sdlc/tooling/generate_hld.sh $initiative_id $generator_provider $generator_model 1"
   echo "DRY RUN: ./ai-sdlc/tooling/review_hld.sh $initiative_id $reviewer_provider $reviewer_model 1"
   loop_finished=1
@@ -141,6 +143,33 @@ fi
 
 mkdir -p "$target/feedback" "$target/evidence"
 python3 "$root/tooling/initialize_design_artifacts.py" "$target" hld
+
+if [ "$profile" = "auto" ]; then
+  assessment_file="$target/evidence/hld-assessment.yaml"
+  if [ ! -s "$assessment_file" ]; then
+    echo "[AI-SDLC] Running preflight HLD impact assessment before generation..."
+    AI_SDLC_ASSESSMENT_TIMEOUT_SECONDS="${AI_SDLC_ASSESSMENT_TIMEOUT_SECONDS:-300}" \
+      "$root/tooling/assess_hld.sh" "$initiative_id" "$generator_provider" "$generator_model"
+  else
+    echo "[AI-SDLC] Reusing existing HLD impact assessment."
+  fi
+  profile="$(python3 "$root/tooling/resolve_hld_profile.py" "$target")" || {
+    echo "HLD profile assessment is invalid; expected small, medium, or large." >&2
+    exit 10
+  }
+  echo "AI-selected HLD profile: $profile"
+fi
+
+max_iterations="${AI_SDLC_HLD_LOOP_MAX_ITERATIONS:-$(profile_value max_iterations)}"
+max_elapsed_minutes="${AI_SDLC_HLD_MAX_ELAPSED_MINUTES:-$(profile_value max_elapsed_minutes)}"
+agent_timeout_seconds="${AI_SDLC_AGENT_TIMEOUT_SECONDS:-$(( $(profile_value agent_timeout_minutes) * 60 ))}"
+export AI_SDLC_HLD_PROFILE="$profile" AI_SDLC_AGENT_TIMEOUT_SECONDS="$agent_timeout_seconds"
+
+reuse_existing_hld=0
+if [ "$resume" = "1" ] && [ -s "$target/hld/hld.md" ]; then
+  reuse_existing_hld=1
+  echo "[AI-SDLC] Resume mode: existing HLD will be retained for review."
+fi
 
 for iteration in $(seq "$start_iteration" "$max_iterations"); do
   echo "HLD AI loop iteration $iteration/$max_iterations (profile: $profile)"
@@ -151,28 +180,18 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
   phase="generator"
   write_checkpoint "running" "$iteration"
   before_hld_hash="$(hld_hash)"
-  "$root/tooling/generate_hld.sh" "$initiative_id" "$generator_provider" "$generator_model" "$iteration"
+  if [ "$reuse_existing_hld" -eq 1 ] && [ "$iteration" -eq "$start_iteration" ]; then
+    echo "[AI-SDLC] Skipping generator; resuming with existing HLD."
+  else
+    "$root/tooling/generate_hld.sh" "$initiative_id" "$generator_provider" "$generator_model" "$iteration"
+  fi
   after_hld_hash="$(hld_hash)"
-  if [ "$profile" = "auto" ]; then
-    selected_profile="$(detect_profile || true)"
-    if [ -z "$selected_profile" ]; then
-      echo "The HLD agent did not provide a valid change_size classification (small, medium, or large)." >&2
-      echo "Escalating for a classification correction; no human profile selection is required." >&2
-      exit 10
-    fi
-    profile="$selected_profile"
-    max_iterations="$(profile_value max_iterations)"
-    max_elapsed_minutes="$(profile_value max_elapsed_minutes)"
-    max_hld_lines="$(profile_value max_hld_lines)"
-    export AI_SDLC_HLD_PROFILE="$profile"
-    echo "AI-selected HLD profile: $profile"
-  fi
-  hld_lines="$(wc -l < "$target/hld/hld.md" | tr -d ' ')"
-  if [ "$hld_lines" -gt "$max_hld_lines" ]; then
-    echo "HLD exceeds $profile profile limit: $hld_lines lines (maximum $max_hld_lines)." >&2
-    echo "Regenerate a concise decision document or select a larger profile." >&2
+  record_profile
+  python3 "$root/tooling/resolve_hld_profile.py" "$target" >/dev/null || {
+    echo "Generated HLD does not contain a valid change_size classification." >&2
     exit 10
-  fi
+  }
+  reuse_existing_hld=0
 
   if [ "$iteration" -gt 1 ] && [ "$before_hld_hash" = "$after_hld_hash" ]; then
     echo "HLD did not change after requested revisions; escalating to human Solution Architect." >&2

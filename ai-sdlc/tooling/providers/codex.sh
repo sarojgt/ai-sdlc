@@ -26,9 +26,9 @@ prompt="$prompt Write the primary HLD to hld/hld.md. Use these assessment labels
 prompt="$prompt Read evidence/design-baseline.yaml as the immutable input snapshot. Preserve its path and exact requirement/context references in the HLD. Do not invent or silently replace version tags or hashes."
 case "${AI_SDLC_HLD_PROFILE:-auto}" in
   auto) prompt="$prompt The lifecycle selected the auto profile. After assessing scope, complexity, affected services, repositories, integrations, data, security, deployment, migration, and governance, classify the initiative as small, medium, or large. Set the HLD front-matter field change_size to exactly that value and tailor the HLD detail and diagrams to the selected size. A small change should remain concise; medium and large changes may include material alternatives and linked detail. Do not choose a profile because of missing facts; record missing facts as CONTEXT GAPs with owners and retrieval actions." ;;
-  small) prompt="$prompt The lifecycle selected the small profile. Confirm whether the change is small; set change_size accordingly and keep hld.md concise, with only material decisions, context gaps, risks, traceability, and useful diagrams." ;;
-  medium) prompt="$prompt The lifecycle selected the medium profile. Confirm the impact classification, set change_size accordingly, and include only material alternatives, trade-offs, security, operations, rollout, and diagrams." ;;
-  large) prompt="$prompt The lifecycle selected the large profile. Confirm the impact classification, set change_size accordingly, keep hld.md as a decision summary, and link supporting detail rather than creating an unreadable document." ;;
+  small) prompt="$prompt The lifecycle selected the small profile. Set change_size accordingly and keep hld.md concise and decision-focused, with only material decisions, context gaps, risks, traceability, and useful diagrams. Omit obvious implementation detail and link deeper supporting detail when needed." ;;
+  medium) prompt="$prompt The lifecycle selected the medium profile. Set change_size accordingly and include only material alternatives, trade-offs, security, operations, rollout, and diagrams. Keep the primary HLD reviewable and link deeper detail." ;;
+  large) prompt="$prompt The lifecycle selected the large profile. Set change_size accordingly, keep hld.md as a decision summary, and link supporting detail rather than creating an unreadable document." ;;
 esac
 
 if [ "${AI_SDLC_AGENT_DRY_RUN:-0}" = "1" ]; then

@@ -3,27 +3,23 @@ hld_profiles:
     max_iterations: 5
     max_elapsed_minutes: 45
     agent_timeout_minutes: 15
-    max_hld_lines: 1200
     max_diagrams: 6
-    guidance: "First classify the change as small, medium, or large, then apply the matching level of detail. Do not guess missing facts."
+    guidance: "Run the preflight impact assessment first, select small, medium, or large, then apply the matching level of detail. Do not guess missing facts."
   small:
     max_iterations: 2
     max_elapsed_minutes: 12
     agent_timeout_minutes: 5
-    max_hld_lines: 360
     max_diagrams: 2
-    guidance: "Keep the HLD to a concise decision document; omit obvious implementation detail."
+    guidance: "Keep the HLD as a concise decision document. Include only material decisions and link supporting detail when needed; do not use line count as a quality gate."
   medium:
     max_iterations: 3
     max_elapsed_minutes: 20
     agent_timeout_minutes: 7
-    max_hld_lines: 600
     max_diagrams: 4
-    guidance: "Include material alternatives, trade-offs, risks, rollout, and operational impact."
+    guidance: "Include material alternatives, trade-offs, risks, rollout, and operational impact. Keep the primary HLD reviewable and link deeper detail."
   large:
     max_iterations: 5
     max_elapsed_minutes: 30
     agent_timeout_minutes: 10
-    max_hld_lines: 1000
     max_diagrams: 6
-    guidance: "Keep hld.md as a summary and link detailed security, deployment, migration, and options documents."
+    guidance: "Keep hld.md as a decision summary and link detailed security, deployment, migration, and options documents."

@@ -50,6 +50,13 @@ selections. It uses the Actions `GITHUB_TOKEN` by default, with an optional
 `COPILOT_GITHUB_TOKEN` Actions secret as a personal-token fallback when the
 organization has not enabled Copilot CLI for Actions.
 
+With the `auto` profile, the loop first runs a lightweight impact assessment
+and records `evidence/hld-assessment.yaml`. That assessment selects the detail
+profile before the full HLD is generated. The profile guides the amount of
+decision detail and diagram depth; it is not a hard line-count limit. Small
+HLDs should remain concise, while medium and large HLDs may link supporting
+documents for security, migration, deployment, options, or other detail.
+
 New intake PRs should stay minimal: capture only `requirement.md` and optional
 initiative-relative context. The post-merge automation creates the initiative
 metadata, reusable boilerplate, and approval metadata in one follow-up PR.
@@ -218,6 +225,17 @@ The HLD review skill can be run independently:
 ```text
 just ai-sdlc-skill hld-review PAY-4567 codex gpt-5.6-terra
 ```
+
+If generation fails after `hld/hld.md` has been created, resume with the
+existing artifact instead of regenerating it:
+
+```text
+AI_SDLC_HLD_RESUME=1 just ai-sdlc-hld PAY-4567 github-copilot claude-haiku-4.5 github-copilot gemini-3.5-flash auto
+```
+
+The resume path repairs or creates the preflight assessment, records the
+selected profile in the HLD metadata, and continues with the bounded review
+loop. It does not grant architecture approval.
 
 After the Product Owner has reviewed and approved the requirement, the command
 prepares the context and request, generates the HLD, invokes the AI reviewer,
