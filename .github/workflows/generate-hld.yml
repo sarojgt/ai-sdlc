@@ -13,12 +13,12 @@ on:
         required: true
         type: string
       generator_model:
-        description: Model ID or auto; see ai-sdlc/config/copilot-model-catalog.json
+        description: Model ID or auto; must be available to the Copilot account
         required: false
         type: string
         default: claude-haiku-4.5
       reviewer_model:
-        description: Different model ID; see ai-sdlc/config/copilot-model-catalog.json
+        description: Different model ID; must be available to the Copilot account
         required: false
         type: string
         default: gemini-3.5-flash
@@ -144,30 +144,6 @@ jobs:
 
       - name: Install GitHub Copilot CLI
         run: npm install -g @github/copilot
-
-      - name: Publish model catalog reference
-        run: |
-          set -euo pipefail
-          {
-            echo "## Copilot model catalog"
-            echo
-            echo "Model inputs accept any model ID available to the Copilot account."
-            echo "The repository routing catalog is [copilot-model-catalog.json](https://github.com/${{ github.repository }}/blob/${{ github.event.repository.default_branch }}/ai-sdlc/config/copilot-model-catalog.json)."
-            echo
-            echo "| Tier | Recommended demo models |"
-            echo "|---|---|"
-            python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          catalog = json.loads(Path("ai-sdlc/config/copilot-model-catalog.json").read_text())
-          for tier in ("economical", "balanced", "advanced"):
-              models = [item["id"] for item in catalog["models"] if item["tier"] == tier and item.get("demo_recommended")]
-              if not models:
-                  models = [item["id"] for item in catalog["models"] if item["tier"] == tier][:5]
-              print(f"| {tier} | {', '.join(models)} |")
-          PY
-          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Validate independent model selection
         env:
