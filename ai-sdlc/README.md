@@ -259,7 +259,9 @@ The second command can use a different AI provider while preserving the same ini
 ## Run a bounded AI HLD review loop
 
 An AI reviewer can critique the generated HLD before the human architect
-review. The generator and reviewer can use different models:
+review. The generator and reviewer can use different models. GitHub Actions
+accepts free-form model IDs because Copilot availability varies by plan,
+client, and organization policy:
 
 ```text
 just ai-sdlc-hld-loop \
@@ -303,10 +305,14 @@ AI_SDLC_HLD_LOOP_DRY_RUN=1 just ai-sdlc-hld-loop \
   PAY-4567 codex gpt-5.6-luna codex gpt-5.6-terra
 ```
 
-In GitHub, use **Actions → Generate HLD with Copilot → Run workflow** to select
-the generator model, different reviewer model, profile, per-call timeout, and
-whether to resume. Automatic scaffold-merge runs use the `auto` profile and
-the longer default timeout; the five-minute reconciler remains a recovery path.
+Use `auto` as a model value when Copilot should choose the model. In GitHub,
+use **Actions → Generate HLD with Copilot → Run workflow** to type the
+generator model, a different reviewer model, profile, per-call timeout, and
+whether to resume. Automatic scaffold-merge runs use the configured defaults.
+The model list in `config/agent-providers.yaml` is a convenience catalog, not
+an allow-list; GitHub may add, retire, or restrict models without this
+repository changing. Unsupported or policy-blocked IDs fail during the
+Copilot call under the account's normal availability rules.
 Human comments are captured with `just ai-sdlc-hld-feedback`; they do not
 approve architecture and must be followed by an explicit bounded rerun.
 

@@ -160,6 +160,8 @@ from starting early.
 - [x] GitHub HLD dispatch exposes model, profile, timeout, force, and resume
       inputs; automatic reconciliation uses safe defaults.
 - [x] Provider and model overrides supported.
+- [x] GitHub model inputs accept free-form IDs and `auto`; the repository list
+      is informational because Copilot availability is plan and policy dependent.
 - [x] Dry-run support available.
 - [ ] Add GitHub Issue → initiative automation.
 - [x] Add automatic and manual HLD workflow triggers, including scheduled

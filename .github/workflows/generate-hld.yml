@@ -13,20 +13,14 @@ on:
         required: true
         type: string
       generator_model:
-        description: Copilot model used to generate the HLD
+        description: Copilot model ID, or auto (must be available to this account)
         required: false
-        type: choice
-        options:
-          - claude-haiku-4.5
-          - claude-sonnet-4
+        type: string
         default: claude-haiku-4.5
       reviewer_model:
-        description: Different Copilot model used to review the HLD
+        description: Different Copilot model ID, or auto (must differ from generator)
         required: false
-        type: choice
-        options:
-          - gemini-3.5-flash
-          - claude-haiku-4.5
+        type: string
         default: gemini-3.5-flash
       hld_profile:
         description: HLD detail profile
