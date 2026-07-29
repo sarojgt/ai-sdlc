@@ -35,12 +35,12 @@ ai-sdlc-skill skill initiative provider="codex" model="gpt-5.6-luna":
 
 # Generate an HLD and run the bounded AI review loop.
 # The generator and reviewer remain independently selectable.
-ai-sdlc-hld initiative generator_provider="codex" generator_model="gpt-5.6-luna" reviewer_provider="codex" reviewer_model="gpt-5.6-terra":
-    ./ai-sdlc/tooling/hld_loop.sh "{{initiative}}" "{{generator_provider}}" "{{generator_model}}" "{{reviewer_provider}}" "{{reviewer_model}}"
+ai-sdlc-hld initiative generator_provider="codex" generator_model="gpt-5.6-luna" reviewer_provider="codex" reviewer_model="gpt-5.6-terra" profile="small":
+    ./ai-sdlc/tooling/hld_loop.sh "{{initiative}}" "{{generator_provider}}" "{{generator_model}}" "{{reviewer_provider}}" "{{reviewer_model}}" "{{profile}}"
 
 # Explicit name for the bounded HLD review loop.
-ai-sdlc-hld-loop initiative generator_provider="codex" generator_model="gpt-5.6-luna" reviewer_provider="codex" reviewer_model="gpt-5.6-terra":
-    ./ai-sdlc/tooling/hld_loop.sh "{{initiative}}" "{{generator_provider}}" "{{generator_model}}" "{{reviewer_provider}}" "{{reviewer_model}}"
+ai-sdlc-hld-loop initiative generator_provider="codex" generator_model="gpt-5.6-luna" reviewer_provider="codex" reviewer_model="gpt-5.6-terra" profile="small":
+    ./ai-sdlc/tooling/hld_loop.sh "{{initiative}}" "{{generator_provider}}" "{{generator_model}}" "{{reviewer_provider}}" "{{reviewer_model}}" "{{profile}}"
 
 # Capture architect feedback and prepare a bounded HLD rerun.
 ai-sdlc-hld-feedback initiative agent="codex" model="gpt-5.6-luna":

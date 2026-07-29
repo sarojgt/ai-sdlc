@@ -19,8 +19,8 @@ comment=""
 read -r -p "Sections to revise, for example risks, rollback: " scope
 read -r -p "Architect feedback: " comment
 
-mkdir -p "$target/evidence"
-feedback_file="$target/evidence/architecture-feedback.md"
+mkdir -p "$target/feedback"
+feedback_file="$target/feedback/human-review.md"
 {
   echo "# Architecture feedback"
   echo ""
@@ -34,4 +34,4 @@ feedback_file="$target/evidence/architecture-feedback.md"
 
 echo "Saved feedback: $feedback_file"
 echo "Rerun the bounded HLD generation with:"
-echo "  just ai-sdlc-hld $initiative_id $agent_provider $agent_model"
+echo "  AI_SDLC_HLD_RESUME=1 just ai-sdlc-hld $initiative_id $agent_provider $agent_model"

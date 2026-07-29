@@ -1,7 +1,8 @@
 hld_loop_policy:
   # Safety cap, not a target. The loop normally stops earlier on pass or escalation.
-  max_iterations: 5
-  max_elapsed_minutes: 30
+  max_iterations: 2
+  max_elapsed_minutes: 12
+  default_profile: small
   stop_on_repeated_feedback: true
   stop_on_unchanged_hld: true
   human_escalation_on_limit: true

@@ -62,6 +62,11 @@ from starting early.
 - [x] Bounded AI HLD feedback loop implemented.
 - [x] Loop limits include iteration, elapsed time, repeated feedback, and
       unchanged-output protection.
+- [x] HLD profiles provide small/medium/large detail limits, per-call timeouts,
+      and a concise default for small changes.
+- [x] HLD loop checkpoints and explicit resume support added for interrupted
+      or timed-out runs.
+- [x] HLD request and run metadata consolidated into one `hld-run.yaml` file.
 - [x] AI progress messages added during long-running generation and review.
 - [x] HLD impact assessment added for size, complexity/risk, services,
       repositories, integrations, data, security, deployment, and governance.
@@ -152,6 +157,8 @@ from starting early.
 
 - [x] `just` command interface established.
 - [x] HLD generation and bounded loop commands established.
+- [x] GitHub HLD dispatch exposes model, profile, timeout, force, and resume
+      inputs; automatic reconciliation uses safe defaults.
 - [x] Provider and model overrides supported.
 - [x] Dry-run support available.
 - [ ] Add GitHub Issue → initiative automation.
@@ -160,7 +167,8 @@ from starting early.
 - [x] Add Copilot cloud-agent setup instructions and repository working agreement.
 - [x] Add draft HLD PR creation.
 - [~] Add AI review comments to the HLD PR.
-- [ ] Add human feedback webhook/command reruns.
+- [~] Add human feedback webhook/command reruns; command and checkpoint resume
+      are available, GitHub comment automation remains pending.
 - [ ] Add Jira issue and status synchronization.
 - [ ] Add Confluence publication or synchronization.
 - [ ] Add cross-repository work-plan orchestration.

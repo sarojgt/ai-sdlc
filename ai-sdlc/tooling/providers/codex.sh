@@ -10,7 +10,7 @@ initiative_id="$1"
 model="${2:-gpt-5.6-luna}"
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 target="$root/initiatives/$initiative_id"
-request_file="$target/evidence/agent-request.yaml"
+request_file="$target/evidence/hld-run.yaml"
 last_message="$target/evidence/agent-last-message.md"
 
 test -f "$request_file" || { echo "Missing agent request: $request_file" >&2; exit 1; }

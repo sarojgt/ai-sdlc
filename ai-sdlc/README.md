@@ -204,10 +204,13 @@ just ai-sdlc-hld PAY-4567 codex gpt-5.6-luna
 ```
 
 This command always runs the bounded AI HLD review loop. The default reviewer
-is `codex gpt-5.6-terra`; both generator and reviewer can be overridden:
+is `codex gpt-5.6-terra`; both generator and reviewer can be overridden. An
+optional profile controls how much detail is expected:
 
 ```text
 just ai-sdlc-hld PAY-4567 codex gpt-5.6-luna codex gpt-5.6-terra
+# Optional final argument: small, medium, or large
+just ai-sdlc-hld PAY-4567 codex gpt-5.6-luna codex gpt-5.6-terra small
 ```
 
 The HLD review skill can be run independently:
@@ -237,11 +240,15 @@ An approved initiative PR can automatically flip `initiative.yaml` and
 `initiative.md` to `approved` and record the approval trail in
 `approvals.yaml`.
 
+The `small` profile is the default and caps the loop at two iterations, twelve
+minutes, and 360 HLD lines. `medium` and `large` allow more detail only when
+the impact assessment justifies it. Each model call has its own timeout.
+
 After architect feedback:
 
 ```text
 just ai-sdlc-hld-feedback PAY-4567 claude claude-sonnet
-just ai-sdlc-hld PAY-4567 claude claude-sonnet
+AI_SDLC_HLD_RESUME=1 just ai-sdlc-hld PAY-4567 claude claude-sonnet
 ```
 
 The second command can use a different AI provider while preserving the same initiative, context, artifacts, and approval rules.
@@ -270,7 +277,10 @@ Generate HLD
   → Stop when the review passes or a guardrail is reached
 ```
 
-Each review is saved as `feedback/ai-review-N.md`. The loop stops when:
+The latest review is saved as `feedback/ai-review.md`, replacing the previous
+review for that run. The loop checkpoint is `evidence/hld-loop.yaml`, so a
+timed-out or interrupted run can be resumed with `AI_SDLC_HLD_RESUME=1`.
+The loop stops when:
 
 - The reviewer returns `pass`.
 - The reviewer returns `escalate`.
@@ -289,6 +299,12 @@ Use a dry run to inspect the planned calls without invoking an agent:
 AI_SDLC_HLD_LOOP_DRY_RUN=1 just ai-sdlc-hld-loop \
   PAY-4567 codex gpt-5.6-luna codex gpt-5.6-terra
 ```
+
+In GitHub, use **Actions → Generate HLD with Copilot → Run workflow** to select
+the generator model, different reviewer model, profile, per-call timeout, and
+whether to resume. Automatic reconciliation uses the safe `small` defaults.
+Human comments are captured with `just ai-sdlc-hld-feedback`; they do not
+approve architecture and must be followed by an explicit bounded rerun.
 
 ## Current Confluence position
 

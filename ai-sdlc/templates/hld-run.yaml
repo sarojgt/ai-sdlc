@@ -1,8 +1,8 @@
-agent_request:
-  run_id: "RUN-{{ initiative.id }}-{{ task.type }}-{{ task.sequence }}"
+hld_run:
+  run_id: "RUN-{{ initiative.id }}-HLD-{{ task.sequence }}"
   initiative_id: "{{ initiative.id }}"
-  task_type: "{{ task.type }}"
-  skill_id: "{{ task.skill }}"
+  task_type: hld
+  profile: "{{ hld.profile }}"
   agent:
     provider: "{{ agent.provider }}"
     model: "{{ agent.model }}"
@@ -17,9 +17,7 @@ agent_request:
     content_sha256: "{{ context.hash }}"
   design_baseline: "evidence/design-baseline.yaml"
   policy:
-    risk_tier: "{{ policy.risk_tier }}"
     allowed_tools: [read_context, read_repository, render_diagram]
     denied_tools: [approve_architecture, merge, deploy_production]
-  output:
-    schema: "{{ task.output_schema }}"
-    directory: "generated/"
+  status: request-prepared
+  human_approval_required: true
