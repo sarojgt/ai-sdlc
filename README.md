@@ -123,8 +123,9 @@ ci/release-semantic-tags
 ```
 
 Do not use provider or agent names such as `agent/`, `copilot/`, `codex/`, or
-`claude/` in branch names. GitHub validates the branch, PR title, and commit
-messages together.
+`claude/` in branch names. The required GitHub check validates the PR title;
+branch names and commit messages remain the recommended convention and are
+used by semantic release when they follow the standard.
 
 ## End-to-end flow
 

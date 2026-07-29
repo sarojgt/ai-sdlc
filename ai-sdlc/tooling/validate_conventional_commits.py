@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate a PR title and all commits introduced by its base/head range."""
+"""Validate a PR title, with optional strict branch and commit checks."""
 
 from __future__ import annotations
 
@@ -38,32 +38,35 @@ def git_commits(base: str, head: str) -> list[Commit]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pr-title", required=True)
-    parser.add_argument("--base", required=True)
-    parser.add_argument("--head", required=True)
-    parser.add_argument("--branch", required=True)
+    parser.add_argument("--base")
+    parser.add_argument("--head")
+    parser.add_argument("--branch")
     args = parser.parse_args()
 
     errors = []
-    branch_error = validate_branch_name(args.branch)
-    if branch_error:
-        errors.append(f"branch `{args.branch}` {branch_error}")
+    if args.branch:
+        branch_error = validate_branch_name(args.branch)
+        if branch_error:
+            errors.append(f"branch `{args.branch}` {branch_error}")
 
     title_error = validate_commit(Commit(args.pr_title))
     if title_error:
         errors.append(f"PR title `{args.pr_title}` {title_error}")
 
-    commits = git_commits(args.base, args.head)
-    if not commits:
-        errors.append("PR contains no commits in the base/head range")
-    for commit in commits:
-        if commit.subject in EXEMPT_COMMIT_SUBJECTS:
-            # Emit to stderr so CI logs preserve visibility without changing the
-            # normal success output contract on stdout.
-            print(f"Skipping exempt legacy commit subject: `{commit.subject}`", file=sys.stderr)
-            continue
-        error = validate_commit(commit)
-        if error:
-            errors.append(f"commit `{commit.subject}` {error}")
+    commits = []
+    if args.base and args.head:
+        commits = git_commits(args.base, args.head)
+        if not commits:
+            errors.append("PR contains no commits in the base/head range")
+        for commit in commits:
+            if commit.subject in EXEMPT_COMMIT_SUBJECTS:
+                # Emit to stderr so CI logs preserve visibility without changing the
+                # normal success output contract on stdout.
+                print(f"Skipping exempt legacy commit subject: `{commit.subject}`", file=sys.stderr)
+                continue
+            error = validate_commit(commit)
+            if error:
+                errors.append(f"commit `{commit.subject}` {error}")
 
     if errors:
         print("Conventional Commit policy failed:", file=sys.stderr)
@@ -71,7 +74,10 @@ def main() -> int:
             print(f"- {error}", file=sys.stderr)
         return 1
 
-    print(f"Conventional Commit policy passed for {len(commits)} commit(s).")
+    if commits:
+        print(f"Conventional Commit policy passed for PR title and {len(commits)} commit(s).")
+    else:
+        print("Conventional Commit policy passed for PR title.")
     return 0
 
 

@@ -84,7 +84,7 @@ from starting early.
 - [x] Post-merge processing creates initiative metadata and context manifest;
       HLD and LLD artifacts are created lazily by gated lifecycle workflows.
 - [x] Cross-agent repository and Copilot instructions define artifact boundaries.
-- [x] Conventional Commit policy and PR title guidance added.
+- [x] PR-title Conventional Commit gate and branch/commit guidance added.
 - [x] Change-focused branch naming policy and validation added.
 - [x] Semantic release tag workflow added for merges to `main`.
 - [x] Scoped semantic versions added for initiatives, HLDs, LLDs, and context.
