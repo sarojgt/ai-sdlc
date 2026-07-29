@@ -90,7 +90,10 @@ docs(policy): improve the operating guide          # no release
 ```
 
 Breaking changes use `feat!:` or a `BREAKING CHANGE:` footer and create a major
-release. Merges to `main` are evaluated by the semantic release workflow.
+release. Merges to `main` are evaluated by the semantic release workflow using
+the merged PR title as the release intent. Repository settings should require
+squash merging so one PR title maps to one release event; commit messages and
+branch names are guidance only.
 Framework scopes (`workflow`, `policy`, `release`, `ai-sdlc`, and `repo`) create
 the global `vMAJOR.MINOR.PATCH` version. Artifact scopes also create independent
 versions: `initiative/<ID>/v...`, `initiative/<ID>/hld/v...`,

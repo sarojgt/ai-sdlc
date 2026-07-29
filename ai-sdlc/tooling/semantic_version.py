@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Calculate the next semantic release tag from Conventional Commits."""
+"""Calculate the next semantic release tag from the merged PR title."""
 
 from __future__ import annotations
 
@@ -51,10 +51,11 @@ def next_version(tag: str | None, bump: str) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--explain", action="store_true")
+    parser.add_argument("--pr-title", help="Merged PR title used as the release intent")
     args = parser.parse_args()
 
     tag = latest_tag()
-    commits = commits_since(tag)
+    commits = [Commit(args.pr_title)] if args.pr_title else commits_since(tag)
     bump = highest_bump(commits)
     if args.explain:
         print(f"latest_tag={tag or 'none'}")
