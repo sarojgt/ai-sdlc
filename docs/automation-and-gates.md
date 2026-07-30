@@ -238,7 +238,10 @@ Each agent loop has a maximum number of retries, maximum time/cost, allowed tool
 
 After LLD approval, fan out to repository workstreams. Fan in only after all required contracts, tests, security checks, and PR approvals are complete. One failed dependency pauses only dependent workstreams where possible.
 
-## Recommended POC technology choices
+## Repository-first implementation choices
+
+The choices below describe the current repository-first implementation and
+future extension points for the evolving standard.
 
 Start with the tools already present in the organization:
 

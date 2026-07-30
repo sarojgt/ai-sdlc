@@ -1,5 +1,6 @@
 # Governed AI-SDLC Initiative Template
 
+
 Copy this directory into the design repository and replace `DEMO-001` with the Jira epic or initiative key.
 
 ## Required sequence
@@ -13,7 +14,7 @@ Copy this directory into the design repository and replace `DEMO-001` with the J
 
 The HLD approval is a hard gate. An LLD, implementation plan, or implementation PR that does not reference an approved HLD version and hash must fail validation.
 
-## Suggested commands for the future POC
+## Suggested future commands
 
 ```text
 ai-sdlc validate templates/ai-sdlc-initiative
