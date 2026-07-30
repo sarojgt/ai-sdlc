@@ -192,6 +192,8 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
     echo "Generated HLD does not contain a valid change_size classification." >&2
     exit 10
   }
+  echo "[AI-SDLC] Validating generated HLD structure and Mermaid diagrams before AI review..."
+  python3 "$root/tooling/validate_hld_artifacts.py" "$target"
   reuse_existing_hld=0
 
   if [ "$iteration" -gt 1 ] && [ "$before_hld_hash" = "$after_hld_hash" ]; then

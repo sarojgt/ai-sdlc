@@ -183,6 +183,9 @@ jobs:
           fi
           echo "name=$branch" >> "$GITHUB_OUTPUT"
 
+      - name: Install Mermaid renderer
+        run: npm install --global @mermaid-js/mermaid-cli
+
       - name: Run bounded HLD generation and review loop
         env:
           GENERATOR_MODEL: ${{ inputs.generator_model || 'claude-haiku-4.5' }}
@@ -211,10 +214,7 @@ jobs:
           bash ai-sdlc/tooling/validate_structure.sh \
             "ai-sdlc/initiatives/${{ needs.resolve.outputs.initiative_id }}"
 
-      - name: Install Mermaid renderer
-        run: npm install --global @mermaid-js/mermaid-cli
-
-      - name: Validate HLD contract and diagrams
+      - name: Validate HLD contract before publishing
         run: |
           python3 ai-sdlc/tooling/validate_hld_artifacts.py \
             "ai-sdlc/initiatives/${{ needs.resolve.outputs.initiative_id }}"

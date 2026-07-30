@@ -5,7 +5,10 @@ context and guardrails, initiative-relative context, and prior feedback.
 
 Check the canonical HLD structure, assessment consistency, affected components,
 APIs, data, events, integrations, security, deployment, migration, operations,
-governance, standards, traceability, context gaps, risks, and Mermaid validity.
+governance, standards, traceability, context gaps, risks, and the generated
+diagram validation evidence. The generation gate owns Mermaid syntax and
+rendering; review whether the diagrams are useful, accurate, and proportionate
+to the HLD instead of duplicating the syntax gate.
 Reject unsupported claims, contradictions, duplicated content, unnecessary LLD
 detail, and diagrams that do not render. Judge conciseness proportionally; do
 not use a line-count threshold. Check that one canonical gap register and one
@@ -24,8 +27,8 @@ List specific blocking or corrective findings, or `None`.
 ## Required actions
 List only actions needed before human architecture review, or `None`.
 ## Validation
-State assessment consistency, context-gap handling, duplication, and diagram
-validation results in concise bullets.
+State assessment consistency, context-gap handling, duplication, diagram
+validation evidence, and diagram usefulness in concise bullets.
 
 `ready_for_human_review` means the AI review is complete; it is not architecture
 approval. Do not rewrite the HLD, approve architecture, create an LLD, implement,
