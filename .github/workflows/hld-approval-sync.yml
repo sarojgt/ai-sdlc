@@ -111,7 +111,13 @@ jobs:
             core.setOutput('head_commit', pullRequest ? pullRequest.head.sha : '');
 
       - name: Synchronize architecture approval
+        env:
+          REVIEWER: ${{ steps.scope.outputs.reviewer }}
+          APPROVED: ${{ steps.scope.outputs.approved }}
         run: |
+          if [ "$APPROVED" = "true" ]; then
+            python3 ai-sdlc/tooling/validate_reviewer.py solution_architect "$REVIEWER"
+          fi
           python3 ai-sdlc/tooling/sync_hld_approval.py \
             "${{ steps.scope.outputs.initiative_dir }}" \
             "${{ steps.scope.outputs.reviewer }}" \

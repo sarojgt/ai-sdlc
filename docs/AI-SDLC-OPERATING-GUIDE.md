@@ -38,7 +38,7 @@ start implementation.
 | Post-merge | Approval-history lookup, metadata/context scaffold PR, optional auto-merge | Repository settings and exception handling |
 | HLD preparation | Context loading, preflight assessment, profile selection | Correct missing context when a gap is found |
 | HLD | Provider invocation, Mermaid/contract validation, bounded review loop, draft PR | Solution Architect/ARB architecture approval |
-| HLD feedback | Inline-comment capture and bounded rerun on the same branch | Architect decides whether feedback is sufficient |
+| HLD feedback | One submitted review becomes one bounded rerun on the same branch | Architect decides whether feedback is sufficient |
 | LLD onward | Gated artifact creation is planned/partial | Engineering, security, release, and deployment approvals |
 
 ## Repository artifacts
@@ -91,6 +91,7 @@ just ai-sdlc-new
 just ai-sdlc-validate ai-sdlc/initiatives/<ID>
 just ai-sdlc-validate-all
 just ai-sdlc-test
+just ai-sdlc-context <ID>
 just ai-sdlc-hld <ID> codex <generator-model> codex <reviewer-model> auto
 AI_SDLC_HLD_RESUME=1 just ai-sdlc-hld <ID> codex <generator-model> codex <reviewer-model> auto
 just ai-sdlc-hld-feedback <ID> <provider> <model>
@@ -129,6 +130,8 @@ connectors are future integrations and are not required by the current flow.
 - HLD branches are updated with normal commits; the workflow does not force-push.
 - Inline comments are collected with their submitted `Request changes` review;
   questions and individual comment edits do not start model runs.
+- Feedback and approval workflows validate the reviewer against the repository
+  allowlist. Production use also requires the [GitHub governance setup](GITHUB-GOVERNANCE-SETUP.md).
 - The loop stops on its configured iteration/time limits, repeated feedback,
   unchanged output, escalation, or a review-ready result.
 - AI review is advisory. A result such as `ready_for_human_review` means the

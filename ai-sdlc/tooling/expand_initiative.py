@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -206,6 +207,10 @@ def main() -> int:
 
     if initiative_yaml.exists() and update_workflow_state(initiative_yaml, "intake", "scaffolded"):
         created_any = True
+
+    # The template establishes the manifest shape; the deterministic builder
+    # records the actual context files and hashes used by subsequent AI runs.
+    subprocess.run([sys.executable, str(Path(__file__).with_name("build_context_pack.py")), str(initiative_dir)], check=True)
 
     if created_any:
         print(f"Expanded scaffold for {initiative_dir.name}")

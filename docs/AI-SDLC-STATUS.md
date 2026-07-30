@@ -77,6 +77,7 @@ from starting early.
 - [x] HLD loop checkpoints and explicit resume support added for interrupted
       or timed-out runs.
 - [x] HLD request and run metadata consolidated into one `hld-run.yaml` file.
+- [x] Deterministic before/after HLD lifecycle hooks record execution evidence.
 - [x] AI progress messages added during long-running generation and review.
 - [x] HLD impact assessment added for size, complexity/risk, services,
       repositories, integrations, data, security, deployment, and governance.
@@ -149,8 +150,10 @@ from starting early.
 - [x] Architecture guardrails stored in the repository.
 - [x] Relative context manifest created per initiative.
 - [x] Context gaps recorded with owner and retrieval action.
-- [ ] Build automated relevance selection for large context sets.
-- [ ] Add context freshness and source-hash validation.
+- [x] Build deterministic repository context-pack assembly from the source
+      registry, requirement keywords, and explicit relative context.
+- [x] Record selected context source hashes and declared freshness in each
+      assembled context manifest.
 - [ ] Add repository/API/schema/ADR discovery adapters.
 - [ ] Add secure context filtering for sensitive content.
 - [ ] Add Confluence synchronization as a future source connector.
@@ -165,9 +168,9 @@ from starting early.
 - [x] HLD approval synchronized from the current-head Solution Architect / ARB
       GitHub review.
 - [~] Security, senior engineering, and release gates defined conceptually.
-- [~] Enforce CODEOWNERS and protected-branch rules in GitHub; repository
-      CODEOWNERS paths are configured, but enterprise team names and branch
-      rules still require repository administration.
+- [~] Enforce CODEOWNERS and protected-branch rules in GitHub; reviewer
+      allowlists are validated in workflows, while enterprise team names and
+      branch rules still require repository administration.
 - [ ] Add required approval checks to HLD and LLD pull requests.
 - [ ] Add architecture review checklists.
 - [x] Add approval invalidation when requirements or context change.

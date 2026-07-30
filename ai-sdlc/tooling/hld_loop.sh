@@ -169,6 +169,7 @@ if [ "${AI_SDLC_HLD_LOOP_DRY_RUN:-0}" = "1" ]; then
 fi
 
 mkdir -p "$target/feedback" "$target/evidence"
+python3 "$root/tooling/run_lifecycle_hooks.py" before_hld "$target"
 python3 "$root/tooling/initialize_design_artifacts.py" "$target" hld
 
 if [ "$profile" = "auto" ]; then
@@ -227,6 +228,7 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
   }
   echo "[AI-SDLC] Validating generated HLD structure and Mermaid diagrams before AI review..."
   python3 "$root/tooling/validate_hld_artifacts.py" "$target"
+  python3 "$root/tooling/run_lifecycle_hooks.py" after_hld "$target"
   reuse_existing_hld=0
 
   if [ "$iteration" -gt 1 ] && [ "$before_hld_hash" = "$after_hld_hash" ]; then

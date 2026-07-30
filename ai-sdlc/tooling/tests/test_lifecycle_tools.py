@@ -100,6 +100,27 @@ class LifecycleToolTests(unittest.TestCase):
             result = self.run_tool(str(TOOLING / "validate_ai_review.py"), str(review))
             self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_context_pack_is_deterministic_and_detects_staleness(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            initiative = Path(directory) / "KAN-5"
+            relative = initiative / "context" / "relative"
+            relative.mkdir(parents=True)
+            (initiative / "requirement.md").write_text("# Secure card API\n", encoding="utf-8")
+            (relative / "api.md").write_text("# Existing contract\n", encoding="utf-8")
+            result = self.run_tool(str(TOOLING / "build_context_pack.py"), str(initiative))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            result = self.run_tool(str(TOOLING / "build_context_pack.py"), str(initiative), "--check")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            (relative / "api.md").write_text("# Changed contract\n", encoding="utf-8")
+            result = self.run_tool(str(TOOLING / "build_context_pack.py"), str(initiative), "--check")
+            self.assertEqual(result.returncode, 1)
+
+    def test_reviewer_allowlist_rejects_untrusted_login(self) -> None:
+        allowed = self.run_tool(str(TOOLING / "validate_reviewer.py"), "solution_architect", "sarojgt")
+        denied = self.run_tool(str(TOOLING / "validate_reviewer.py"), "solution_architect", "untrusted")
+        self.assertEqual(allowed.returncode, 0, allowed.stderr)
+        self.assertEqual(denied.returncode, 1)
+
 
 if __name__ == "__main__":
     unittest.main()

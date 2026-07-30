@@ -58,6 +58,10 @@ ai-sdlc-validate-all:
         fi; \
     done
 
+# Assemble or refresh deterministic, hashed context for an expanded initiative.
+ai-sdlc-context initiative:
+    python3 ./ai-sdlc/tooling/build_context_pack.py "ai-sdlc/initiatives/{{initiative}}"
+
 # Run the focused lifecycle tool regression tests.
 ai-sdlc-test:
     python3 -m unittest discover -s ai-sdlc/tooling/tests -p 'test_*.py'

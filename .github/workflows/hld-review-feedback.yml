@@ -53,6 +53,11 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Verify Solution Architect reviewer
+        env:
+          REVIEWER: ${{ github.event.review.user.login }}
+        run: python3 ai-sdlc/tooling/validate_reviewer.py solution_architect "$REVIEWER"
+
       - name: Collect submitted review feedback
         id: feedback
         env:

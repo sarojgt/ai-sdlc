@@ -40,6 +40,8 @@ initiatives/<ID>/context/relative/ requirement-specific context
 
 The requirement remains outside the context directory. Markdown is the human
 source of truth; YAML records metadata, approvals, hashes, and evidence.
+`just ai-sdlc-context <ID>` assembles a deterministic, hashed context pack
+from explicit relative context plus the repository context registry.
 
 ## Local interface
 

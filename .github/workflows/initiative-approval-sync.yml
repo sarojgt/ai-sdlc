@@ -162,7 +162,13 @@ jobs:
 
       - name: Sync human approval metadata
         if: steps.scope.outputs.intake_change == 'true'
+        env:
+          REVIEWER: ${{ steps.scope.outputs.reviewer }}
+          APPROVED: ${{ steps.scope.outputs.approved }}
         run: |
+          if [ "$APPROVED" = "true" ]; then
+            python3 ai-sdlc/tooling/validate_reviewer.py product_owner "$REVIEWER"
+          fi
           python3 ai-sdlc/tooling/sync_initiative_approval.py \
             "${{ steps.scope.outputs.initiative_dir }}" \
             "${{ steps.scope.outputs.reviewer }}" \
