@@ -93,6 +93,7 @@ hld_loop:
   generator_model: "$generator_model"
   reviewer_provider: "$reviewer_provider"
   reviewer_model: "$reviewer_model"
+  prompt_set: "hld-prompts-v1"
   agent_timeout_seconds: $agent_timeout_seconds
   human_architecture_approval_required: true
 EOF
@@ -191,6 +192,8 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
     echo "Generated HLD does not contain a valid change_size classification." >&2
     exit 10
   }
+  echo "[AI-SDLC] Validating generated HLD structure and Mermaid diagrams before AI review..."
+  python3 "$root/tooling/validate_hld_artifacts.py" "$target"
   reuse_existing_hld=0
 
   if [ "$iteration" -gt 1 ] && [ "$before_hld_hash" = "$after_hld_hash" ]; then
@@ -223,7 +226,7 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
 
   decision="$(sed -n 's/^decision: *//p' "$review_file" | head -1 | tr -d '\r' | tr '[:upper:]' '[:lower:]')"
   case "$decision" in
-    pass)
+    ready_for_human_review|pass)
       cat > "$target/evidence/hld-loop.yaml" <<EOF
 hld_loop:
   status: ai_review_passed
@@ -234,10 +237,11 @@ hld_loop:
   generator_model: "$generator_model"
   reviewer_provider: "$reviewer_provider"
   reviewer_model: "$reviewer_model"
+  prompt_set: "hld-prompts-v1"
   human_architecture_approval_required: true
 EOF
       loop_finished=1
-      echo "AI review passed after $iteration iteration(s)."
+      echo "AI review completed after $iteration iteration(s)."
       echo "Next gate: human Solution Architect review and approval."
       exit 0
       ;;

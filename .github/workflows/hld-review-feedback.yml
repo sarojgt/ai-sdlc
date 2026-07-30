@@ -98,6 +98,9 @@ jobs:
           echo "generator_model=$generator_model" >> "$GITHUB_OUTPUT"
           echo "reviewer_model=$reviewer_model" >> "$GITHUB_OUTPUT"
 
+      - name: Install Mermaid renderer
+        run: npm install --global @mermaid-js/mermaid-cli
+
       - name: Rerun bounded HLD review loop
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -113,6 +116,13 @@ jobs:
             "$initiative_id" \
             github-copilot "${{ steps.models.outputs.generator_model }}" \
             github-copilot "${{ steps.models.outputs.reviewer_model }}" auto
+
+      - name: Validate HLD contract before publishing
+        run: |
+          initiative_id="${{ github.event.pull_request.head.ref }}"
+          initiative_id="${initiative_id#feat/hld-}"
+          python3 ai-sdlc/tooling/validate_hld_artifacts.py \
+            "ai-sdlc/initiatives/$initiative_id"
 
       - name: Commit feedback-driven HLD update
         env:

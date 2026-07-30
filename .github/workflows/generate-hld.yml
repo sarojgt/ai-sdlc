@@ -165,6 +165,27 @@ jobs:
           echo "Generator model: $GENERATOR_MODEL"
           echo "Reviewer model: $REVIEWER_MODEL"
 
+      - name: Prepare HLD branch without rewriting history
+        id: prepare
+        env:
+          INITIATIVE_ID: ${{ needs.resolve.outputs.initiative_id }}
+        run: |
+          set -euo pipefail
+          normalized="$(printf '%s' "$INITIATIVE_ID" | tr '[:upper:]' '[:lower:]' | tr '_' '-')"
+          branch="feat/hld-$normalized"
+          if git ls-remote --exit-code origin "refs/heads/$branch" >/dev/null 2>&1; then
+            git fetch origin "$branch"
+            git switch -c "$branch" "origin/$branch"
+            echo "Resuming existing HLD branch: $branch"
+          else
+            git switch -c "$branch"
+            echo "Creating HLD branch: $branch"
+          fi
+          echo "name=$branch" >> "$GITHUB_OUTPUT"
+
+      - name: Install Mermaid renderer
+        run: npm install --global @mermaid-js/mermaid-cli
+
       - name: Run bounded HLD generation and review loop
         env:
           GENERATOR_MODEL: ${{ inputs.generator_model || 'claude-haiku-4.5' }}
@@ -193,30 +214,41 @@ jobs:
           bash ai-sdlc/tooling/validate_structure.sh \
             "ai-sdlc/initiatives/${{ needs.resolve.outputs.initiative_id }}"
 
-      - name: Resolve policy-compliant HLD branch
-        id: branch
+      - name: Validate HLD contract before publishing
+        run: |
+          python3 ai-sdlc/tooling/validate_hld_artifacts.py \
+            "ai-sdlc/initiatives/${{ needs.resolve.outputs.initiative_id }}"
+
+      - name: Publish HLD branch without force-push
         env:
+          GH_TOKEN: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
+          HLD_BRANCH: ${{ steps.prepare.outputs.name }}
           INITIATIVE_ID: ${{ needs.resolve.outputs.initiative_id }}
+          GENERATOR_MODEL: ${{ inputs.generator_model || 'claude-haiku-4.5' }}
+          REVIEWER_MODEL: ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}
         run: |
           set -euo pipefail
-          normalized="$(printf '%s' "$INITIATIVE_ID" | tr '[:upper:]' '[:lower:]' | tr '_' '-')"
-          echo "name=feat/hld-$normalized" >> "$GITHUB_OUTPUT"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "ai-sdlc/initiatives/$INITIATIVE_ID/hld" \
+            "ai-sdlc/initiatives/$INITIATIVE_ID/evidence" \
+            "ai-sdlc/initiatives/$INITIATIVE_ID/feedback"
+          if git diff --cached --quiet; then
+            echo "No HLD changes to publish."
+            exit 0
+          fi
+          git commit -m "feat(hld): generate HLD for $INITIATIVE_ID"
+          git remote set-url origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git push origin "$HLD_BRANCH"
 
-      - name: Create HLD review pull request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
-          commit-message: "feat(hld): generate HLD for ${{ needs.resolve.outputs.initiative_id }}"
-          title: "feat(hld): generate HLD for ${{ needs.resolve.outputs.initiative_id }}"
-          body: |
-            ## AI-generated HLD proposal
-
-            Initiative: `${{ needs.resolve.outputs.initiative_id }}`
-            Generator: `github-copilot / ${{ inputs.generator_model || 'claude-haiku-4.5' }}`
-            Reviewer: `github-copilot / ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}`
-
-            The bounded AI review loop passed. This PR remains pending human
-            Solution Architect / ARB approval. AI has not approved architecture.
-          branch: ${{ steps.branch.outputs.name }}
-          delete-branch: false
-          draft: true
+          if ! gh pr view "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh pr create \
+              --repo "$GITHUB_REPOSITORY" \
+              --base main \
+              --head "$HLD_BRANCH" \
+              --title "feat(hld): generate HLD for $INITIATIVE_ID" \
+              --body "## AI-generated HLD proposal\n\nInitiative: \`$INITIATIVE_ID\`\nGenerator: \`github-copilot / $GENERATOR_MODEL\`\nReviewer: \`github-copilot / $REVIEWER_MODEL\`\n\nThe bounded AI review loop passed. This draft remains pending human Solution Architect / ARB approval. AI has not approved architecture." \
+              --draft
+          else
+            echo "Updated existing HLD PR for $HLD_BRANCH without force-push."
+          fi

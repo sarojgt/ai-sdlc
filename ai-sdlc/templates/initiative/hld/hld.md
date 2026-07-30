@@ -51,10 +51,12 @@ sentences.
 
 ## 3. Scope and boundaries
 
-## 4. Confirmed context and context gaps
+## 4. Context basis and gap register
 
-Separate confirmed facts from proposed changes. Record missing facts as a
-`CONTEXT GAP` with an owner and retrieval action; do not fill gaps with guesses.
+Keep one canonical context-gap register in this section. Other sections must
+reference gap IDs only; do not repeat gap descriptions in impact, risks, or
+review sections. Separate confirmed facts from proposed changes and do not
+fill gaps with guesses.
 
 ## 5. Current-state and target approach
 
@@ -90,7 +92,10 @@ to this initiative.
 <!-- Embed only useful, renderable Mermaid diagrams. Small changes normally need
      one context/flow diagram and at most one deployment or component view. -->
 
-## 11. Risks, ADRs, and open questions
+## 11. Risks and decision points
+
+Keep one canonical risk register in this section. Add ADRs or open questions
+only when they represent a distinct decision that is not already captured.
 
 ## 12. Traceability
 
