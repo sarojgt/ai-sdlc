@@ -9,25 +9,19 @@ on:
   workflow_dispatch:
     inputs:
       initiative_id:
-        description: Initiative ID, for example DEMO-005
+        description: Initiative ID, for example <WORK-ITEM-ID>
         required: true
         type: string
       generator_model:
-        description: "Generator model ID or auto. Catalog: https://github.com/sarojgt/ai-sdlc/blob/main/ai-sdlc/config/copilot-model-catalog.md"
+        description: "Generator model ID or auto. See ai-sdlc/config/copilot-model-catalog.md."
         required: false
         type: string
         default: claude-haiku-4.5
       reviewer_model:
-        description: "Reviewer model ID; must differ from generator. Catalog: https://github.com/sarojgt/ai-sdlc/blob/main/ai-sdlc/config/copilot-model-catalog.md"
+        description: "Reviewer model ID; must differ from generator. See ai-sdlc/config/copilot-model-catalog.md."
         required: false
         type: string
         default: gemini-3.5-flash
-      hld_profile:
-        description: HLD detail profile
-        required: false
-        type: choice
-        options: [auto, small, medium, large]
-        default: auto
       agent_timeout_minutes:
         description: Timeout for each generator or reviewer call
         required: false
@@ -54,7 +48,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  copilot-requests: write
+  models: read
 
 concurrency:
   group: hld-generation-${{ inputs.initiative_id || github.event.pull_request.number }}
@@ -102,19 +96,12 @@ jobs:
           fi
           target="ai-sdlc/initiatives/$initiative_id"
           test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
-          grep -q 'status: approved' "$target/requirement.md" || {
-            echo "Requirement is not approved; HLD generation will not start."
-            echo "This is expected for an initial intake merge before approval sync."
+          if ! python3 ai-sdlc/tooling/approval_gate.py requirements "$target"; then
+            echo "Requirements gate has not passed; HLD generation will not start."
             echo "should_run=false" >> "$GITHUB_OUTPUT"
             echo "initiative_id=$initiative_id" >> "$GITHUB_OUTPUT"
             exit 0
-          }
-          grep -A 4 'gate: requirements' "$target/approvals.yaml" | grep -q 'decision: approved' || {
-            echo "Human requirements approval is not recorded; HLD generation will not start."
-            echo "should_run=false" >> "$GITHUB_OUTPUT"
-            echo "initiative_id=$initiative_id" >> "$GITHUB_OUTPUT"
-            exit 0
-          }
+          fi
 
           if [ "$FORCE_RUN" != "true" ] && [ -f "$target/evidence/hld-loop.yaml" ]; then
             echo "HLD loop evidence already exists; skipping duplicate automatic run."
@@ -190,7 +177,9 @@ jobs:
         env:
           GENERATOR_MODEL: ${{ inputs.generator_model || 'claude-haiku-4.5' }}
           REVIEWER_MODEL: ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}
-          HLD_PROFILE: ${{ inputs.hld_profile || 'auto' }}
+          # The impact-assessment agent selects small, medium, or large.
+          # A manual profile override would undermine proportional HLDs.
+          HLD_PROFILE: auto
           AGENT_TIMEOUT_MINUTES: ${{ inputs.agent_timeout_minutes || '15' }}
           ASSESSMENT_TIMEOUT_MINUTES: ${{ inputs.assessment_timeout_minutes || '5' }}
           RESUME: ${{ inputs.resume || false }}

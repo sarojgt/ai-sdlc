@@ -58,6 +58,18 @@ ai-sdlc-validate-all:
         fi; \
     done
 
+# Assemble or refresh deterministic, hashed context for an expanded initiative.
+ai-sdlc-context initiative:
+    python3 ./ai-sdlc/tooling/build_context_pack.py "ai-sdlc/initiatives/{{initiative}}"
+
+# Compare an HLD baseline with newer context tags; never regenerates the HLD.
+ai-sdlc-context-drift initiative:
+    python3 ./ai-sdlc/tooling/evaluate_context_drift.py "ai-sdlc/initiatives/{{initiative}}"
+
+# Run the focused lifecycle tool regression tests.
+ai-sdlc-test:
+    python3 -m unittest discover -s ai-sdlc/tooling/tests -p 'test_*.py'
+
 # Show the reusable AI-SDLC framework structure.
 ai-sdlc-tree:
     find ai-sdlc -type f | awk -F/ 'NF <= 4' | sort

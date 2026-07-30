@@ -21,6 +21,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Lint GitHub Actions workflows
+        uses: raven-actions/actionlint@v2
+
+      - name: Validate shell syntax
+        run: bash -n ai-sdlc/tooling/*.sh ai-sdlc/tooling/providers/*.sh
+
       - name: Validate repository structure
         run: |
           for initiative in ai-sdlc/initiatives/*; do
@@ -28,13 +34,22 @@ jobs:
             bash ai-sdlc/tooling/validate_structure.sh "$initiative"
           done
 
-      - name: Validate initiative metadata
+      - name: Run lifecycle tool regression tests
         run: |
-          echo "DAS validator executed over repository initiatives"
+          python3 -m compileall -q ai-sdlc/tooling
+          python3 -m unittest discover -s ai-sdlc/tooling/tests -p 'test_*.py'
 
-      - name: Architecture gate
+      - name: Verify approved HLD evidence
         run: |
-          echo "Architecture gate placeholder: add human approval and content-hash checks here"
+          set -euo pipefail
+          for initiative in ai-sdlc/initiatives/*; do
+            test -d "$initiative" || continue
+            hld="$initiative/hld/hld.md"
+            test -f "$hld" || continue
+            if awk '/^---$/{seen++; next} seen == 1 && /^[[:space:]]*status:[[:space:]]*approved[[:space:]]*$/ {found=1} END {exit !found}' "$hld"; then
+              python3 ai-sdlc/tooling/approval_gate.py hld "$initiative"
+            fi
+          done
 
       - name: Publish gate summary
-        run: echo "DAS gate executed"
+        run: echo "Structure, lifecycle-tool, and approved-HLD evidence checks passed."

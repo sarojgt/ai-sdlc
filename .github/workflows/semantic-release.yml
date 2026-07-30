@@ -66,7 +66,8 @@ jobs:
               --title "$framework_tag" \
               --generate-notes
           fi
-          while IFS='|' read -r track tag bump; do
+          while IFS= read -r artifact; do
+            tag="$(printf '%s' "$artifact" | cut -d '|' -f 2)"
             [ -n "$tag" ] || continue
             gh release create "$tag" \
               --target "${GITHUB_SHA}" \

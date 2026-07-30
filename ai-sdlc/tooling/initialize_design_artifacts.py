@@ -37,6 +37,14 @@ def main() -> int:
     if not initiative_dir.is_dir():
         fail(f"Initiative directory not found: {initiative_dir}")
 
+    if artifact == "lld":
+        import subprocess
+
+        gate = Path(__file__).with_name("approval_gate.py")
+        result = subprocess.run([sys.executable, str(gate), "hld", str(initiative_dir)])
+        if result.returncode:
+            fail("LLD initialization is locked until the HLD approval gate passes")
+
     template = initiative_dir.parent.parent / "templates" / "initiative" / artifact / f"{artifact}.md"
     if not template.exists():
         fail(f"Design template not found: {template}")

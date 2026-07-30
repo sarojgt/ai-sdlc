@@ -40,6 +40,8 @@ initiatives/<ID>/context/relative/ requirement-specific context
 
 The requirement remains outside the context directory. Markdown is the human
 source of truth; YAML records metadata, approvals, hashes, and evidence.
+`just ai-sdlc-context <ID>` assembles a deterministic, hashed context pack
+from explicit relative context plus the repository context registry.
 
 ## Local interface
 
@@ -61,7 +63,7 @@ artifact and approval contract.
 
 - `initiative-approval-sync.yml`: intake merge to scaffold PR
 - `generate-hld.yml`: merged scaffold PR or manual HLD dispatch
-- `hld-review-feedback.yml`: bounded rerun from architect feedback
+- `hld-review-feedback.yml`: one bounded revision from a submitted architect review
 - `hld-approval-sync.yml`: merged HLD PR to approval metadata
 - `das-gate.yml`: structure and repository gate validation
 

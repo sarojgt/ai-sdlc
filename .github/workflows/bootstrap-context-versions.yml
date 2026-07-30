@@ -1,0 +1,58 @@
+name: Bootstrap Context Versions
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type bootstrap-context-v1 to create initial v1.0.0 context tags on main
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bootstrap-context-versions
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    if: github.ref == 'refs/heads/main' && inputs.confirm == 'bootstrap-context-v1'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main with tags
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Verify no context package is already versioned
+        run: |
+          set -euo pipefail
+          packages=(architecture security technology platform domain product)
+          for package in "${packages[@]}"; do
+            if git tag --list "context/$package/v*" | grep -q .; then
+              echo "Context package $package already has a version tag; bootstrap is one-time only." >&2
+              exit 1
+            fi
+          done
+
+      - name: Create v1.0.0 context baseline tags
+        run: |
+          set -euo pipefail
+          packages=(architecture security technology platform domain product)
+          for package in "${packages[@]}"; do
+            tag="context/$package/v1.0.0"
+            git tag -a "$tag" -m "Initial governed context baseline for $package"
+            git push origin "$tag"
+            echo "- \`$tag\` → \`$GITHUB_SHA\`" >> "$GITHUB_STEP_SUMMARY"
+          done
+
+      - name: Publish bootstrap summary
+        run: |
+          {
+            echo "# Context version bootstrap complete"
+            echo
+            echo "These lightweight Git tags establish the initial main-based context baseline."
+          } >> "$GITHUB_STEP_SUMMARY"

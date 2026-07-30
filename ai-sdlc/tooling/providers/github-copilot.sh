@@ -13,7 +13,7 @@ target="$root/initiatives/$initiative_id"
 
 test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
 command -v copilot >/dev/null 2>&1 || { echo "GitHub Copilot CLI was not found on PATH." >&2; exit 30; }
-prompt="$(python3 "$root/tooling/render_prompt.py" --name hld-generation --initiative-id "$initiative_id" --model "$model" --profile "${AI_SDLC_HLD_PROFILE:-auto}")"
+prompt="$(python3 "$root/tooling/render_prompt.py" --name hld-generation --initiative-id "$initiative_id" --model "$model" --profile "${AI_SDLC_HLD_PROFILE:-auto}" --mode "${AI_SDLC_HLD_MODE:-initial}" --feedback-file "${AI_SDLC_HLD_FEEDBACK_FILE:-}")"
 
 echo "[AI-SDLC] Starting GitHub Copilot generator: $model" >&2
 echo "[AI-SDLC] Context loading and HLD analysis in progress..." >&2

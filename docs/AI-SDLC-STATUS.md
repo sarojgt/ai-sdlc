@@ -77,6 +77,7 @@ from starting early.
 - [x] HLD loop checkpoints and explicit resume support added for interrupted
       or timed-out runs.
 - [x] HLD request and run metadata consolidated into one `hld-run.yaml` file.
+- [x] Deterministic before/after HLD lifecycle hooks record execution evidence.
 - [x] AI progress messages added during long-running generation and review.
 - [x] HLD impact assessment added for size, complexity/risk, services,
       repositories, integrations, data, security, deployment, and governance.
@@ -149,8 +150,16 @@ from starting early.
 - [x] Architecture guardrails stored in the repository.
 - [x] Relative context manifest created per initiative.
 - [x] Context gaps recorded with owner and retrieval action.
-- [ ] Build automated relevance selection for large context sets.
-- [ ] Add context freshness and source-hash validation.
+- [x] Build deterministic repository context-pack assembly from the source
+      registry, requirement keywords, and explicit relative context.
+- [x] Record selected context source hashes and declared freshness in each
+      assembled context manifest.
+- [x] Version context packages with scoped semantic tags and record resolved
+      package tags/commits in each generated HLD design baseline.
+- [x] Provide a guarded, one-time `v1.0.0` bootstrap workflow for existing
+      context packages on `main`.
+- [x] Provide manual, evidence-only context drift evaluation; it never
+      regenerates an HLD automatically.
 - [ ] Add repository/API/schema/ADR discovery adapters.
 - [ ] Add secure context filtering for sensitive content.
 - [ ] Add Confluence synchronization as a future source connector.
@@ -165,9 +174,9 @@ from starting early.
 - [x] HLD approval synchronized from the current-head Solution Architect / ARB
       GitHub review.
 - [~] Security, senior engineering, and release gates defined conceptually.
-- [~] Enforce CODEOWNERS and protected-branch rules in GitHub; repository
-      CODEOWNERS paths are configured, but enterprise team names and branch
-      rules still require repository administration.
+- [~] Enforce CODEOWNERS and protected-branch rules in GitHub; reviewer
+      allowlists are validated in workflows, while enterprise team names and
+      branch rules still require repository administration.
 - [ ] Add required approval checks to HLD and LLD pull requests.
 - [ ] Add architecture review checklists.
 - [x] Add approval invalidation when requirements or context change.
@@ -192,12 +201,15 @@ from starting early.
       retained for recovery.
 - [x] Add Copilot cloud-agent setup instructions and repository working agreement.
 - [x] Add draft HLD PR creation.
-- [~] Add AI review comments to the HLD PR.
+- [x] AI HLD review output uses a validated decision contract with findings,
+      required actions, and validation evidence.
 - [x] HLD resume publishing preserves existing branch commits without a
       force-push.
-- [~] Add human feedback webhook/command reruns; command and checkpoint resume
-      are available, and guarded inline HLD review-comment reruns are now
-      implemented.
+- [x] Human feedback reruns are available locally and on GitHub: one submitted
+      architect `Request changes` review becomes one immutable feedback batch
+      and one bounded revision. Individual inline comments do not invoke AI.
+- [ ] Enforce organisation-specific Solution Architect / ARB membership for
+      GitHub feedback and approval gates (CODEOWNERS/branch protection).
 - [ ] Add Jira issue and status synchronization.
 - [ ] Add Confluence publication or synchronization.
 - [ ] Add cross-repository work-plan orchestration.

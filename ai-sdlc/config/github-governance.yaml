@@ -1,0 +1,10 @@
+# Replace these POC identities with GitHub teams when this repository moves to
+# the enterprise organisation. GitHub branch protection must also require the
+# matching CODEOWNERS review; see docs/GITHUB-GOVERNANCE-SETUP.md.
+github_reviewers:
+  product_owner:
+    - sarojgt
+  solution_architect:
+    - sarojgt
+  senior_engineer:
+    - sarojgt

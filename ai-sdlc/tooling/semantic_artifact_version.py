@@ -11,6 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from conventional_commits import Commit  # noqa: E402
+from context_versions import package_for  # noqa: E402
 
 
 SEMVER = re.compile(r"^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
@@ -60,10 +61,10 @@ def tracks(paths: list[str], commit: Commit) -> set[str]:
                 "initiative", "requirement", "approval", "traceability"
             }:
                 result.add(f"initiative/{initiative}")
-        elif path.startswith("ai-sdlc/context/consistent/") and commit.scope == "context":
-            result.add("context/consistent")
-        elif path.startswith("ai-sdlc/context/guardrails/") and commit.scope == "context":
-            result.add("context/guardrails")
+        elif commit.scope == "context":
+            package = package_for(path)
+            if package:
+                result.add(f"context/{package}")
     return result
 
 

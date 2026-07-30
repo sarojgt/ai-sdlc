@@ -14,12 +14,7 @@ reviewer_model="$5"
 profile="${6:-${AI_SDLC_HLD_PROFILE:-auto}}"
 root="$(cd "$(dirname "$0")/.." && pwd)"
 target="$root/initiatives/$initiative_id"
-policy_file="$root/config/hld-loop-policy.yaml"
 profile_file="$root/config/hld-profiles.yaml"
-
-policy_value() {
-  sed -n "s/^  $1: *//p" "$policy_file" | head -1 | tr -d '\r'
-}
 
 profile_value() {
   awk -v profile="$profile" -v key="$1" '
@@ -36,7 +31,8 @@ esac
 
 max_iterations="${AI_SDLC_HLD_LOOP_MAX_ITERATIONS:-$(profile_value max_iterations)}"
 max_elapsed_minutes="${AI_SDLC_HLD_MAX_ELAPSED_MINUTES:-$(profile_value max_elapsed_minutes)}"
-agent_timeout_seconds="${AI_SDLC_AGENT_TIMEOUT_SECONDS:-$(( $(profile_value agent_timeout_minutes) * 60 ))}"
+configured_agent_timeout_seconds="${AI_SDLC_AGENT_TIMEOUT_SECONDS:-}"
+agent_timeout_seconds="${configured_agent_timeout_seconds:-$(( $(profile_value agent_timeout_minutes) * 60 ))}"
 export AI_SDLC_HLD_PROFILE="$profile" AI_SDLC_AGENT_TIMEOUT_SECONDS="$agent_timeout_seconds"
 
 sha256() {
@@ -51,10 +47,7 @@ sha256() {
 }
 
 test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
-grep -q 'status: approved' "$target/requirement.md" || {
-  echo "Requirement is not approved. HLD loop cannot start." >&2
-  exit 10
-}
+python3 "$root/tooling/approval_gate.py" requirements "$target"
 
 case "$max_iterations" in
   ''|*[!0-9]*) echo "max-iterations must be a positive integer" >&2; exit 2 ;;
@@ -68,12 +61,25 @@ fi
 case "$max_elapsed_minutes" in
   ''|*[!0-9]*) echo "max_elapsed_minutes must be a positive integer" >&2; exit 2 ;;
 esac
+if [ "$max_elapsed_minutes" -lt 1 ]; then
+  echo "max_elapsed_minutes must be at least one minute" >&2
+  exit 2
+fi
 
 started_at="$(date +%s)"
 checkpoint_file="$target/evidence/hld-loop.yaml"
 resume="${AI_SDLC_HLD_RESUME:-0}"
+# A human-review batch is an explicit input to a revision.  Keep the internal
+# name generic so AI reviewer feedback can become the next revision input too.
+feedback_file="${AI_SDLC_HLD_REVISION_FEEDBACK_FILE:-${AI_SDLC_HLD_FEEDBACK_FILE:-}}"
+if [ -n "$feedback_file" ]; then
+  case "$feedback_file" in
+    /*|*".."*) echo "Feedback file must be a relative initiative path" >&2; exit 2 ;;
+  esac
+  test -f "$target/$feedback_file" || { echo "Feedback file not found: $feedback_file" >&2; exit 1; }
+fi
 start_iteration=1
-if [ "$resume" = "1" ] && [ -f "$checkpoint_file" ]; then
+if [ -z "$feedback_file" ] && [ "$resume" = "1" ] && [ -f "$checkpoint_file" ]; then
   start_iteration="$(sed -n 's/^  iteration: *//p' "$checkpoint_file" | head -1)"
   start_iteration="${start_iteration:-1}"
 fi
@@ -93,6 +99,7 @@ hld_loop:
   generator_model: "$generator_model"
   reviewer_provider: "$reviewer_provider"
   reviewer_model: "$reviewer_model"
+  feedback_file: "$feedback_file"
   prompt_set: "hld-prompts-v1"
   agent_timeout_seconds: $agent_timeout_seconds
   human_architecture_approval_required: true
@@ -111,6 +118,25 @@ hld_hash() {
   find "$target/hld" -type f -print | sort | while IFS= read -r file; do
     sha256 "$file"
   done | sha256 | awk '{print $1}'
+}
+
+remaining_timeout_seconds() {
+  elapsed=$(( $(date +%s) - started_at ))
+  remaining=$(( max_elapsed_minutes * 60 - elapsed ))
+  if [ "$remaining" -le 0 ]; then
+    echo "HLD AI loop time limit reached; escalating to human Solution Architect." >&2
+    exit 10
+  fi
+  if [ "$remaining" -lt "$agent_timeout_seconds" ]; then
+    echo "$remaining"
+  else
+    echo "$agent_timeout_seconds"
+  fi
+}
+
+run_agent_within_budget() {
+  timeout_seconds="$(remaining_timeout_seconds)"
+  AI_SDLC_AGENT_TIMEOUT_SECONDS="$timeout_seconds" "$@"
 }
 
 record_profile() {
@@ -143,6 +169,7 @@ if [ "${AI_SDLC_HLD_LOOP_DRY_RUN:-0}" = "1" ]; then
 fi
 
 mkdir -p "$target/feedback" "$target/evidence"
+python3 "$root/tooling/run_lifecycle_hooks.py" before_hld "$target"
 python3 "$root/tooling/initialize_design_artifacts.py" "$target" hld
 
 if [ "$profile" = "auto" ]; then
@@ -163,11 +190,11 @@ fi
 
 max_iterations="${AI_SDLC_HLD_LOOP_MAX_ITERATIONS:-$(profile_value max_iterations)}"
 max_elapsed_minutes="${AI_SDLC_HLD_MAX_ELAPSED_MINUTES:-$(profile_value max_elapsed_minutes)}"
-agent_timeout_seconds="${AI_SDLC_AGENT_TIMEOUT_SECONDS:-$(( $(profile_value agent_timeout_minutes) * 60 ))}"
+agent_timeout_seconds="${configured_agent_timeout_seconds:-$(( $(profile_value agent_timeout_minutes) * 60 ))}"
 export AI_SDLC_HLD_PROFILE="$profile" AI_SDLC_AGENT_TIMEOUT_SECONDS="$agent_timeout_seconds"
 
 reuse_existing_hld=0
-if [ "$resume" = "1" ] && [ -s "$target/hld/hld.md" ]; then
+if [ -z "$feedback_file" ] && [ "$resume" = "1" ] && [ -s "$target/hld/hld.md" ]; then
   reuse_existing_hld=1
   echo "[AI-SDLC] Resume mode: existing HLD will be retained for review."
 fi
@@ -184,7 +211,14 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
   if [ "$reuse_existing_hld" -eq 1 ] && [ "$iteration" -eq "$start_iteration" ]; then
     echo "[AI-SDLC] Skipping generator; resuming with existing HLD."
   else
-    "$root/tooling/generate_hld.sh" "$initiative_id" "$generator_provider" "$generator_model" "$iteration"
+    if [ -n "$feedback_file" ]; then
+      export AI_SDLC_HLD_MODE=revision
+      export AI_SDLC_HLD_FEEDBACK_FILE="$feedback_file"
+    else
+      export AI_SDLC_HLD_MODE=initial
+      unset AI_SDLC_HLD_FEEDBACK_FILE
+    fi
+    run_agent_within_budget "$root/tooling/generate_hld.sh" "$initiative_id" "$generator_provider" "$generator_model" "$iteration"
   fi
   after_hld_hash="$(hld_hash)"
   record_profile
@@ -194,6 +228,7 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
   }
   echo "[AI-SDLC] Validating generated HLD structure and Mermaid diagrams before AI review..."
   python3 "$root/tooling/validate_hld_artifacts.py" "$target"
+  python3 "$root/tooling/run_lifecycle_hooks.py" after_hld "$target"
   reuse_existing_hld=0
 
   if [ "$iteration" -gt 1 ] && [ "$before_hld_hash" = "$after_hld_hash" ]; then
@@ -203,13 +238,14 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
 
   phase="reviewer"
   write_checkpoint "running" "$iteration"
-  "$root/tooling/review_hld.sh" "$initiative_id" "$reviewer_provider" "$reviewer_model" "$iteration"
+  run_agent_within_budget "$root/tooling/review_hld.sh" "$initiative_id" "$reviewer_provider" "$reviewer_model" "$iteration"
 
   review_file="$target/feedback/ai-review.md"
   test -f "$review_file" || {
     echo "AI reviewer did not produce: $review_file" >&2
     exit 30
   }
+  python3 "$root/tooling/validate_ai_review.py" "$review_file"
 
   feedback_hash="$(sed -e '/^reviewer:/d' -e '/^model:/d' -e '/^iteration:/d' "$review_file" | sha256 | awk '{print $1}')"
   if [ -n "$previous_feedback_hash" ] && [ "$feedback_hash" = "$previous_feedback_hash" ]; then
@@ -237,6 +273,7 @@ hld_loop:
   generator_model: "$generator_model"
   reviewer_provider: "$reviewer_provider"
   reviewer_model: "$reviewer_model"
+  feedback_file: "$feedback_file"
   prompt_set: "hld-prompts-v1"
   human_architecture_approval_required: true
 EOF
@@ -251,6 +288,8 @@ EOF
         echo "Escalate to the human Solution Architect: $review_file" >&2
         exit 10
       fi
+      feedback_file="feedback/ai-review.md"
+      export AI_SDLC_HLD_MODE=revision AI_SDLC_HLD_FEEDBACK_FILE="$feedback_file"
       echo "AI review requested changes; continuing with bounded regeneration."
       ;;
     escalate|*)

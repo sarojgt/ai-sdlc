@@ -61,6 +61,7 @@ PRs in affected application repositories later.
 | [Operating Guide](docs/AI-SDLC-OPERATING-GUIDE.md) | Current process and usage |
 | [Framework reference](ai-sdlc/README.md) | Layout, artifacts, interfaces |
 | [Status checklist](docs/AI-SDLC-STATUS.md) | Implemented and planned work |
+| [Context versioning](docs/CONTEXT-VERSIONING.md) | Scoped context tags, HLD baselines, and drift evidence |
 | [Automation and gates](docs/automation-and-gates.md) | Detailed automation design |
 | [HLD runbook](ai-sdlc/design/hld-generation-runbook.md) | HLD design reference |
 | [Agent runner design](ai-sdlc/design/agent-runner.md) | Provider adapter design |
