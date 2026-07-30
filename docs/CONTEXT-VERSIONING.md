@@ -21,5 +21,7 @@ current reachable package tags. It writes evidence only; a human decides
 whether to review, revise, or supersede the HLD. It never regenerates a design.
 
 Packages without a historical tag are recorded as `unreleased` until their
-first context release. Bootstrap initial package tags on `main` once through a
-controlled release operation before relying on version-only governance.
+first context release. Bootstrap initial package tags on `main` once through
+**Actions → Bootstrap Context Versions → Run workflow** and enter
+`bootstrap-context-v1`. It creates lightweight `v1.0.0` Git tags only and
+refuses to replace an existing package tag.

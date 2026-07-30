@@ -156,6 +156,8 @@ from starting early.
       assembled context manifest.
 - [x] Version context packages with scoped semantic tags and record resolved
       package tags/commits in each generated HLD design baseline.
+- [x] Provide a guarded, one-time `v1.0.0` bootstrap workflow for existing
+      context packages on `main`.
 - [x] Provide manual, evidence-only context drift evaluation; it never
       regenerates an HLD automatically.
 - [ ] Add repository/API/schema/ADR discovery adapters.
