@@ -1,18 +1,29 @@
 # HLD Generation Runbook
 
+> **Current implementation note:** For the commands, triggers, paths, and
+> recovery flow implemented today, use the [AI-SDLC Operating Guide](../../docs/AI-SDLC-OPERATING-GUIDE.md).
+> This runbook contains detailed design and target-state material; it does
+> not use an `ai-sdlc:generate-hld` label, scheduled reconciliation, or the
+> older `generated/` artifact paths.
+
 ## Purpose
 
 Generate a reviewable HLD proposal from an approved requirement while keeping architecture approval fully human-owned.
 
 The AI does not directly “decide the HLD.” It produces an HLD proposal, opens a design PR, and waits for the Solution Architect.
 
-## How a user starts the run
+## Target-state trigger options
+
+The following section preserves the future integration design. It is not the
+current trigger contract; use the operating guide for the implemented GitHub
+workflow.
 
 The framework should support three equivalent triggers:
 
 ### Option 1 — GitHub label
 
-Add the label `ai-sdlc:generate-hld` to the initiative issue.
+In a future issue-driven integration, an intake system could add a label such
+as `ai-sdlc:generate-hld` to an approved issue.
 
 ### Option 2 — GitHub Actions manual dispatch
 

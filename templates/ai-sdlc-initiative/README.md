@@ -1,5 +1,11 @@
 # Governed AI-SDLC Initiative Template
 
+> This template describes the desired initiative experience. The currently
+> supported repository interface is provided by the `just` recipes documented
+> in [`docs/AI-SDLC-OPERATING-GUIDE.md`](../../docs/AI-SDLC-OPERATING-GUIDE.md).
+> Commands below that use an `ai-sdlc` executable are target interfaces, not
+> prerequisites for the current GitHub workflow.
+
 Copy this directory into the design repository and replace `DEMO-001` with the Jira epic or initiative key.
 
 ## Required sequence

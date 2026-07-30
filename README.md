@@ -8,7 +8,9 @@ GitHub. Confluence is intentionally not required yet. A future Confluence
 connector can populate or refresh the repository context without changing the
 initiative workflow.
 
-Start here: [AI-SDLC usage guide](ai-sdlc/README.md)
+Start here: [AI-SDLC operating guide](docs/AI-SDLC-OPERATING-GUIDE.md). The
+[framework reference](ai-sdlc/README.md) contains detailed commands and
+artifact documentation.
 
 ## Prerequisites
 
@@ -238,7 +240,7 @@ approval.
 Generator and reviewer providers/models can be overridden independently:
 
 ```text
-just ai-sdlc-hld PAY-4567 claude claude-sonnet-4 codex gpt-review-model
+just ai-sdlc-hld PAY-4567 codex gpt-5.6-luna codex gpt-5.6-terra
 ```
 
 The loop is bounded by iteration, time, unchanged-output, and repeated-feedback

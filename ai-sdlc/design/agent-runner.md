@@ -1,5 +1,11 @@
 # AI Agent Runner and CLI Adapter Design
 
+> **Current implementation note:** The implemented provider entry points live
+> under `ai-sdlc/tooling/providers/` and are invoked through `run_agent.sh`.
+> Use the [AI-SDLC Operating Guide](../../docs/AI-SDLC-OPERATING-GUIDE.md) for
+> current commands and artifact paths; historical `ai-sdlc-agent-*` commands
+> and `generated/` paths below are design concepts, not current interfaces.
+
 ## Purpose
 
 Allow the same AI-SDLC workflow to use Codex, Claude, GitHub Copilot, local models, or another coding agent without changing the lifecycle, context model, DAS artifacts, or human gates.
@@ -61,7 +67,7 @@ Each adapter accepts the same input and produces the same output:
 ```text
 stdin:  hld-run.yaml
 stdout: progress and structured run events
-files:  generated artifacts in generated/
+files:  generated artifacts in initiatives/<ID>/hld/ and evidence/
 output: agent-response.yaml
 exit 0: task completed and response is valid
 exit 10: task needs human input
@@ -172,7 +178,7 @@ must use stricter isolated runners and independent policy enforcement.
 ## Feedback and rerun commands
 
 ```text
-just ai-sdlc-feedback PAY-4567 \
+just ai-sdlc-hld-feedback PAY-4567 \
   --artifact HLD-PAY-4567 \
   --comment-id 12345
 ```
@@ -203,7 +209,7 @@ the loop does not converge. A `pass` unlocks only the human Solution Architect
 review; it never unlocks LLD or implementation by itself.
 
 ```text
-just ai-sdlc-hld PAY-4567 claude
+just ai-sdlc-hld PAY-4567 codex gpt-5.6-luna codex gpt-5.6-terra auto
 
 # The orchestrator reads the feedback scope from the saved review event.
 # Example event: evidence/review-comment-12345.yaml

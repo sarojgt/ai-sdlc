@@ -33,6 +33,13 @@ Business input
 The HLD approval gate must prevent LLD, implementation, merge, and deployment
 from starting early.
 
+## Current documentation entry point
+
+- [x] Concise current operating guide added at
+      `docs/AI-SDLC-OPERATING-GUIDE.md`; older research, adoption, and design
+      documents are reference material and must not override the implemented
+      workflow described there.
+
 ## Prerequisites
 
 - [x] Git repository and shell-based command interface.
