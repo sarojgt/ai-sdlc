@@ -41,8 +41,6 @@ jobs:
       - name: Create v1.0.0 context baseline tags
         run: |
           set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           packages=(architecture security technology platform domain product)
           for package in "${packages[@]}"; do
             tag="context/$package/v1.0.0"
