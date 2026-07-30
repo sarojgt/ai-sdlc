@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import re
 import sys
+import os
 from pathlib import Path
 
 
@@ -13,7 +14,7 @@ def main() -> int:
         print("Usage: validate_reviewer.py <role> <github-login>", file=sys.stderr)
         return 2
     role, login = sys.argv[1:]
-    policy = Path(__file__).resolve().parents[1] / "config" / "github-governance.yaml"
+    policy = Path(os.environ.get("AI_SDLC_GOVERNANCE_FILE", Path(__file__).resolve().parents[1] / "config" / "github-governance.yaml"))
     text = policy.read_text(encoding="utf-8")
     section = re.search(rf"(?ms)^  {re.escape(role)}:\s*$\n(.*?)(?=^  \w|\Z)", text)
     allowed = set(re.findall(r"^    -\s+([A-Za-z0-9-]+)\s*$", section.group(1) if section else ""))

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -14,7 +15,7 @@ TOOLING = Path(__file__).resolve().parents[1]
 
 class LifecycleToolTests(unittest.TestCase):
     def initiative(self, root: Path) -> Path:
-        initiative = root / "KAN-5"
+        initiative = root / "TEST-INITIATIVE"
         (initiative / "context" / "relative").mkdir(parents=True)
         (initiative / "requirement.md").write_text(
             "---\nartifact:\n  status: approved\n---\n# Requirement\n", encoding="utf-8"
@@ -33,8 +34,8 @@ class LifecycleToolTests(unittest.TestCase):
         )
         return initiative
 
-    def run_tool(self, *args: str) -> subprocess.CompletedProcess[str]:
-        return subprocess.run([sys.executable, *args], text=True, capture_output=True, check=False)
+    def run_tool(self, *args: str, env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
+        return subprocess.run([sys.executable, *args], text=True, capture_output=True, check=False, env=env)
 
     def test_requirement_gate_requires_matching_hash(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -49,13 +50,13 @@ class LifecycleToolTests(unittest.TestCase):
     def test_feedback_batch_preserves_submitted_review_comments(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            initiative = root / "KAN-5"
+            initiative = root / "TEST-INITIATIVE"
             (initiative / "hld").mkdir(parents=True)
             (initiative / "hld" / "hld.md").write_text("# HLD\n", encoding="utf-8")
             body = root / "review.md"
             comments = root / "comments.json"
             body.write_text("Please address the API contract.\n", encoding="utf-8")
-            comments.write_text(json.dumps([{"path": "ai-sdlc/initiatives/KAN-5/hld/hld.md", "line": 12, "body": "Clarify pagination."}]), encoding="utf-8")
+            comments.write_text(json.dumps([{"path": f"ai-sdlc/initiatives/{initiative.name}/hld/hld.md", "line": 12, "body": "Clarify pagination."}]), encoding="utf-8")
             result = self.run_tool(
                 str(TOOLING / "create_feedback_batch.py"), str(initiative), "--review-id", "42",
                 "--reviewer", "architect", "--review-commit", "abc", "--review-body-file", str(body),
@@ -102,7 +103,7 @@ class LifecycleToolTests(unittest.TestCase):
 
     def test_context_pack_is_deterministic_and_detects_staleness(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            initiative = Path(directory) / "KAN-5"
+            initiative = Path(directory) / "TEST-INITIATIVE"
             relative = initiative / "context" / "relative"
             relative.mkdir(parents=True)
             (initiative / "requirement.md").write_text("# Secure card API\n", encoding="utf-8")
@@ -116,8 +117,12 @@ class LifecycleToolTests(unittest.TestCase):
             self.assertEqual(result.returncode, 1)
 
     def test_reviewer_allowlist_rejects_untrusted_login(self) -> None:
-        allowed = self.run_tool(str(TOOLING / "validate_reviewer.py"), "solution_architect", "sarojgt")
-        denied = self.run_tool(str(TOOLING / "validate_reviewer.py"), "solution_architect", "untrusted")
+        with tempfile.TemporaryDirectory() as directory:
+            policy = Path(directory) / "governance.yaml"
+            policy.write_text("github_reviewers:\n  solution_architect:\n    - test-architect\n", encoding="utf-8")
+            environment = {**os.environ, "AI_SDLC_GOVERNANCE_FILE": str(policy)}
+            allowed = self.run_tool(str(TOOLING / "validate_reviewer.py"), "solution_architect", "test-architect", env=environment)
+            denied = self.run_tool(str(TOOLING / "validate_reviewer.py"), "solution_architect", "untrusted", env=environment)
         self.assertEqual(allowed.returncode, 0, allowed.stderr)
         self.assertEqual(denied.returncode, 1)
 

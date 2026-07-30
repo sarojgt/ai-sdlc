@@ -9,16 +9,16 @@ on:
   workflow_dispatch:
     inputs:
       initiative_id:
-        description: Initiative ID, for example DEMO-005
+        description: Initiative ID, for example <WORK-ITEM-ID>
         required: true
         type: string
       generator_model:
-        description: "Generator model ID or auto. Catalog: https://github.com/sarojgt/ai-sdlc/blob/main/ai-sdlc/config/copilot-model-catalog.md"
+        description: "Generator model ID or auto. See ai-sdlc/config/copilot-model-catalog.md."
         required: false
         type: string
         default: claude-haiku-4.5
       reviewer_model:
-        description: "Reviewer model ID; must differ from generator. Catalog: https://github.com/sarojgt/ai-sdlc/blob/main/ai-sdlc/config/copilot-model-catalog.md"
+        description: "Reviewer model ID; must differ from generator. See ai-sdlc/config/copilot-model-catalog.md."
         required: false
         type: string
         default: gemini-3.5-flash

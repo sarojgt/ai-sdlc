@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       initiative_dir:
-        description: Initiative directory, for example ai-sdlc/initiatives/DEMO-005
+        description: Initiative directory, for example ai-sdlc/initiatives/<WORK-ITEM-ID>
         required: true
         type: string
       pull_request_number:
