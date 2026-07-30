@@ -1,11 +1,5 @@
 # HLD Generation Runbook
 
-> **Current implementation note:** For the commands, triggers, paths, and
-> recovery flow implemented today, use the [AI-SDLC Operating Guide](../../docs/AI-SDLC-OPERATING-GUIDE.md).
-> This runbook contains detailed design and target-state material; it does
-> not use an `ai-sdlc:generate-hld` label, scheduled reconciliation, or the
-> older `generated/` artifact paths.
-
 ## Purpose
 
 Generate a reviewable HLD proposal from an approved requirement while keeping architecture approval fully human-owned.

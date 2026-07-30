@@ -241,8 +241,7 @@ After LLD approval, fan out to repository workstreams. Fan in only after all req
 ## Repository-first implementation choices
 
 The choices below describe the current repository-first implementation and
-future extension points. The framework is an evolving standard, not limited to
-the initial pilot.
+future extension points for the evolving standard.
 
 Start with the tools already present in the organization:
 

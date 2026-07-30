@@ -1,11 +1,5 @@
 # AI Agent Runner and CLI Adapter Design
 
-> **Current implementation note:** The implemented provider entry points live
-> under `ai-sdlc/tooling/providers/` and are invoked through `run_agent.sh`.
-> Use the [AI-SDLC Operating Guide](../../docs/AI-SDLC-OPERATING-GUIDE.md) for
-> current commands and artifact paths; historical `ai-sdlc-agent-*` commands
-> and `generated/` paths below are design concepts, not current interfaces.
-
 ## Purpose
 
 Allow the same AI-SDLC workflow to use Codex, Claude, GitHub Copilot, local models, or another coding agent without changing the lifecycle, context model, DAS artifacts, or human gates.
