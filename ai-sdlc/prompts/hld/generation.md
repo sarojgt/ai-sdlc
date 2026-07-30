@@ -6,6 +6,9 @@ AGENTS.md, evidence/design-baseline.yaml, and evidence/hld-assessment.yaml.
 {{ revision_instructions }}
 
 Produce one human-readable HLD in hld/hld.md using the repository HLD template.
+Include a compact **Context baseline** table using the selected package versions
+in evidence/design-baseline.yaml; do not invent a version when it is marked
+`unreleased`.
 Assess and state the change size, complexity/risk, affected services and
 repositories, APIs, data stores, events, jobs, infrastructure, channels,
 integrations, security, deployment, migration, operations, and governance.

@@ -92,6 +92,7 @@ just ai-sdlc-validate ai-sdlc/initiatives/<ID>
 just ai-sdlc-validate-all
 just ai-sdlc-test
 just ai-sdlc-context <ID>
+just ai-sdlc-context-drift <ID>
 just ai-sdlc-hld <ID> codex <generator-model> codex <reviewer-model> auto
 AI_SDLC_HLD_RESUME=1 just ai-sdlc-hld <ID> codex <generator-model> codex <reviewer-model> auto
 just ai-sdlc-hld-feedback <ID> <provider> <model>
@@ -136,6 +137,9 @@ connectors are future integrations and are not required by the current flow.
   unchanged output, escalation, or a review-ready result.
 - AI review is advisory. A result such as `ready_for_human_review` means the
   draft is ready for an architect, not that it is approved.
+- HLD evidence records the selected context-package tags and commits. Context
+  drift is evaluated explicitly and writes evidence only; it never regenerates
+  or invalidates an HLD automatically.
 - Use the manual reconciler only for a missed handoff; it is intentionally not
   scheduled because scheduled scans can consume model tokens unexpectedly.
 

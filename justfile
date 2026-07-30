@@ -62,6 +62,10 @@ ai-sdlc-validate-all:
 ai-sdlc-context initiative:
     python3 ./ai-sdlc/tooling/build_context_pack.py "ai-sdlc/initiatives/{{initiative}}"
 
+# Compare an HLD baseline with newer context tags; never regenerates the HLD.
+ai-sdlc-context-drift initiative:
+    python3 ./ai-sdlc/tooling/evaluate_context_drift.py "ai-sdlc/initiatives/{{initiative}}"
+
 # Run the focused lifecycle tool regression tests.
 ai-sdlc-test:
     python3 -m unittest discover -s ai-sdlc/tooling/tests -p 'test_*.py'

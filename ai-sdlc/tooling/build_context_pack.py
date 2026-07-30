@@ -8,6 +8,9 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from context_versions import latest_tag, package_for, tag_commit  # noqa: E402
+
 BASELINE_IDS = {"enterprise-architecture", "security-baseline", "api-standards", "arb-governance"}
 
 def digest(path: Path) -> str:
@@ -58,10 +61,11 @@ def main() -> int:
         matches = len(words.intersection(re.findall(r"[a-z][a-z0-9-]{3,}", text)))
         always = entry.get("id") in BASELINE_IDS
         if always or matches >= 2:
-            items.append({**entry, "path": source, "content_sha256": digest(path), "selection": "baseline" if always else f"keyword-match:{matches}"})
+            package = package_for(source)
+            items.append({**entry, "path": source, "package": package or "unversioned", "version_tag": latest_tag(package) if package else "unversioned", "version_commit": tag_commit(latest_tag(package)) if package else "", "content_sha256": digest(path), "selection": "baseline" if always else f"keyword-match:{matches}"})
     for path in sorted((initiative / "context" / "relative").rglob("*") if (initiative / "context" / "relative").is_dir() else []):
         if path.is_file():
-            items.append({"id": f"relative-{path.stem}", "class": "relative", "authority": "initiative-owner", "freshness": "initiative", "path": str(path.relative_to(initiative)), "content_sha256": digest(path), "selection": "explicit-relative-context"})
+            items.append({"id": f"relative-{path.stem}", "class": "relative", "authority": "initiative-owner", "freshness": "initiative", "path": str(path.relative_to(initiative)), "package": "relative", "version_tag": "unreleased", "version_commit": "", "content_sha256": digest(path), "selection": "explicit-relative-context"})
     combined = hashlib.sha256("\n".join(f"{item['path']}:{item['content_sha256']}" for item in items).encode()).hexdigest()
     output = initiative / "context-manifest.yaml"
     if check:
@@ -72,7 +76,7 @@ def main() -> int:
         return 0
     lines = ["das_version: \"0.1\"", f'initiative: {yaml_quote(initiative.name)}', "context_pack:", f'  id: {yaml_quote("CTX-" + initiative.name + "-v1")}', "  version: 1", "  status: assembled", "  items:"]
     for item in items:
-        lines.extend([f'    - id: {yaml_quote(item["id"])}', f'      class: {yaml_quote(item["class"])}', f'      path: {yaml_quote(item["path"])}', f'      authority: {yaml_quote(item["authority"])}', f'      freshness: {yaml_quote(item["freshness"])}', f'      selection: {yaml_quote(item["selection"])}', f'      content_sha256: {yaml_quote(item["content_sha256"])}'])
+        lines.extend([f'    - id: {yaml_quote(item["id"])}', f'      class: {yaml_quote(item["class"])}', f'      package: {yaml_quote(item["package"])}', f'      version_tag: {yaml_quote(item["version_tag"])}', f'      version_commit: {yaml_quote(item["version_commit"])}', f'      path: {yaml_quote(item["path"])}', f'      authority: {yaml_quote(item["authority"])}', f'      freshness: {yaml_quote(item["freshness"])}', f'      selection: {yaml_quote(item["selection"])}', f'      content_sha256: {yaml_quote(item["content_sha256"])}'])
     lines.extend(["  exclusions:", "    - \"configured secret and build patterns\"", f'  content_sha256: {yaml_quote(combined)}', ""])
     output.write_text("\n".join(lines), encoding="utf-8")
     print(f"Context pack assembled: {output} ({len(items)} items)")

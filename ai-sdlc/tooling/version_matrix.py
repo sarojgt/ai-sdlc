@@ -9,7 +9,7 @@ import subprocess
 
 FRAMEWORK_TAG = re.compile(r"^v\d+\.\d+\.\d+$")
 SCOPED_TAG = re.compile(
-    r"^(?P<track>initiative/[^/]+(?:/(?:hld|lld|context))?|context/(?:consistent|guardrails))/(?P<version>v\d+\.\d+\.\d+)$"
+    r"^(?P<track>initiative/[^/]+(?:/(?:hld|lld|context))?|context/[a-z-]+)/(?P<version>v\d+\.\d+\.\d+)$"
 )
 
 

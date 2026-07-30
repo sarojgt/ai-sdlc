@@ -154,6 +154,10 @@ from starting early.
       registry, requirement keywords, and explicit relative context.
 - [x] Record selected context source hashes and declared freshness in each
       assembled context manifest.
+- [x] Version context packages with scoped semantic tags and record resolved
+      package tags/commits in each generated HLD design baseline.
+- [x] Provide manual, evidence-only context drift evaluation; it never
+      regenerates an HLD automatically.
 - [ ] Add repository/API/schema/ADR discovery adapters.
 - [ ] Add secure context filtering for sensitive content.
 - [ ] Add Confluence synchronization as a future source connector.

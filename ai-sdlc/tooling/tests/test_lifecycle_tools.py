@@ -11,6 +11,8 @@ from pathlib import Path
 
 
 TOOLING = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(TOOLING))
+from context_versions import package_for  # noqa: E402
 
 
 class LifecycleToolTests(unittest.TestCase):
@@ -125,6 +127,11 @@ class LifecycleToolTests(unittest.TestCase):
             denied = self.run_tool(str(TOOLING / "validate_reviewer.py"), "solution_architect", "untrusted", env=environment)
         self.assertEqual(allowed.returncode, 0, allowed.stderr)
         self.assertEqual(denied.returncode, 1)
+
+    def test_context_paths_map_to_stable_version_packages(self) -> None:
+        self.assertEqual(package_for("ai-sdlc/context/consistent/architecture/api-standards.md"), "architecture")
+        self.assertEqual(package_for("ai-sdlc/context/guardrails/security/secure-logging.md"), "security")
+        self.assertEqual(package_for("ai-sdlc/context/consistent/technology/tech-radar.md"), "technology")
 
 
 if __name__ == "__main__":
