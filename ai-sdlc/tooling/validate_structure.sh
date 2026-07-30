@@ -102,4 +102,3 @@ case "$state" in
 esac
 
 echo "AI-SDLC framework structure is valid."
-echo "Next implementation step: replace placeholder checks with DAS/hash/approval validation."

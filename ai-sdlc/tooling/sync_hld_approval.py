@@ -81,12 +81,12 @@ def main() -> int:
         print(f"Invalidated HLD approval for {initiative_dir.name}; a current-head architect review is required")
         return 0
 
-    content_hash = hld_hash(hld_md)
-    approvals_yaml.write_text(update_gate(approvals_text, "approved", reviewer, content_hash, submitted_at, review_commit))
     hld_text = hld_md.read_text()
     hld_text = replace_first(hld_text, r"^(\s*status:\s*)[^\n]+$", r"\1approved", "HLD status")
     hld_text = replace_first(hld_text, r"^(Solution Architect / ARB:\s*).*$", rf"\1{reviewer}", "HLD approval text")
     hld_md.write_text(hld_text)
+    content_hash = hld_hash(hld_md)
+    approvals_yaml.write_text(update_gate(approvals_text, "approved", reviewer, content_hash, submitted_at, review_commit))
     yaml_text = initiative_yaml.read_text()
     yaml_text = replace_first(yaml_text, r"^(\s*state:\s*)[^\n]+$", r"\1hld_approved", "initiative workflow state")
     initiative_yaml.write_text(yaml_text)

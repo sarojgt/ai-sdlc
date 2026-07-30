@@ -71,7 +71,7 @@ validation, and execution evidence.
 | `initiative-approval-sync.yml` | Merged initiative PR; manual recovery | Records valid intake approval and opens the scaffold PR |
 | `generate-hld.yml` | Merged `chore/initiative-post-merge-*` PR; manual dispatch | Generates and reviews an HLD |
 | `hld-trigger-reconciler.yml` | Manual dispatch only | Recovers a missed HLD handoff without scheduled model runs |
-| `hld-review-feedback.yml` | Architect HLD review comment | Captures actionable feedback and reruns the bounded loop |
+| `hld-review-feedback.yml` | Submitted architect `Request changes` review | Batches its summary and inline comments into one bounded HLD revision |
 | `hld-approval-sync.yml` | Merged `feat/hld-*` PR; manual recovery | Records current-head architect approval |
 | `das-gate.yml` | Initiative/config/schema/workflow PR | Validates structure and publishes the repository gate summary |
 
@@ -90,6 +90,7 @@ installed by the HLD GitHub workflow; it is optional for basic intake work.
 just ai-sdlc-new
 just ai-sdlc-validate ai-sdlc/initiatives/<ID>
 just ai-sdlc-validate-all
+just ai-sdlc-test
 just ai-sdlc-hld <ID> codex <generator-model> codex <reviewer-model> auto
 AI_SDLC_HLD_RESUME=1 just ai-sdlc-hld <ID> codex <generator-model> codex <reviewer-model> auto
 just ai-sdlc-hld-feedback <ID> <provider> <model>
@@ -126,6 +127,8 @@ connectors are future integrations and are not required by the current flow.
 
 - A failed post-generation step can resume from the existing HLD checkpoint.
 - HLD branches are updated with normal commits; the workflow does not force-push.
+- Inline comments are collected with their submitted `Request changes` review;
+  questions and individual comment edits do not start model runs.
 - The loop stops on its configured iteration/time limits, repeated feedback,
   unchanged output, escalation, or a review-ready result.
 - AI review is advisory. A result such as `ready_for_human_review` means the

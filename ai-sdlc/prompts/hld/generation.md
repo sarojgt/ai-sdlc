@@ -3,6 +3,8 @@ Act as the Solution Architect HLD generation agent for initiative
 relevant initiative-relative context, shared consistent context, guardrails,
 AGENTS.md, evidence/design-baseline.yaml, and evidence/hld-assessment.yaml.
 
+{{ revision_instructions }}
+
 Produce one human-readable HLD in hld/hld.md using the repository HLD template.
 Assess and state the change size, complexity/risk, affected services and
 repositories, APIs, data stores, events, jobs, infrastructure, channels,

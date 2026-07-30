@@ -1,0 +1,105 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+
+TOOLING = Path(__file__).resolve().parents[1]
+
+
+class LifecycleToolTests(unittest.TestCase):
+    def initiative(self, root: Path) -> Path:
+        initiative = root / "KAN-5"
+        (initiative / "context" / "relative").mkdir(parents=True)
+        (initiative / "requirement.md").write_text(
+            "---\nartifact:\n  status: approved\n---\n# Requirement\n", encoding="utf-8"
+        )
+        digest = hashlib.sha256()
+        digest.update(b"requirement.md\0")
+        digest.update((initiative / "requirement.md").read_bytes())
+        (initiative / "approvals.yaml").write_text(
+            "records:\n"
+            "  - gate: requirements\n"
+            "    decision: approved\n"
+            "    principal: \"architect\"\n"
+            f"    content_sha256: \"{digest.hexdigest()}\"\n"
+            "    review_commit: \"abc\"\n",
+            encoding="utf-8",
+        )
+        return initiative
+
+    def run_tool(self, *args: str) -> subprocess.CompletedProcess[str]:
+        return subprocess.run([sys.executable, *args], text=True, capture_output=True, check=False)
+
+    def test_requirement_gate_requires_matching_hash(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            initiative = self.initiative(Path(directory))
+            result = self.run_tool(str(TOOLING / "approval_gate.py"), "requirements", str(initiative))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            (initiative / "requirement.md").write_text("---\nartifact:\n  status: approved\n---\n# Changed\n", encoding="utf-8")
+            result = self.run_tool(str(TOOLING / "approval_gate.py"), "requirements", str(initiative))
+            self.assertEqual(result.returncode, 10)
+            self.assertIn("content hash", result.stderr)
+
+    def test_feedback_batch_preserves_submitted_review_comments(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            initiative = root / "KAN-5"
+            (initiative / "hld").mkdir(parents=True)
+            (initiative / "hld" / "hld.md").write_text("# HLD\n", encoding="utf-8")
+            body = root / "review.md"
+            comments = root / "comments.json"
+            body.write_text("Please address the API contract.\n", encoding="utf-8")
+            comments.write_text(json.dumps([{"path": "ai-sdlc/initiatives/KAN-5/hld/hld.md", "line": 12, "body": "Clarify pagination."}]), encoding="utf-8")
+            result = self.run_tool(
+                str(TOOLING / "create_feedback_batch.py"), str(initiative), "--review-id", "42",
+                "--reviewer", "architect", "--review-commit", "abc", "--review-body-file", str(body),
+                "--comments-file", str(comments),
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            batch = initiative / "feedback" / "batches" / "review-42.md"
+            self.assertIn("Please address", batch.read_text(encoding="utf-8"))
+            self.assertIn("Clarify pagination", batch.read_text(encoding="utf-8"))
+
+    def test_hld_gate_requires_matching_approved_hld(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            initiative = self.initiative(Path(directory))
+            hld = initiative / "hld" / "hld.md"
+            hld.parent.mkdir()
+            hld.write_text("---\nartifact:\n  status: approved\n---\n# HLD\n", encoding="utf-8")
+            digest = hashlib.sha256(hld.read_bytes()).hexdigest()
+            (initiative / "approvals.yaml").write_text(
+                (initiative / "approvals.yaml").read_text(encoding="utf-8")
+                + "  - gate: hld\n"
+                + "    decision: approved\n"
+                + "    principal: \"architect\"\n"
+                + f"    content_sha256: \"{digest}\"\n"
+                + "    review_commit: \"def\"\n",
+                encoding="utf-8",
+            )
+            result = self.run_tool(str(TOOLING / "approval_gate.py"), "hld", str(initiative))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            hld.write_text("---\nartifact:\n  status: approved\n---\n# Changed HLD\n", encoding="utf-8")
+            result = self.run_tool(str(TOOLING / "approval_gate.py"), "hld", str(initiative))
+            self.assertEqual(result.returncode, 10)
+            self.assertIn("content hash", result.stderr)
+
+    def test_review_validator_requires_front_matter_and_sections(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            review = Path(directory) / "ai-review.md"
+            review.write_text(
+                "---\nreviewer: codex\nmodel: review\niteration: 1\ndecision: ready_for_human_review\n---\n\n"
+                "## Findings\nNone.\n\n## Required actions\nNone.\n\n## Validation\n- Valid.\n",
+                encoding="utf-8",
+            )
+            result = self.run_tool(str(TOOLING / "validate_ai_review.py"), str(review))
+            self.assertEqual(result.returncode, 0, result.stderr)
+
+
+if __name__ == "__main__":
+    unittest.main()

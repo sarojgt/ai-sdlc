@@ -14,14 +14,15 @@ last_message="$target/evidence/agent-last-message.md"
 
 test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
 command -v codex >/dev/null 2>&1 || { echo "Codex CLI was not found on PATH." >&2; exit 30; }
-prompt="$(python3 "$root/tooling/render_prompt.py" --name hld-generation --initiative-id "$initiative_id" --model "$model" --profile "${AI_SDLC_HLD_PROFILE:-auto}")"
+prompt="$(python3 "$root/tooling/render_prompt.py" --name hld-generation --initiative-id "$initiative_id" --model "$model" --profile "${AI_SDLC_HLD_PROFILE:-auto}" --mode "${AI_SDLC_HLD_MODE:-initial}" --feedback-file "${AI_SDLC_HLD_FEEDBACK_FILE:-}")"
 
 if [ "${AI_SDLC_AGENT_DRY_RUN:-0}" = "1" ]; then
   printf '%s\n' "codex --ask-for-approval never exec --cd $target --model $model --sandbox workspace-write --output-last-message $last_message - < rendered-prompt"
   exit 0
 fi
 
-"$root/tooling/providers/run_codex_with_progress.sh" "$target" "$model" "$last_message" "$prompt"
+python3 "$root/tooling/with_timeout.py" "${AI_SDLC_AGENT_TIMEOUT_SECONDS:-480}" \
+  "$root/tooling/providers/run_codex_with_progress.sh" "$target" "$model" "$last_message" "$prompt"
 
 cat > "$target/evidence/agent-response.yaml" <<EOF
 agent_response:

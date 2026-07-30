@@ -58,6 +58,10 @@ ai-sdlc-validate-all:
         fi; \
     done
 
+# Run the focused lifecycle tool regression tests.
+ai-sdlc-test:
+    python3 -m unittest discover -s ai-sdlc/tooling/tests -p 'test_*.py'
+
 # Show the reusable AI-SDLC framework structure.
 ai-sdlc-tree:
     find ai-sdlc -type f | awk -F/ 'NF <= 4' | sort

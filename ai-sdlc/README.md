@@ -61,7 +61,7 @@ artifact and approval contract.
 
 - `initiative-approval-sync.yml`: intake merge to scaffold PR
 - `generate-hld.yml`: merged scaffold PR or manual HLD dispatch
-- `hld-review-feedback.yml`: bounded rerun from architect feedback
+- `hld-review-feedback.yml`: one bounded revision from a submitted architect review
 - `hld-approval-sync.yml`: merged HLD PR to approval metadata
 - `das-gate.yml`: structure and repository gate validation
 

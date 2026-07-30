@@ -14,14 +14,9 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 target="$root/initiatives/$initiative_id"
 
 test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
+python3 "$root/tooling/approval_gate.py" requirements "$target"
 
-if ! grep -q 'status: approved' "$target/requirement.md"; then
-  echo "Requirement is not approved. Review it before generating HLD." >&2
-  echo "Run: just ai-sdlc-review-requirement $initiative_id" >&2
-  exit 10
-fi
-
-mkdir -p "$target/evidence" "$target/generated"
+mkdir -p "$target/evidence"
 python3 "$root/tooling/build_design_baseline.py" "$initiative_id" > "$target/evidence/design-baseline.yaml"
 cp "$root/templates/hld-run.yaml" "$target/evidence/hld-run.yaml"
 

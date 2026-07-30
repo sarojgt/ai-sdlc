@@ -1,8 +1,8 @@
-name: Rerun HLD from Architect Review Comment
+name: Revise HLD from Architect Review
 
 on:
-  pull_request_review_comment:
-    types: [created, edited]
+  pull_request_review:
+    types: [submitted]
 
 permissions:
   contents: write
@@ -10,21 +10,18 @@ permissions:
   copilot-requests: write
 
 concurrency:
-  group: hld-review-feedback-${{ github.event.pull_request.number }}
+  group: hld-review-feedback-${{ github.event.pull_request.number }}-${{ github.event.review.id }}
   cancel-in-progress: false
 
 jobs:
-  rerun:
+  revise:
     if: >-
+      github.event.review.state == 'changes_requested' &&
       github.event.pull_request.base.ref == 'main' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       startsWith(github.event.pull_request.head.ref, 'feat/hld-') &&
-      github.event.comment.author_association != 'NONE' &&
-      github.event.comment.author_association != 'FIRST_TIMER' &&
-      github.event.comment.author_association != 'FIRST_TIME_CONTRIBUTOR' &&
-      github.event.comment.user.type != 'Bot' &&
-      startsWith(github.event.comment.path, 'ai-sdlc/initiatives/') &&
-      contains(github.event.comment.path, '/hld/')
+      contains(fromJSON('["MEMBER","OWNER","COLLABORATOR"]'), github.event.review.author_association) &&
+      github.event.review.user.type != 'Bot'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -34,118 +31,122 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
+      - name: Resolve initiative from the reviewed HLD path
+        id: scope
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          mapfile -t initiatives < <(
+            gh pr view "$PR_NUMBER" --json files --jq '.files[].path' |
+              awk -F/ '/^ai-sdlc\/initiatives\/[^/]+\/hld\// {print $3}' | sort -u
+          )
+          if [ "${#initiatives[@]}" -ne 1 ]; then
+            echo "Expected exactly one initiative HLD in the PR; found ${#initiatives[@]}" >&2
+            exit 1
+          fi
+          echo "initiative_id=${initiatives[0]}" >> "$GITHUB_OUTPUT"
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.x'
+
+      - name: Collect submitted review feedback
+        id: feedback
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INITIATIVE_ID: ${{ steps.scope.outputs.initiative_id }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REVIEW_ID: ${{ github.event.review.id }}
+          REVIEWER: ${{ github.event.review.user.login }}
+          REVIEW_COMMIT: ${{ github.event.review.commit_id }}
+          REVIEW_BODY: ${{ github.event.review.body }}
+        run: |
+          set -euo pipefail
+          review_body_file="$RUNNER_TEMP/review-body.md"
+          comments_file="$RUNNER_TEMP/review-comments.json"
+          printf '%s' "$REVIEW_BODY" > "$review_body_file"
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/reviews/$REVIEW_ID/comments?per_page=100" > "$comments_file"
+          python3 ai-sdlc/tooling/create_feedback_batch.py \
+            "ai-sdlc/initiatives/$INITIATIVE_ID" \
+            --review-id "$REVIEW_ID" \
+            --reviewer "$REVIEWER" \
+            --review-commit "$REVIEW_COMMIT" \
+            --review-body-file "$review_body_file" \
+            --comments-file "$comments_file" >> "$GITHUB_OUTPUT"
 
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
           node-version: 22
 
-      - name: Install GitHub Copilot CLI
-        run: npm install -g @github/copilot
-
-      - name: Record architect feedback
-        env:
-          INITIATIVE_ID: ${{ github.event.pull_request.head.ref }}
-          COMMENT_ID: ${{ github.event.comment.id }}
-          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
-          COMMENT_PATH: ${{ github.event.comment.path }}
-          COMMENT_LINE: ${{ github.event.comment.line || github.event.comment.original_line || 0 }}
-          COMMENT_BODY: ${{ github.event.comment.body }}
+      - name: Install GitHub Copilot CLI and Mermaid renderer
         run: |
-          set -euo pipefail
-          initiative_id="${INITIATIVE_ID#feat/hld-}"
-          mkdir -p "ai-sdlc/initiatives/$initiative_id/feedback"
-          export INITIATIVE_ID COMMENT_ID COMMENT_AUTHOR COMMENT_PATH COMMENT_LINE COMMENT_BODY
-          python3 - <<'PY'
-          import os
-          from pathlib import Path
-
-          initiative = os.environ["INITIATIVE_ID"].removeprefix("feat/hld-")
-          feedback = Path(f"ai-sdlc/initiatives/{initiative}/feedback/human-review.md")
-          body = os.environ.get("COMMENT_BODY", "").strip()
-          entry = (
-              f"\n## GitHub inline review comment {os.environ['COMMENT_ID']}\n\n"
-              f"- Reviewer: `{os.environ['COMMENT_AUTHOR']}`\n"
-              f"- Path: `{os.environ['COMMENT_PATH']}`\n"
-              f"- Line: `{os.environ['COMMENT_LINE']}`\n"
-              f"- Source: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}#discussion_r{os.environ['COMMENT_ID']}\n\n"
-              f"{body}\n"
-          )
-          with feedback.open("a", encoding="utf-8") as handle:
-              handle.write(entry)
-          print(f"Recorded architect feedback in {feedback}")
-          PY
+          npm install -g @github/copilot @mermaid-js/mermaid-cli
 
       - name: Resolve HLD models
         id: models
+        env:
+          INITIATIVE_ID: ${{ steps.scope.outputs.initiative_id }}
         run: |
           set -euo pipefail
-          initiative_id="${{ github.event.pull_request.head.ref }}"
-          initiative_id="${initiative_id#feat/hld-}"
-          evidence="ai-sdlc/initiatives/$initiative_id/evidence/hld-loop.yaml"
+          evidence="ai-sdlc/initiatives/$INITIATIVE_ID/evidence/hld-loop.yaml"
           generator_model="$(sed -n 's/^  generator_model: *"\{0,1\}\([^" ]*\).*/\1/p' "$evidence" | head -1)"
           reviewer_model="$(sed -n 's/^  reviewer_model: *"\{0,1\}\([^" ]*\).*/\1/p' "$evidence" | head -1)"
           generator_model="${generator_model:-claude-haiku-4.5}"
           reviewer_model="${reviewer_model:-gemini-3.5-flash}"
-          if [ "$generator_model" = "$reviewer_model" ]; then
-            echo "Existing generator and reviewer models are identical; using the safe independent reviewer default." >&2
-            reviewer_model="gemini-3.5-flash"
-          fi
+          test "$generator_model" != "$reviewer_model" || {
+            echo "Generator and reviewer models must differ." >&2
+            exit 1
+          }
           echo "generator_model=$generator_model" >> "$GITHUB_OUTPUT"
           echo "reviewer_model=$reviewer_model" >> "$GITHUB_OUTPUT"
 
-      - name: Install Mermaid renderer
-        run: npm install --global @mermaid-js/mermaid-cli
-
-      - name: Rerun bounded HLD review loop
+      - name: Revise and review HLD from one feedback batch
         env:
           GITHUB_TOKEN: ${{ github.token }}
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN || github.token }}
+          INITIATIVE_ID: ${{ steps.scope.outputs.initiative_id }}
           AI_SDLC_HLD_PROFILE: auto
           AI_SDLC_AGENT_TIMEOUT_SECONDS: 900
           AI_SDLC_HLD_RESUME: 1
+          AI_SDLC_HLD_REVISION_FEEDBACK_FILE: ${{ steps.feedback.outputs.feedback_file }}
         run: |
           set -euo pipefail
-          initiative_id="${{ github.event.pull_request.head.ref }}"
-          initiative_id="${initiative_id#feat/hld-}"
           ./ai-sdlc/tooling/hld_loop.sh \
-            "$initiative_id" \
+            "$INITIATIVE_ID" \
             github-copilot "${{ steps.models.outputs.generator_model }}" \
             github-copilot "${{ steps.models.outputs.reviewer_model }}" auto
 
       - name: Validate HLD contract before publishing
-        run: |
-          initiative_id="${{ github.event.pull_request.head.ref }}"
-          initiative_id="${initiative_id#feat/hld-}"
-          python3 ai-sdlc/tooling/validate_hld_artifacts.py \
-            "ai-sdlc/initiatives/$initiative_id"
+        env:
+          INITIATIVE_ID: ${{ steps.scope.outputs.initiative_id }}
+        run: python3 ai-sdlc/tooling/validate_hld_artifacts.py "ai-sdlc/initiatives/$INITIATIVE_ID"
 
       - name: Commit feedback-driven HLD update
         env:
-          GH_TOKEN: ${{ github.token }}
-          INITIATIVE_ID: ${{ github.event.pull_request.head.ref }}
+          INITIATIVE_ID: ${{ steps.scope.outputs.initiative_id }}
+          HLD_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "ai-sdlc/initiatives/${INITIATIVE_ID#feat/hld-}/feedback/human-review.md" \
-            "ai-sdlc/initiatives/${INITIATIVE_ID#feat/hld-}/hld" \
-            "ai-sdlc/initiatives/${INITIATIVE_ID#feat/hld-}/evidence"
+          git add "ai-sdlc/initiatives/$INITIATIVE_ID/feedback" \
+            "ai-sdlc/initiatives/$INITIATIVE_ID/hld" \
+            "ai-sdlc/initiatives/$INITIATIVE_ID/evidence"
           if git diff --cached --quiet; then
             echo "No HLD changes were produced."
             exit 0
           fi
           git commit -m "fix(hld): address architect review feedback"
-          git push origin "${INITIATIVE_ID}"
+          git push origin "$HLD_BRANCH"
 
-      - name: Report rerun status
-        if: always()
+      - name: Report successful feedback batch
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          FEEDBACK_FILE: ${{ steps.feedback.outputs.feedback_file }}
         run: |
-          gh pr comment "$PR_NUMBER" --body "HLD feedback automation processed inline review comment #${{ github.event.comment.id }}. The bounded generator/reviewer loop ran on the existing HLD branch. Human Solution Architect approval is still required."
+          gh pr comment "$PR_NUMBER" --body "Processed one submitted architecture review as feedback batch \`$FEEDBACK_FILE\`. The HLD revision and bounded AI review completed; human Solution Architect approval is still required."

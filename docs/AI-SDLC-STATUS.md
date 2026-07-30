@@ -192,12 +192,15 @@ from starting early.
       retained for recovery.
 - [x] Add Copilot cloud-agent setup instructions and repository working agreement.
 - [x] Add draft HLD PR creation.
-- [~] Add AI review comments to the HLD PR.
+- [x] AI HLD review output uses a validated decision contract with findings,
+      required actions, and validation evidence.
 - [x] HLD resume publishing preserves existing branch commits without a
       force-push.
-- [~] Add human feedback webhook/command reruns; command and checkpoint resume
-      are available, and guarded inline HLD review-comment reruns are now
-      implemented.
+- [x] Human feedback reruns are available locally and on GitHub: one submitted
+      architect `Request changes` review becomes one immutable feedback batch
+      and one bounded revision. Individual inline comments do not invoke AI.
+- [ ] Enforce organisation-specific Solution Architect / ARB membership for
+      GitHub feedback and approval gates (CODEOWNERS/branch protection).
 - [ ] Add Jira issue and status synchronization.
 - [ ] Add Confluence publication or synchronization.
 - [ ] Add cross-repository work-plan orchestration.
