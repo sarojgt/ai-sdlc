@@ -46,10 +46,18 @@ jobs:
           framework_changed=false
           initiative_changed=false
 
-          grep -qE '^\.github/workflows/' "$RUNNER_TEMP/das-changed-files.txt" && workflow_changed=true || true
-          grep -qE '^ai-sdlc/tooling/' "$RUNNER_TEMP/das-changed-files.txt" && tooling_changed=true || true
-          grep -qE '^ai-sdlc/(config|schemas|prompts|templates)/' "$RUNNER_TEMP/das-changed-files.txt" && framework_changed=true || true
-          grep -qE '^ai-sdlc/initiatives/[^/]+/' "$RUNNER_TEMP/das-changed-files.txt" && initiative_changed=true || true
+          if grep -qE '^\.github/workflows/' "$RUNNER_TEMP/das-changed-files.txt"; then
+            workflow_changed=true
+          fi
+          if grep -qE '^ai-sdlc/tooling/' "$RUNNER_TEMP/das-changed-files.txt"; then
+            tooling_changed=true
+          fi
+          if grep -qE '^ai-sdlc/(config|schemas|prompts|templates)/' "$RUNNER_TEMP/das-changed-files.txt"; then
+            framework_changed=true
+          fi
+          if grep -qE '^ai-sdlc/initiatives/[^/]+/' "$RUNNER_TEMP/das-changed-files.txt"; then
+            initiative_changed=true
+          fi
 
           if [ "$EVENT_NAME" != "pull_request" ] || [ "$framework_changed" = true ]; then
             validation_scope=all
@@ -80,7 +88,7 @@ jobs:
         with:
           # GitHub supports copilot-requests for Copilot CLI inference, but
           # actionlint's embedded permission schema may lag that platform scope.
-          flags: '-ignore "unknown permission scope.*copilot-requests"'
+          flags: '-ignore ''unknown permission scope "copilot-requests"'''
 
       - name: Validate shell syntax
         if: steps.scope.outputs.tooling_changed == 'true'
