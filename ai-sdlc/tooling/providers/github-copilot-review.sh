@@ -11,12 +11,18 @@ model="$2"
 iteration="$3"
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 target="$root/initiatives/$initiative_id"
-review_file="$target/feedback/ai-review.md"
+review_relative="${AI_SDLC_HLD_REVIEW_FILE:-feedback/reviews/ai-review-iteration-${iteration}.md}"
+case "$review_relative" in
+  /*|*".."*) echo "Review output file must be a relative initiative path" >&2; exit 2 ;;
+esac
+review_file="$target/$review_relative"
+mkdir -p "$(dirname "$review_file")"
+created_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
 test -f "$target/hld/hld.md" || { echo "Missing HLD: $target/hld/hld.md" >&2; exit 1; }
 command -v copilot >/dev/null 2>&1 || { echo "GitHub Copilot CLI was not found on PATH." >&2; exit 30; }
-prompt="$(python3 "$root/tooling/render_prompt.py" --name hld-review --initiative-id "$initiative_id" --provider github-copilot --model "$model" --iteration "$iteration" --profile "${AI_SDLC_HLD_PROFILE:-auto}" --feedback-file "${AI_SDLC_HLD_FEEDBACK_FILE:-}")"
+prompt="$(python3 "$root/tooling/render_prompt.py" --name hld-review --initiative-id "$initiative_id" --provider github-copilot --model "$model" --iteration "$iteration" --profile "${AI_SDLC_HLD_PROFILE:-auto}" --feedback-file "${AI_SDLC_HLD_FEEDBACK_FILE:-}" --review-output-file "$review_relative" --created-at "$created_at")"
 
 echo "[AI-SDLC] Starting GitHub Copilot reviewer: $model" >&2
 python3 "$root/tooling/with_timeout.py" "${AI_SDLC_AGENT_TIMEOUT_SECONDS:-480}" \

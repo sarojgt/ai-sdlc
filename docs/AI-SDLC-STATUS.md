@@ -64,6 +64,8 @@ from starting early.
 - [x] Human-readable Markdown as the primary artifact format.
 - [x] YAML metadata and evidence model established.
 - [x] DAS metadata and schema foundation added.
+- [x] DAS GitHub validation is impact-aware: changed initiatives are checked
+      selectively and framework-wide checks run only for framework changes.
 - [x] Shared context separated into consistent context and guardrails.
 - [x] Initiative-relative context separated from the requirement.
 - [x] Initiative bootstrap templates created.
@@ -91,8 +93,9 @@ from starting early.
       and approved patterns.
 - [x] HLD alternatives are limited to meaningful trade-offs or constraints.
 - [x] Mermaid diagrams embedded in the primary HLD document.
-- [x] HLD structure, evidence consistency, duplication, and Mermaid validation
-      checks added before an HLD PR is published.
+- [x] HLD structure, evidence consistency, duplication, and structural Mermaid
+      validation checks added before an HLD PR is published; browser rendering
+      is optional in CI because hosted-runner Chromium sandbox policies vary.
 - [x] Canonical HLD path standardized as `initiatives/<ID>/hld/hld.md`.
 - [x] Older demo initiatives archived under `ai-sdlc/examples/archive/`.
 - [x] Incidental `.DS_Store` and graph workspace artifacts removed/ignored.

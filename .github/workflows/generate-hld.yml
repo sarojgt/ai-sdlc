@@ -188,9 +188,6 @@ jobs:
           fi
           echo "name=$branch" >> "$GITHUB_OUTPUT"
 
-      - name: Install Mermaid renderer
-        run: npm install --global @mermaid-js/mermaid-cli
-
       - name: Run bounded HLD generation and review loop
         env:
           GENERATOR_MODEL: ${{ inputs.generator_model || 'gpt-5.6-luna' }}
@@ -203,6 +200,10 @@ jobs:
           RESUME: ${{ needs.resolve.outputs.resume || inputs.resume || false }}
           AI_SDLC_HLD_COMMIT_CHECKPOINTS: 1
           AI_SDLC_HLD_BRANCH: ${{ steps.prepare.outputs.name }}
+          # Hosted runners may prevent Chromium's sandbox from starting.
+          # Keep structural Mermaid checks without making generation depend on
+          # a browser renderer. Rendering remains available for local checks.
+          AI_SDLC_SKIP_MERMAID_RENDER: 1
           GITHUB_TOKEN: ${{ github.token }}
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN || github.token }}
         run: |
@@ -252,6 +253,8 @@ jobs:
             "ai-sdlc/initiatives/${{ needs.resolve.outputs.initiative_id }}"
 
       - name: Validate HLD contract before publishing
+        env:
+          AI_SDLC_SKIP_MERMAID_RENDER: 1
         run: |
           python3 ai-sdlc/tooling/validate_hld_artifacts.py \
             "ai-sdlc/initiatives/${{ needs.resolve.outputs.initiative_id }}"
@@ -279,12 +282,27 @@ jobs:
           fi
 
           if ! gh pr view "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            requirement_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/blob/main/ai-sdlc/initiatives/${INITIATIVE_ID}/requirement.md"
+            initiative_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/main/ai-sdlc/initiatives/${INITIATIVE_ID}"
+            body_file="$(mktemp)"
+            trap 'rm -f "$body_file"' EXIT
+            cat > "$body_file" <<EOF
+## AI-generated HLD proposal
+
+Initiative: [${INITIATIVE_ID}](${initiative_url})
+Requirement: [requirement.md](${requirement_url})
+
+Generator: \`github-copilot / ${GENERATOR_MODEL}\`
+Reviewer: \`github-copilot / ${REVIEWER_MODEL}\`
+
+The bounded AI review loop passed. This draft remains pending human Solution Architect / ARB approval. AI has not approved architecture.
+EOF
             gh pr create \
               --repo "$GITHUB_REPOSITORY" \
               --base main \
               --head "$HLD_BRANCH" \
               --title "feat(hld): generate HLD for $INITIATIVE_ID" \
-              --body "## AI-generated HLD proposal\n\nInitiative: \`$INITIATIVE_ID\`\nGenerator: \`github-copilot / $GENERATOR_MODEL\`\nReviewer: \`github-copilot / $REVIEWER_MODEL\`\n\nThe bounded AI review loop passed. This draft remains pending human Solution Architect / ARB approval. AI has not approved architecture." \
+              --body-file "$body_file" \
               --draft
           else
             echo "Updated existing HLD PR for $HLD_BRANCH without force-push."
