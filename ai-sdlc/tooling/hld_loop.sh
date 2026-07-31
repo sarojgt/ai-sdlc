@@ -123,6 +123,7 @@ hld_loop:
   generator_model: "$generator_model"
   reviewer_provider: "$reviewer_provider"
   reviewer_model: "$reviewer_model"
+  review_file: "feedback/reviews/ai-review-iteration-${iteration:-$start_iteration}.md"
   requirement_sha256: "$requirement_hash"
   context_manifest_sha256: "$context_manifest_hash"
   repository_commit: "$(git rev-parse HEAD)"
@@ -283,7 +284,9 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
   write_checkpoint "running" "$iteration"
   run_agent_within_budget "$root/tooling/review_hld.sh" "$initiative_id" "$reviewer_provider" "$reviewer_model" "$iteration"
 
-  review_file="$target/feedback/ai-review.md"
+  review_file_relative="feedback/reviews/ai-review-iteration-$iteration.md"
+  export AI_SDLC_HLD_REVIEW_FILE="$review_file_relative"
+  review_file="$target/$review_file_relative"
   test -f "$review_file" || {
     echo "AI reviewer did not produce: $review_file" >&2
     exit 30
@@ -333,7 +336,7 @@ EOF
         echo "Escalate to the human Solution Architect: $review_file" >&2
         exit 10
       fi
-      feedback_file="feedback/ai-review.md"
+      feedback_file="$review_file_relative"
       export AI_SDLC_HLD_MODE=revision AI_SDLC_HLD_FEEDBACK_FILE="$feedback_file"
       echo "AI review requested changes; continuing with bounded regeneration."
       ;;

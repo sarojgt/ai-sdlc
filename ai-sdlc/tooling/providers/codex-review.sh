@@ -11,13 +11,19 @@ model="${2:-gpt-5.6-terra}"
 iteration="${3:-1}"
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 target="$root/initiatives/$initiative_id"
-review_file="$target/feedback/ai-review.md"
+review_relative="${AI_SDLC_HLD_REVIEW_FILE:-feedback/reviews/ai-review-iteration-${iteration}.md}"
+case "$review_relative" in
+  /*|*".."*) echo "Review output file must be a relative initiative path" >&2; exit 2 ;;
+esac
+review_file="$target/$review_relative"
+mkdir -p "$(dirname "$review_file")"
+created_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 last_message="$target/evidence/ai-review-$iteration-last-message.md"
 
 test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
 test -f "$target/hld/hld.md" || { echo "Missing HLD: $target/hld/hld.md" >&2; exit 1; }
 command -v codex >/dev/null 2>&1 || { echo "Codex CLI was not found on PATH." >&2; exit 30; }
-prompt="$(python3 "$root/tooling/render_prompt.py" --name hld-review --initiative-id "$initiative_id" --provider codex --model "$model" --iteration "$iteration" --profile "${AI_SDLC_HLD_PROFILE:-auto}" --feedback-file "${AI_SDLC_HLD_FEEDBACK_FILE:-}")"
+prompt="$(python3 "$root/tooling/render_prompt.py" --name hld-review --initiative-id "$initiative_id" --provider codex --model "$model" --iteration "$iteration" --profile "${AI_SDLC_HLD_PROFILE:-auto}" --feedback-file "${AI_SDLC_HLD_FEEDBACK_FILE:-}" --review-output-file "$review_relative" --created-at "$created_at")"
 
 if [ "${AI_SDLC_AGENT_DRY_RUN:-0}" = "1" ]; then
   printf '%s\n' "codex --ask-for-approval never exec --cd $target --model $model --sandbox workspace-write --output-last-message $last_message < rendered-review-prompt"

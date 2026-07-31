@@ -187,7 +187,8 @@ HLD generation may use an independent reviewer model before human review:
 just ai-sdlc-hld-loop PAY-4567 codex gpt-5.6-luna codex gpt-5.6-terra
 ```
 
-The reviewer writes the latest decision to `feedback/ai-review.md` with one of
+The reviewer writes an immutable decision to
+`feedback/reviews/ai-review-iteration-<N>.md` with one of
 these decisions:
 
 ```text

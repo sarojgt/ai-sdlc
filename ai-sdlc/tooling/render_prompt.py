@@ -25,6 +25,8 @@ def main() -> int:
     parser.add_argument("--profile", default="auto")
     parser.add_argument("--mode", choices=["initial", "revision"], default="initial")
     parser.add_argument("--feedback-file", default="")
+    parser.add_argument("--review-output-file", default="feedback/ai-review.md")
+    parser.add_argument("--created-at", default="unknown")
     args = parser.parse_args()
 
     root = Path(__file__).resolve().parents[1]
@@ -46,6 +48,8 @@ def main() -> int:
         "profile_instructions": PROFILE_INSTRUCTIONS.get(args.profile, PROFILE_INSTRUCTIONS["auto"]),
         "mode": args.mode,
         "feedback_file": feedback_file or "None",
+        "review_output_file": args.review_output_file,
+        "created_at": args.created_at,
         "revision_instructions": revision_instructions,
     }
     for key, value in values.items():

@@ -16,13 +16,15 @@ detail, and diagrams that do not render. Judge conciseness proportionally; do
 not use a line-count threshold. Check that one canonical gap register and one
 canonical risk register are used.
 
-Write only feedback/ai-review.md. Start with this exact YAML front matter:
+Write only `{{ review_output_file }}`. Never delete, overwrite, or modify any
+previous AI review file. Start with this exact YAML front matter:
 
 ```yaml
 ---
 reviewer: {{ provider }}
 model: {{ model }}
 iteration: {{ iteration }}
+created_at: {{ created_at }}
 decision: changes_requested
 ---
 ```

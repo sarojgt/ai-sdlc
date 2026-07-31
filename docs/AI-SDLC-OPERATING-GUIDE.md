@@ -58,7 +58,7 @@ ai-sdlc/initiatives/<ID>/hld/hld.md
 ai-sdlc/initiatives/<ID>/evidence/hld-assessment.yaml
 ai-sdlc/initiatives/<ID>/evidence/hld-run.yaml
 ai-sdlc/initiatives/<ID>/evidence/design-baseline.yaml
-ai-sdlc/initiatives/<ID>/feedback/ai-review.md
+ai-sdlc/initiatives/<ID>/feedback/reviews/ai-review-iteration-<N>.md
 ```
 
 Markdown is for human decisions. YAML is for metadata, approvals, hashes,
