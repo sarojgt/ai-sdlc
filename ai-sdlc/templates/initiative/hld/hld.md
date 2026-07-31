@@ -24,11 +24,15 @@ policy:
 
 # HLD: {{ initiative.title }}
 
-## 1. Impact assessment
+<!-- Adapted from the Paymentology Architecture SDD template. Keep the main
+     document concise and decision-oriented; move substantial detail to linked
+     supporting artifacts. -->
 
-Classify the change as **small**, **medium**, or **large**. Complete only the
-rows that materially affect this initiative; do not restate standard platform
-capabilities that are already provided by the target deployment pattern.
+## 1. Change assessment
+
+Classify the change as **small**, **medium**, or **large**. Record only impacts
+that are material to this initiative; do not restate standard platform
+capabilities already supplied by the target deployment pattern.
 
 | Dimension | Assessment | Evidence or context gap |
 |---|---|---|
@@ -44,29 +48,95 @@ capabilities that are already provided by the target deployment pattern.
 
 **Assessment summary:** one short paragraph explaining why this classification was chosen.
 
-## 2. Problem and outcome
+## 2. Motivation and outcome
 
-State the problem, intended outcome, and measurable success signal in a few
-sentences.
+State the business problem, intended outcome, and measurable success signal.
 
-## 3. Scope and boundaries
+## 3. Authors and approvals
 
-## 4. Context basis and gap register
+| Role | Person or team | Status |
+|---|---|---|
+| Business owner | | |
+| Solution Architect / ARB | | Pending |
+| Infrastructure / Platform | | |
+| Engineering lead | | |
+| Security | | |
+
+## 4. Solution overview
+
+Summarize the recommended solution in one short paragraph.
+
+## 5. High-level business requirements
+
+List the requirements this design satisfies and link the approved requirement
+or business epic where available.
+
+## 6. Architecture principles applied
+
+| Principle or approved pattern | Application to this design | Context evidence |
+|---|---|---|
+| | | |
+
+## 7. Non-functional requirements
+
+Cover only relevant performance, availability, security, scalability, cost,
+operability, and compliance constraints. Do not invent target values.
+
+## 8. Assumptions and scope boundaries
+
+State confirmed assumptions and what is explicitly out of scope.
+
+## 9. Context gaps
 
 Keep one canonical context-gap register in this section. Other sections must
-reference gap IDs only; do not repeat gap descriptions in impact, risks, or
-review sections. Separate confirmed facts from proposed changes and do not
-fill gaps with guesses.
+reference gap IDs only. Separate confirmed facts from proposed changes and do
+not fill gaps with guesses.
 
-## 5. Current-state and target approach
+| Gap ID | Missing fact | Owner | Retrieval action | Blocks decision? |
+|---|---|---|---|---|
+| GAP-001 | | | | |
 
-## 6. Options and trade-offs
+## 10. Risks
+
+| Risk ID | Risk | Impact | Mitigation or owner |
+|---|---|---|---|
+| RISK-001 | | | |
+
+## 11. Solution design
+
+### Context view
+
+Use a C4 Level 1 diagram showing actors, system boundaries, and major external
+interactions.
+
+### Logical view
+
+Use a C4 Level 2/container view, showing only the affected or relevant
+existing components.
+
+### Information and data view
+
+Include an ERD or data-flow diagram only when data ownership, storage, or
+movement is material to the decision.
+
+### Process and interaction view
+
+Include a sequence or activity diagram for material runtime behavior,
+including asynchronous, retry, concurrency, or failure paths where relevant.
+
+### Physical and deployment view
+
+Show the relevant workload zone, regional deployment, platform boundary, and
+operational dependencies. Reference the approved platform design instead of
+duplicating standard topology.
+
+## 12. Options and trade-offs
 
 For a small change, show one recommended option and alternatives only when a
 material trade-off exists. Medium and large changes may include a short option
 comparison and link to supporting detail.
 
-## 7. Recommendation and decision points
+## 13. Recommendation and decision points
 
 **Applicable standards and approved patterns:**
 
@@ -80,27 +150,31 @@ smallest compliant design.
 **Alternatives considered:** include only alternatives with a material trade-off,
 pattern mismatch, or meaningful constraint.
 
-## 8. Security, NFRs, and operations
+## 14. Security considerations
 
-Cover only the NFRs and operational concerns changed or specifically relevant
-to this initiative.
+Describe authentication, authorization, trust boundaries, data protection,
+PCI/CHD implications, audit, and security review needs that are specific to
+this initiative.
 
-## 9. Delivery, rollout, and rollback
+## 15. Testing considerations
 
-## 10. Diagrams
+Describe only design-specific functional, integration, performance, resilience,
+migration, security, or disaster-recovery testing needs.
 
-<!-- Embed only useful, renderable Mermaid diagrams. Small changes normally need
-     one context/flow diagram and at most one deployment or component view. -->
+## 16. Operations and delivery
 
-## 11. Risks and decision points
+Cover monitoring, alerting, runbooks, deployment, rollout, rollback, migration,
+and operational ownership. Include only what changes or is material.
 
-Keep one canonical risk register in this section. Add ADRs or open questions
-only when they represent a distinct decision that is not already captured.
+<!-- Embed only useful, renderable Mermaid diagrams in the relevant design-view
+     sections. Small changes normally need one context/flow diagram and at most
+     one deployment or component view. -->
 
-## 12. Traceability
+## 17. Traceability and ADRs
 
 Link the requirement, selected context, affected systems, related repositories,
-and follow-on LLD. Keep evidence in YAML; keep the human decision here.
+and follow-on LLD. Record only decisions that need an ADR; keep evidence in
+YAML and human decisions in this document.
 
 ## Architecture approval
 

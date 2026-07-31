@@ -5,7 +5,11 @@ AGENTS.md, evidence/design-baseline.yaml, and evidence/hld-assessment.yaml.
 
 {{ revision_instructions }}
 
-Produce one human-readable HLD in hld/hld.md using the repository HLD template.
+Produce one human-readable HLD in hld/hld.md using the repository HLD template,
+which is adapted from the Paymentology Architecture Solution Design Document
+(SDD) template. Preserve the template's section order and headings. The HLD
+is a concise architecture decision document, not an LLD or implementation
+specification.
 Include a compact **Context baseline** table using the selected package versions
 in evidence/design-baseline.yaml; do not invent a version when it is marked
 `unreleased`.
@@ -16,9 +20,10 @@ Apply confirmed enterprise standards and approved patterns. Recommend the
 smallest compliant design and reuse existing capabilities where evidence
 supports reuse. Include alternatives only for material trade-offs.
 
-Use exactly one canonical context-gap register. Other sections must reference
-gap IDs instead of repeating their descriptions. Use exactly one canonical
-risk register, and do not repeat the same recommendation in multiple sections.
+Use exactly one canonical context-gap register under `Context gaps` and one
+canonical risk register under `Risks`. Other sections must reference gap or
+risk IDs instead of repeating their descriptions. Do not repeat the same
+recommendation in multiple sections.
 Clearly distinguish confirmed facts, proposed decisions, and context gaps. Do
 not invent components, APIs, repositories, tables, cloud services, endpoints,
 SLA values, retention rules, or integrations. Keep detailed API schemas, SQL,
@@ -28,7 +33,8 @@ supporting documents.
 Keep hld.md concise and decision-focused for the selected profile:
 {{ profile_instructions }}
 
-Embed only useful Mermaid diagrams directly in hld.md. Use fenced mermaid
+Embed useful Mermaid diagrams directly in the relevant Context, Logical,
+Information/Data, Process/Interaction, or Physical/Deployment view. Use fenced mermaid
 blocks, quoted labels when punctuation is present, and portable Mermaid syntax.
 Do not use HTML tags such as <br/>. Each diagram must have a clear purpose and
 must render independently. Do not create separate diagram files as the primary
