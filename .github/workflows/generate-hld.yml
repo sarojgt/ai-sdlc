@@ -286,17 +286,14 @@ jobs:
             initiative_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/tree/main/ai-sdlc/initiatives/${INITIATIVE_ID}"
             body_file="$(mktemp)"
             trap 'rm -f "$body_file"' EXIT
-            cat > "$body_file" <<EOF
-## AI-generated HLD proposal
-
-Initiative: [${INITIATIVE_ID}](${initiative_url})
-Requirement: [requirement.md](${requirement_url})
-
-Generator: \`github-copilot / ${GENERATOR_MODEL}\`
-Reviewer: \`github-copilot / ${REVIEWER_MODEL}\`
-
-The bounded AI review loop passed. This draft remains pending human Solution Architect / ARB approval. AI has not approved architecture.
-EOF
+            printf '%s\n\n%s\n%s\n\n%s\n%s\n\n%s\n' \
+              '## AI-generated HLD proposal' \
+              "Initiative: [${INITIATIVE_ID}](${initiative_url})" \
+              "Requirement: [requirement.md](${requirement_url})" \
+              "Generator: \`github-copilot / ${GENERATOR_MODEL}\`" \
+              "Reviewer: \`github-copilot / ${REVIEWER_MODEL}\`" \
+              'The bounded AI review loop passed. This draft remains pending human Solution Architect / ARB approval. AI has not approved architecture.' \
+              > "$body_file"
             gh pr create \
               --repo "$GITHUB_REPOSITORY" \
               --base main \
