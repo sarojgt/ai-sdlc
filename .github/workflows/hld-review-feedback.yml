@@ -87,9 +87,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install GitHub Copilot CLI and Mermaid renderer
-        run: |
-          npm install -g @github/copilot @mermaid-js/mermaid-cli
+      - name: Install GitHub Copilot CLI
+        run: npm install -g @github/copilot
 
       - name: Resolve HLD models
         id: models
@@ -118,6 +117,7 @@ jobs:
           AI_SDLC_AGENT_TIMEOUT_SECONDS: 900
           AI_SDLC_HLD_RESUME: 1
           AI_SDLC_HLD_REVISION_FEEDBACK_FILE: ${{ steps.feedback.outputs.feedback_file }}
+          AI_SDLC_SKIP_MERMAID_RENDER: 1
         run: |
           set -euo pipefail
           ./ai-sdlc/tooling/hld_loop.sh \
@@ -128,6 +128,7 @@ jobs:
       - name: Validate HLD contract before publishing
         env:
           INITIATIVE_ID: ${{ steps.scope.outputs.initiative_id }}
+          AI_SDLC_SKIP_MERMAID_RENDER: 1
         run: python3 ai-sdlc/tooling/validate_hld_artifacts.py "ai-sdlc/initiatives/$INITIATIVE_ID"
 
       - name: Commit feedback-driven HLD update

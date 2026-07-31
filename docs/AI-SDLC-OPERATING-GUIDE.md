@@ -83,8 +83,9 @@ already has loop evidence unless `force` or `resume` is explicitly selected.
 ## Commands
 
 Prerequisites are Git, `just`, Bash, and the selected provider CLI for local
-runs. Use `gh` for GitHub branches and pull requests. Mermaid rendering is
-installed by the HLD GitHub workflow; it is optional for basic intake work.
+runs. Use `gh` for GitHub branches and pull requests. GitHub Actions perform
+structural Mermaid checks without requiring browser rendering; local runs can
+enable rendering when Mermaid CLI and Chromium are available.
 
 ```text
 just ai-sdlc-new

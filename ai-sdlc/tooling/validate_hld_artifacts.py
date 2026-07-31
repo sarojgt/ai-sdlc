@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
@@ -24,6 +25,16 @@ def mermaid_blocks(text: str) -> list[str]:
 
 def validate_mermaid(blocks: list[str]) -> None:
     mmdc = which("mmdc")
+    skip_render = os.environ.get("AI_SDLC_SKIP_MERMAID_RENDER", "").lower() in {
+        "1",
+        "true",
+        "yes",
+    }
+    if skip_render and mmdc:
+        print(
+            "Mermaid browser rendering skipped; structural Mermaid checks remain enabled.",
+            file=sys.stderr,
+        )
     for index, block in enumerate(blocks, 1):
         if "<br" in block.lower():
             raise ValueError(f"Mermaid diagram {index} uses HTML; use portable Mermaid labels")
@@ -31,7 +42,7 @@ def validate_mermaid(blocks: list[str]) -> None:
         if not first.startswith(("flowchart", "graph", "sequencediagram", "classdiagram", "statediagram", "erdiagram", "journey", "gantt", "pie", "mindmap", "timeline")):
             raise ValueError(f"Mermaid diagram {index} has unsupported or missing diagram declaration")
 
-        if mmdc:
+        if mmdc and not skip_render:
             with tempfile.TemporaryDirectory() as directory:
                 source = Path(directory) / "diagram.mmd"
                 output = Path(directory) / "diagram.svg"
