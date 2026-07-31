@@ -71,6 +71,17 @@ Success is demonstrated by the requirement acceptance criteria: valid authorized
 - New external events, webhooks, scheme calls, or customer notifications; none is confirmed for this initiative.
 - Detailed resource paths, JSON schemas, error payloads, database schema, scheduling implementation, retry algorithm, test cases, runbooks, or migration scripts. These belong in the LLD after approval.
 
+### Affected surfaces
+
+| Surface | HLD position | Confirmation required |
+|---|---|---|
+| API and channels | Add one backward-compatible mutation to the existing card-management API, reached by the approved client portal and operations channel; exact route, audience, and BFF path are unknown. | Card/API and Identity owners (CG-01, CG-02) |
+| Services and repositories | Extend the existing card-management API and authoritative card-state capabilities; service and repository names are not confirmed. | Card/API owner (CG-01) |
+| Data and persistence | Store or extend only the minimum temporary-block lifecycle metadata in the authoritative card-state persistence; database, zone, isolation unit, backup, and retention are unknown. | Card data, Security, and Platform owners (CG-05) |
+| Events and jobs | Reuse the existing expiry scheduler, durable timer, or event-processing job. No new topic, event, scheduler, or standalone worker is proposed. | Card platform and SRE owners (CG-03) |
+| Infrastructure and deployment | Reuse the target estate's existing gateway, service runtime, persistence, observability, and promotion pipeline; cloud, region, platform generation, and shared/dedicated boundaries are unknown. | Platform and deployment owners (CG-05) |
+| Integrations | Reuse existing Auth0/API Gateway/IMS authorization, audit, and observability paths where present. No external gateway, scheme, token-service, webhook, or notification integration is assumed. | Identity, Product, and Card owners (CG-02, CG-07) |
+
 ## 4. Confirmed context and context gaps
 
 ### Confirmed design constraints

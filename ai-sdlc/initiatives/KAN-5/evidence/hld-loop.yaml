@@ -4,7 +4,7 @@ hld_loop:
   iterations: 1
   profile: "medium"
   generator_provider: "github-copilot"
-  generator_model: "gpt-5.6-terra"
+  generator_model: "gpt-5.6-luna"
   reviewer_provider: "github-copilot"
-  reviewer_model: "gemini-3.5-flash"
+  reviewer_model: "claude-haiku-4.5"
   human_architecture_approval_required: true

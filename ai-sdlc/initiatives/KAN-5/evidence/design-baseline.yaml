@@ -1,6 +1,6 @@
 baseline_version: "0.1"
-repository_commit: "12a1b41ca94bd995d8acf652f1c0f2e1e9fcfedc"
-framework_tag: "v0.3.3"
+repository_commit: "ae4205ac0c014a7bd92729fd5a93d7541099331c"
+framework_tag: "v0.4.1"
 initiative:
   id: "KAN-5"
   tag: "initiative/KAN-5/v0.1.0"
