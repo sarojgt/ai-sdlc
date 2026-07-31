@@ -65,6 +65,7 @@ jobs:
     outputs:
       initiative_id: ${{ steps.scope.outputs.initiative_id }}
       should_run: ${{ steps.scope.outputs.should_run }}
+      resume: ${{ steps.scope.outputs.resume }}
     steps:
       - name: Checkout default branch
         uses: actions/checkout@v5
@@ -77,6 +78,7 @@ jobs:
         env:
           DISPATCH_INITIATIVE: ${{ inputs.initiative_id }}
           FORCE_RUN: ${{ inputs.force || false }}
+          RESUME_INPUT: ${{ inputs.resume || false }}
           PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number || 0 }}
           EVENT_NAME: ${{ github.event_name }}
           GH_TOKEN: ${{ github.token }}
@@ -96,22 +98,38 @@ jobs:
           fi
           target="ai-sdlc/initiatives/$initiative_id"
           test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
+          resume=false
           if ! python3 ai-sdlc/tooling/approval_gate.py requirements "$target"; then
             echo "Requirements gate has not passed; HLD generation will not start."
-            echo "should_run=false" >> "$GITHUB_OUTPUT"
-            echo "initiative_id=$initiative_id" >> "$GITHUB_OUTPUT"
+            {
+              echo "should_run=false"
+              echo "initiative_id=$initiative_id"
+              echo "resume=false"
+            } >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           if [ "$FORCE_RUN" != "true" ] && [ -f "$target/evidence/hld-loop.yaml" ]; then
-            echo "HLD loop evidence already exists; skipping duplicate automatic run."
-            echo "should_run=false" >> "$GITHUB_OUTPUT"
-            echo "initiative_id=$initiative_id" >> "$GITHUB_OUTPUT"
-            exit 0
+            status="$(sed -n 's/^  status: *//p' "$target/evidence/hld-loop.yaml" | head -1 | tr -d '"')"
+            if [ "$RESUME_INPUT" = "true" ] || [ "$status" = "interrupted_or_failed" ] || [ "$status" = "running" ]; then
+              echo "Resuming HLD from checkpoint status: ${status:-unknown}"
+              resume=true
+            else
+              echo "HLD loop evidence already exists; skipping duplicate automatic run."
+              {
+                echo "should_run=false"
+                echo "initiative_id=$initiative_id"
+                echo "resume=false"
+              } >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
           fi
 
-          echo "initiative_id=$initiative_id" >> "$GITHUB_OUTPUT"
-          echo "should_run=true" >> "$GITHUB_OUTPUT"
+          {
+            echo "initiative_id=$initiative_id"
+            echo "should_run=true"
+            echo "resume=$resume"
+          } >> "$GITHUB_OUTPUT"
 
   hld:
     needs: resolve
@@ -182,7 +200,9 @@ jobs:
           HLD_PROFILE: auto
           AGENT_TIMEOUT_MINUTES: ${{ inputs.agent_timeout_minutes || '15' }}
           ASSESSMENT_TIMEOUT_MINUTES: ${{ inputs.assessment_timeout_minutes || '5' }}
-          RESUME: ${{ inputs.resume || false }}
+          RESUME: ${{ needs.resolve.outputs.resume || inputs.resume || false }}
+          AI_SDLC_HLD_COMMIT_CHECKPOINTS: 1
+          AI_SDLC_HLD_BRANCH: ${{ steps.prepare.outputs.name }}
           GITHUB_TOKEN: ${{ github.token }}
           COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN || github.token }}
         run: |
@@ -197,6 +217,34 @@ jobs:
             "${{ needs.resolve.outputs.initiative_id }}" \
             github-copilot "$GENERATOR_MODEL" \
             github-copilot "$REVIEWER_MODEL" "$HLD_PROFILE"
+
+      - name: Restore lifecycle tooling after AI run
+        if: always()
+        run: |
+          set -euo pipefail
+          git fetch origin main --quiet
+          git restore --source=origin/main -- ai-sdlc/tooling .github
+
+      - name: Publish HLD checkpoint after run
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
+          HLD_BRANCH: ${{ steps.prepare.outputs.name }}
+          INITIATIVE_ID: ${{ needs.resolve.outputs.initiative_id }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "ai-sdlc/initiatives/$INITIATIVE_ID/hld" \
+            "ai-sdlc/initiatives/$INITIATIVE_ID/evidence" \
+            "ai-sdlc/initiatives/$INITIATIVE_ID/feedback"
+          if git diff --cached --quiet; then
+            echo "No additional HLD checkpoint changes to publish."
+            exit 0
+          fi
+          git commit -m "chore(hld): persist checkpoint for $INITIATIVE_ID"
+          git remote set-url origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+          git push origin "$HLD_BRANCH"
 
       - name: Validate generated initiative
         run: |
@@ -223,12 +271,12 @@ jobs:
             "ai-sdlc/initiatives/$INITIATIVE_ID/evidence" \
             "ai-sdlc/initiatives/$INITIATIVE_ID/feedback"
           if git diff --cached --quiet; then
-            echo "No HLD changes to publish."
-            exit 0
+            echo "No final HLD changes to publish."
+          else
+            git commit -m "feat(hld): generate HLD for $INITIATIVE_ID"
+            git remote set-url origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+            git push origin "$HLD_BRANCH"
           fi
-          git commit -m "feat(hld): generate HLD for $INITIATIVE_ID"
-          git remote set-url origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
-          git push origin "$HLD_BRANCH"
 
           if ! gh pr view "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh pr create \
