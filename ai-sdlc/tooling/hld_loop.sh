@@ -69,6 +69,8 @@ fi
 started_at="$(date +%s)"
 checkpoint_file="$target/evidence/hld-loop.yaml"
 resume="${AI_SDLC_HLD_RESUME:-0}"
+commit_checkpoints="${AI_SDLC_HLD_COMMIT_CHECKPOINTS:-0}"
+checkpoint_branch="${AI_SDLC_HLD_BRANCH:-}"
 # A human-review batch is an explicit input to a revision.  Keep the internal
 # name generic so AI reviewer feedback can become the next revision input too.
 feedback_file="${AI_SDLC_HLD_REVISION_FEEDBACK_FILE:-${AI_SDLC_HLD_FEEDBACK_FILE:-}}"
@@ -88,6 +90,7 @@ loop_finished=0
 write_checkpoint() {
   status="$1"
   iteration="$2"
+  mkdir -p "$(dirname "$checkpoint_file")"
   cat > "$checkpoint_file" <<EOF
 hld_loop:
   status: $status
@@ -105,10 +108,25 @@ hld_loop:
   human_architecture_approval_required: true
 EOF
 }
+checkpoint_commit() {
+  checkpoint_phase="$1"
+  [ "$commit_checkpoints" = "1" ] || return 0
+  git config user.name "${AI_SDLC_GIT_USER_NAME:-github-actions[bot]}"
+  git config user.email "${AI_SDLC_GIT_USER_EMAIL:-41898282+github-actions[bot]@users.noreply.github.com}"
+  git add "$target/hld" "$target/evidence" "$target/feedback"
+  if git diff --cached --quiet; then
+    return 0
+  fi
+  git commit -m "chore(hld): checkpoint iteration-${iteration:-$start_iteration}-$checkpoint_phase"
+  if [ -n "$checkpoint_branch" ]; then
+    git push origin "HEAD:$checkpoint_branch"
+  fi
+}
 on_exit() {
   result=$?
   if [ "$loop_finished" -eq 0 ]; then
     write_checkpoint "interrupted_or_failed" "${iteration:-$start_iteration}"
+    checkpoint_commit "failure"
   fi
   exit "$result"
 }
@@ -229,6 +247,7 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
   echo "[AI-SDLC] Validating generated HLD structure and Mermaid diagrams before AI review..."
   python3 "$root/tooling/validate_hld_artifacts.py" "$target"
   python3 "$root/tooling/run_lifecycle_hooks.py" after_hld "$target"
+  checkpoint_commit "generator"
   reuse_existing_hld=0
 
   if [ "$iteration" -gt 1 ] && [ "$before_hld_hash" = "$after_hld_hash" ]; then
@@ -246,6 +265,7 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
     exit 30
   }
   python3 "$root/tooling/validate_ai_review.py" "$review_file"
+  checkpoint_commit "reviewer"
 
   feedback_hash="$(sed -e '/^reviewer:/d' -e '/^model:/d' -e '/^iteration:/d' "$review_file" | sha256 | awk '{print $1}')"
   if [ -n "$previous_feedback_hash" ] && [ "$feedback_hash" = "$previous_feedback_hash" ]; then
@@ -277,6 +297,7 @@ hld_loop:
   prompt_set: "hld-prompts-v1"
   human_architecture_approval_required: true
 EOF
+      checkpoint_commit "complete"
       loop_finished=1
       echo "AI review completed after $iteration iteration(s)."
       echo "Next gate: human Solution Architect review and approval."

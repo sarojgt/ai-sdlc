@@ -75,7 +75,8 @@ from starting early.
       proportional detail guidance, and per-call timeouts; automatic selection
       is the default.
 - [x] HLD loop checkpoints and explicit resume support added for interrupted
-      or timed-out runs.
+      or timed-out runs, with GitHub checkpoint commits pushed after each
+      generation/review phase.
 - [x] HLD request and run metadata consolidated into one `hld-run.yaml` file.
 - [x] Deterministic before/after HLD lifecycle hooks record execution evidence.
 - [x] AI progress messages added during long-running generation and review.
