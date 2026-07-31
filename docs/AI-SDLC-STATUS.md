@@ -64,6 +64,8 @@ from starting early.
 - [x] Human-readable Markdown as the primary artifact format.
 - [x] YAML metadata and evidence model established.
 - [x] DAS metadata and schema foundation added.
+- [x] DAS GitHub validation is impact-aware: changed initiatives are checked
+      selectively and framework-wide checks run only for framework changes.
 - [x] Shared context separated into consistent context and guardrails.
 - [x] Initiative-relative context separated from the requirement.
 - [x] Initiative bootstrap templates created.
