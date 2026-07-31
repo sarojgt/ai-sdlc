@@ -6,7 +6,10 @@ on:
       - "ai-sdlc/initiatives/**"
       - "ai-sdlc/config/**"
       - "ai-sdlc/schemas/**"
-      - ".github/**"
+      - "ai-sdlc/tooling/**"
+      - "ai-sdlc/prompts/**"
+      - "ai-sdlc/templates/**"
+      - ".github/workflows/**"
   workflow_dispatch:
 
 permissions:
@@ -20,21 +23,116 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Determine validation scope
+        id: scope
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            git diff --name-only "$BASE_SHA...$HEAD_SHA" > "$RUNNER_TEMP/das-changed-files.txt"
+          else
+            git ls-files > "$RUNNER_TEMP/das-changed-files.txt"
+          fi
+
+          changed="$(cat "$RUNNER_TEMP/das-changed-files.txt")"
+          workflow_changed=false
+          tooling_changed=false
+          framework_changed=false
+          initiative_changed=false
+
+          grep -qE '^\.github/workflows/' "$RUNNER_TEMP/das-changed-files.txt" && workflow_changed=true || true
+          grep -qE '^ai-sdlc/tooling/' "$RUNNER_TEMP/das-changed-files.txt" && tooling_changed=true || true
+          grep -qE '^ai-sdlc/(config|schemas|prompts|templates)/' "$RUNNER_TEMP/das-changed-files.txt" && framework_changed=true || true
+          grep -qE '^ai-sdlc/initiatives/[^/]+/' "$RUNNER_TEMP/das-changed-files.txt" && initiative_changed=true || true
+
+          if [ "$EVENT_NAME" != "pull_request" ] || [ "$framework_changed" = true ]; then
+            validation_scope=all
+          elif [ "$initiative_changed" = true ]; then
+            validation_scope=initiatives
+          elif [ "$tooling_changed" = true ] || [ "$workflow_changed" = true ]; then
+            validation_scope=framework
+          else
+            validation_scope=none
+          fi
+
+          initiatives="$(sed -n 's#^ai-sdlc/initiatives/\([^/]\+\)/.*#\1#p' "$RUNNER_TEMP/das-changed-files.txt" | sort -u)"
+          echo "Validation scope: $validation_scope"
+          printf '%s\n' "$changed"
+          {
+            echo "validation_scope=$validation_scope"
+            echo "workflow_changed=$workflow_changed"
+            echo "tooling_changed=$tooling_changed"
+            echo "initiative_changed=$initiative_changed"
+            echo 'initiatives<<EOF'
+            printf '%s\n' "$initiatives"
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Lint GitHub Actions workflows
+        if: steps.scope.outputs.workflow_changed == 'true'
+        uses: raven-actions/actionlint@v2
+        with:
+          # GitHub supports copilot-requests for Copilot CLI inference, but
+          # actionlint's embedded permission schema may lag that platform scope.
+          flags: '-ignore "unknown permission scope.*copilot-requests"'
+
+      - name: Validate shell syntax
+        if: steps.scope.outputs.tooling_changed == 'true'
+        run: bash -n ai-sdlc/tooling/*.sh ai-sdlc/tooling/providers/*.sh
 
       - name: Validate repository structure
+        if: steps.scope.outputs.validation_scope == 'all' || steps.scope.outputs.validation_scope == 'initiatives'
         run: |
-          for initiative in ai-sdlc/initiatives/*; do
-            test -d "$initiative" || continue
-            bash ai-sdlc/tooling/validate_structure.sh "$initiative"
+          set -euo pipefail
+          if [ "${{ steps.scope.outputs.validation_scope }}" = "all" ]; then
+            for initiative in ai-sdlc/initiatives/*; do
+              test -d "$initiative" || continue
+              bash ai-sdlc/tooling/validate_structure.sh "$initiative"
+            done
+          else
+            while IFS= read -r initiative_id; do
+              test -n "$initiative_id" || continue
+              bash ai-sdlc/tooling/validate_structure.sh "ai-sdlc/initiatives/$initiative_id"
+            done <<'EOF'
+          ${{ steps.scope.outputs.initiatives }}
+          EOF
+          fi
+
+      - name: Run lifecycle tool regression tests
+        if: steps.scope.outputs.tooling_changed == 'true' || steps.scope.outputs.validation_scope == 'all'
+        run: |
+          python3 -m compileall -q ai-sdlc/tooling
+          python3 -m unittest discover -s ai-sdlc/tooling/tests -p 'test_*.py'
+
+      - name: Verify approved HLD evidence
+        if: steps.scope.outputs.validation_scope == 'all' || steps.scope.outputs.validation_scope == 'initiatives'
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.scope.outputs.validation_scope }}" = "all" ]; then
+            initiatives="$(find ai-sdlc/initiatives -mindepth 1 -maxdepth 1 -type d -print | sort)"
+          else
+            initiatives=""
+            while IFS= read -r initiative_id; do
+              test -n "$initiative_id" || continue
+              initiatives="$initiatives ai-sdlc/initiatives/$initiative_id"
+            done <<'EOF'
+          ${{ steps.scope.outputs.initiatives }}
+          EOF
+          fi
+          for initiative in $initiatives; do
+            hld="$initiative/hld/hld.md"
+            test -f "$hld" || continue
+            if awk '/^---$/{seen++; next} seen == 1 && /^[[:space:]]*status:[[:space:]]*approved[[:space:]]*$/ {found=1} END {exit !found}' "$hld"; then
+              python3 ai-sdlc/tooling/approval_gate.py hld "$initiative"
+            fi
           done
 
-      - name: Validate initiative metadata
-        run: |
-          echo "DAS validator executed over repository initiatives"
-
-      - name: Architecture gate
-        run: |
-          echo "Architecture gate placeholder: add human approval and content-hash checks here"
-
       - name: Publish gate summary
-        run: echo "DAS gate executed"
+        run: |
+          echo "DAS gate completed with validation scope: ${{ steps.scope.outputs.validation_scope }}."

@@ -33,6 +33,13 @@ Business input
 The HLD approval gate must prevent LLD, implementation, merge, and deployment
 from starting early.
 
+## Current documentation entry point
+
+- [x] Concise current operating guide added at
+      `docs/AI-SDLC-OPERATING-GUIDE.md`; older research, adoption, and design
+      documents are reference material and must not override the implemented
+      workflow described there.
+
 ## Prerequisites
 
 - [x] Git repository and shell-based command interface.
@@ -52,9 +59,13 @@ from starting early.
 - [x] Vendor-neutral provider adapter concept established.
 - [x] Codex provider adapter implemented with configurable model selection.
 - [x] Provider-neutral adapter boundary documented for future providers.
+- [x] HLD assessment, generation, and review prompts externalized as versioned
+      repository Markdown instead of inline shell strings.
 - [x] Human-readable Markdown as the primary artifact format.
 - [x] YAML metadata and evidence model established.
 - [x] DAS metadata and schema foundation added.
+- [x] DAS GitHub validation is impact-aware: changed initiatives are checked
+      selectively and framework-wide checks run only for framework changes.
 - [x] Shared context separated into consistent context and guardrails.
 - [x] Initiative-relative context separated from the requirement.
 - [x] Initiative bootstrap templates created.
@@ -66,8 +77,10 @@ from starting early.
       proportional detail guidance, and per-call timeouts; automatic selection
       is the default.
 - [x] HLD loop checkpoints and explicit resume support added for interrupted
-      or timed-out runs.
+      or timed-out runs, with GitHub checkpoint commits pushed after each
+      generation/review phase and requirement/context hash checks on resume.
 - [x] HLD request and run metadata consolidated into one `hld-run.yaml` file.
+- [x] Deterministic before/after HLD lifecycle hooks record execution evidence.
 - [x] AI progress messages added during long-running generation and review.
 - [x] HLD impact assessment added for size, complexity/risk, services,
       repositories, integrations, data, security, deployment, and governance.
@@ -80,6 +93,9 @@ from starting early.
       and approved patterns.
 - [x] HLD alternatives are limited to meaningful trade-offs or constraints.
 - [x] Mermaid diagrams embedded in the primary HLD document.
+- [x] HLD structure, evidence consistency, duplication, and structural Mermaid
+      validation checks added before an HLD PR is published; browser rendering
+      is optional in CI because hosted-runner Chromium sandbox policies vary.
 - [x] Canonical HLD path standardized as `initiatives/<ID>/hld/hld.md`.
 - [x] Older demo initiatives archived under `ai-sdlc/examples/archive/`.
 - [x] Incidental `.DS_Store` and graph workspace artifacts removed/ignored.
@@ -98,6 +114,8 @@ from starting early.
 - [x] Scoped semantic versions added for initiatives, HLDs, LLDs, and context.
 - [x] HLD design baseline records exact parent versions and context hashes.
 - [x] Human-readable version matrix command and GitHub summary added.
+- [x] Semantic GitHub Release notes include the reachable context package
+      versions and source commits.
 - [x] GitHub workflow actions upgraded for the Node 24 runner transition.
 - [x] Initiative processing restricted to merged pull requests.
 - [x] HLD and initiative bootstrap scripts work with BSD and GNU `sed`.
@@ -138,8 +156,16 @@ from starting early.
 - [x] Architecture guardrails stored in the repository.
 - [x] Relative context manifest created per initiative.
 - [x] Context gaps recorded with owner and retrieval action.
-- [ ] Build automated relevance selection for large context sets.
-- [ ] Add context freshness and source-hash validation.
+- [x] Build deterministic repository context-pack assembly from the source
+      registry, requirement keywords, and explicit relative context.
+- [x] Record selected context source hashes and declared freshness in each
+      assembled context manifest.
+- [x] Version context packages with scoped semantic tags and record resolved
+      package tags/commits in each generated HLD design baseline.
+- [x] Provide a guarded, one-time `v1.0.0` bootstrap workflow for existing
+      context packages on `main`.
+- [x] Provide manual, evidence-only context drift evaluation; it never
+      regenerates an HLD automatically.
 - [ ] Add repository/API/schema/ADR discovery adapters.
 - [ ] Add secure context filtering for sensitive content.
 - [ ] Add Confluence synchronization as a future source connector.
@@ -154,9 +180,9 @@ from starting early.
 - [x] HLD approval synchronized from the current-head Solution Architect / ARB
       GitHub review.
 - [~] Security, senior engineering, and release gates defined conceptually.
-- [~] Enforce CODEOWNERS and protected-branch rules in GitHub; repository
-      CODEOWNERS paths are configured, but enterprise team names and branch
-      rules still require repository administration.
+- [~] Enforce CODEOWNERS and protected-branch rules in GitHub; reviewer
+      allowlists are validated in workflows, while enterprise team names and
+      branch rules still require repository administration.
 - [ ] Add required approval checks to HLD and LLD pull requests.
 - [ ] Add architecture review checklists.
 - [x] Add approval invalidation when requirements or context change.
@@ -181,10 +207,15 @@ from starting early.
       retained for recovery.
 - [x] Add Copilot cloud-agent setup instructions and repository working agreement.
 - [x] Add draft HLD PR creation.
-- [~] Add AI review comments to the HLD PR.
-- [~] Add human feedback webhook/command reruns; command and checkpoint resume
-      are available, and guarded inline HLD review-comment reruns are now
-      implemented.
+- [x] AI HLD review output uses a validated decision contract with findings,
+      required actions, and validation evidence.
+- [x] HLD resume publishing preserves existing branch commits without a
+      force-push.
+- [x] Human feedback reruns are available locally and on GitHub: one submitted
+      architect `Request changes` review becomes one immutable feedback batch
+      and one bounded revision. Individual inline comments do not invoke AI.
+- [ ] Enforce organisation-specific Solution Architect / ARB membership for
+      GitHub feedback and approval gates (CODEOWNERS/branch protection).
 - [ ] Add Jira issue and status synchronization.
 - [ ] Add Confluence publication or synchronization.
 - [ ] Add cross-repository work-plan orchestration.

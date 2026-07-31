@@ -1,6 +1,6 @@
 agent_providers:
   codex:
-    adapter_command: "ai-sdlc-agent-codex"
+    adapter_command: "ai-sdlc/tooling/providers/codex.sh"
     default_model: "gpt-5.6-luna"
     model_selection: per_run
     models:
@@ -8,20 +8,12 @@ agent_providers:
       - "gpt-5.6-terra"
       - "gpt-5.6-sol"
       - "gpt-5.3-codex"
-    capabilities: [requirements, hld, lld, implementation, review]
-    execution: local_cli
-    approval_authority: none
-  claude:
-    adapter_command: "ai-sdlc-agent-claude"
-    default_model: "provider-default"
-    model_selection: per_run
-    models: []
-    capabilities: [requirements, hld, lld, implementation, review]
+    capabilities: [hld, review]
     execution: local_cli
     approval_authority: none
   github-copilot:
     adapter_command: "ai-sdlc/tooling/providers/github-copilot.sh"
-    default_model: "claude-haiku-4.5"
+    default_model: "gpt-5.6-luna"
     model_selection: per_run
     models:
       - "auto"
@@ -45,22 +37,16 @@ agent_providers:
       - "raptor-mini"
       - "kimi-k2.7-code"
       - "grok-4.5"
-    capabilities: [requirements, hld, lld, implementation, review]
+    capabilities: [hld, review]
     execution: github_actions_cli
     approval_authority: none
-  custom:
-    adapter_command: "ai-sdlc-agent-custom"
-    default_model: "provider-default"
-    model_selection: per_run
-    models: []
-    capabilities: [requirements, hld, lld, implementation, review]
-    execution: managed_adapter
-    approval_authority: none
+
+planned_provider_adapters: [claude, gemini, qwen, local, custom]
 
 contract:
   input: "hld-run.yaml"
   output: "agent-response.yaml"
-  artifacts_directory: "generated/"
+  artifacts_directory: "hld/"
   required_metadata:
     - initiative_id
     - task_type

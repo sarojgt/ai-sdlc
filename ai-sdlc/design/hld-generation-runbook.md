@@ -6,13 +6,18 @@ Generate a reviewable HLD proposal from an approved requirement while keeping ar
 
 The AI does not directly “decide the HLD.” It produces an HLD proposal, opens a design PR, and waits for the Solution Architect.
 
-## How a user starts the run
+## Target-state trigger options
+
+The following section preserves the future integration design. It is not the
+current trigger contract; use the operating guide for the implemented GitHub
+workflow.
 
 The framework should support three equivalent triggers:
 
 ### Option 1 — GitHub label
 
-Add the label `ai-sdlc:generate-hld` to the initiative issue.
+In a future issue-driven integration, an intake system could add a label such
+as `ai-sdlc:generate-hld` to an approved issue.
 
 ### Option 2 — GitHub Actions manual dispatch
 

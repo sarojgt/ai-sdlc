@@ -37,7 +37,6 @@ jobs:
           REQUESTED_INITIATIVE: ${{ inputs.initiative_id }}
           GENERATOR_MODEL: claude-haiku-4.5
           REVIEWER_MODEL: gemini-3.5-flash
-          HLD_PROFILE: auto
           AGENT_TIMEOUT_MINUTES: 15
         run: |
           set -euo pipefail
@@ -63,10 +62,7 @@ jobs:
                 --jq 'length')"
               [ "$merged_scaffold" -gt 0 ] || continue
 
-              grep -q 'status: approved' "$directory/requirement.md" || continue
-              [ -f "$directory/approvals.yaml" ] || continue
-              grep -A 4 'gate: requirements' "$directory/approvals.yaml" | \
-                grep -q 'decision: approved' || continue
+              python3 ai-sdlc/tooling/approval_gate.py requirements "$directory" >/dev/null 2>&1 || continue
               [ -f "$directory/evidence/hld-loop.yaml" ] && continue
 
               candidates+=("$initiative_id")
@@ -81,19 +77,10 @@ jobs:
           for initiative_id in "${candidates[@]}"; do
             target="ai-sdlc/initiatives/$initiative_id"
             test -d "$target" || { echo "Unknown initiative: $initiative_id" >&2; exit 1; }
-            grep -q 'status: approved' "$target/requirement.md" || {
-              echo "$initiative_id: requirements are not approved; skipping."
+            if ! python3 ai-sdlc/tooling/approval_gate.py requirements "$target"; then
+              echo "$initiative_id: requirements gate has not passed; skipping."
               continue
-            }
-            test -f "$target/approvals.yaml" || {
-              echo "$initiative_id: approval metadata is not available; skipping."
-              continue
-            }
-            grep -A 4 'gate: requirements' "$target/approvals.yaml" | \
-              grep -q 'decision: approved' || {
-              echo "$initiative_id: human requirements approval is not recorded; skipping."
-              continue
-            }
+            fi
             if [ -f "$target/evidence/hld-loop.yaml" ]; then
               echo "$initiative_id: HLD loop evidence already exists; skipping."
               continue
@@ -106,6 +93,5 @@ jobs:
               --field "initiative_id=$initiative_id" \
               --field "generator_model=$GENERATOR_MODEL" \
               --field "reviewer_model=$REVIEWER_MODEL" \
-              --field "hld_profile=$HLD_PROFILE" \
               --field "agent_timeout_minutes=$AGENT_TIMEOUT_MINUTES"
           done
