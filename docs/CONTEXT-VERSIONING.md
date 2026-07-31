@@ -25,3 +25,7 @@ first context release. Bootstrap initial package tags on `main` once through
 **Actions → Bootstrap Context Versions → Run workflow** and enter
 `bootstrap-context-v1`. It creates lightweight `v1.0.0` Git tags only and
 refuses to replace an existing package tag.
+
+Every semantic GitHub Release also prepends a **Context versions** table to
+its release notes. The table records the latest reachable tag and source
+commit for each context package at the release commit.
