@@ -18,12 +18,17 @@ gates:
     next_state: lld_draft
     automated_checks:
       - das_schema_valid
-      - multiple_options_present
-      - tradeoff_scorecard_present
-      - risks_present
-      - rollback_present
+      - hld_core_present
+      - context_gap_register_present
+      - risk_register_present
       - requirements_coverage_complete
       - no_blocking_comments
+    conditional_checks:
+      - multiple_options_when_material_tradeoff_exists
+      - tradeoff_analysis_when_options_are_present
+      - diagrams_when_a_visual_explains_the_decision
+      - rollout_or_rollback_when_delivery_or_migration_is_affected
+      - adrs_when_a_decision_requires_a_separate_record
     invalidates_on_change: [lld, implementation_plan, stories]
   lld:
     required_role: senior_engineer

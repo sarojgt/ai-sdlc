@@ -12,6 +12,12 @@ from pathlib import Path
 from shutil import which
 
 VALID_PROFILES = {"small", "medium", "large"}
+CORE_HEADING_ALTERNATIVES = {
+    "assessment": ("change assessment", "impact assessment"),
+    "problem or motivation": ("motivation", "problem", "outcome"),
+    "solution or recommendation": ("solution overview", "recommendation"),
+    "traceability": ("traceability",),
+}
 
 
 def field(text: str, name: str) -> str | None:
@@ -21,6 +27,22 @@ def field(text: str, name: str) -> str | None:
 
 def mermaid_blocks(text: str) -> list[str]:
     return re.findall(r"```mermaid\s*\n(.*?)```", text, re.I | re.S)
+
+
+def visible_headings(text: str) -> list[str]:
+    without_comments = re.sub(r"<!--.*?-->", "", text, flags=re.S)
+    return re.findall(r"^##\s+(.+)$", without_comments, re.M)
+
+
+def validate_core_headings(headings: list[str]) -> None:
+    normalized = [heading.strip().lower() for heading in headings]
+    missing = [
+        label
+        for label, alternatives in CORE_HEADING_ALTERNATIVES.items()
+        if not any(any(option in heading for option in alternatives) for heading in normalized)
+    ]
+    if missing:
+        raise ValueError(f"HLD is missing mandatory core sections: {', '.join(missing)}")
 
 
 def validate_mermaid(blocks: list[str]) -> None:
@@ -81,7 +103,12 @@ def main() -> int:
             print(f"HLD loop profile mismatch: loop={loop_profile}, HLD={profile}", file=sys.stderr)
             return 1
 
-    headings = re.findall(r"^##\s+(.+)$", hld_text, re.M)
+    headings = visible_headings(hld_text)
+    try:
+        validate_core_headings(headings)
+    except ValueError as error:
+        print(str(error), file=sys.stderr)
+        return 1
     duplicates = sorted({heading for heading in headings if headings.count(heading) > 1})
     if duplicates:
         print(f"Duplicate HLD section headings: {', '.join(duplicates)}", file=sys.stderr)

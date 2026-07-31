@@ -40,7 +40,8 @@ Embed useful Mermaid diagrams directly in the relevant Context, Logical,
 Information/Data, Process/Interaction, or Physical/Deployment view. Use fenced mermaid
 blocks, quoted labels when punctuation is present, and portable Mermaid syntax.
 Do not use HTML tags such as <br/>. Each diagram must have a clear purpose and
-must render independently. Do not create separate diagram files as the primary
+must render independently. Remove unused template guidance and placeholder
+rows from the final HLD. Do not create separate diagram files as the primary
 review artifact. Preserve the exact design-baseline reference.
 
 Modify only HLD artifacts and generated evidence. Do not approve architecture,
