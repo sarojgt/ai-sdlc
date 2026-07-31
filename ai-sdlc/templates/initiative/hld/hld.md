@@ -66,27 +66,7 @@ State the business problem, intended outcome, and measurable success signal.
 
 Summarize the recommended solution in one short paragraph.
 
-## 5. High-level business requirements
-
-List the requirements this design satisfies and link the approved requirement
-or business epic where available.
-
-## 6. Architecture principles applied
-
-| Principle or approved pattern | Application to this design | Context evidence |
-|---|---|---|
-| | | |
-
-## 7. Non-functional requirements
-
-Cover only relevant performance, availability, security, scalability, cost,
-operability, and compliance constraints. Do not invent target values.
-
-## 8. Assumptions and scope boundaries
-
-State confirmed assumptions and what is explicitly out of scope.
-
-## 9. Context gaps
+## 5. Context gaps
 
 Keep one canonical context-gap register in this section. Other sections must
 reference gap IDs only. Separate confirmed facts from proposed changes and do
@@ -96,47 +76,66 @@ not fill gaps with guesses.
 |---|---|---|---|---|
 | GAP-001 | | | | |
 
-## 10. Risks
+## 6. Risks
 
 | Risk ID | Risk | Impact | Mitigation or owner |
 |---|---|---|---|
 | RISK-001 | | | |
 
-## 11. Solution design
+## 7. Solution design
+
+Add only the relevant SDD views below. Use subsections freely, and omit views
+that do not affect the decision. Keep diagrams beside the view they explain.
+
+<!-- Optional SDD sections to add when material:
+
+## High-level business requirements
+Link the requirements, epic, or business case satisfied by this design.
+
+## Architecture principles applied
+Reference only the approved principles and patterns that constrain this design.
+
+## Non-functional requirements
+Cover relevant performance, availability, security, scalability, cost,
+operability, and compliance constraints without inventing target values.
+
+## Assumptions and scope boundaries
+Record confirmed assumptions and explicit exclusions.
 
 ### Context view
-
-Use a C4 Level 1 diagram showing actors, system boundaries, and major external
-interactions.
+C4 Level 1: actors, system boundary, and major external interactions.
 
 ### Logical view
-
-Use a C4 Level 2/container view, showing only the affected or relevant
-existing components.
+C4 Level 2/container view of affected or relevant existing components.
 
 ### Information and data view
-
-Include an ERD or data-flow diagram only when data ownership, storage, or
-movement is material to the decision.
+ERD or data flow only when data ownership, storage, or movement is material.
 
 ### Process and interaction view
-
-Include a sequence or activity diagram for material runtime behavior,
-including asynchronous, retry, concurrency, or failure paths where relevant.
+Sequence or activity view for material runtime, asynchronous, retry, or
+failure behavior.
 
 ### Physical and deployment view
+Relevant workload zone, regional deployment, platform boundary, and operations.
+Reference approved platform topology instead of duplicating it.
 
-Show the relevant workload zone, regional deployment, platform boundary, and
-operational dependencies. Reference the approved platform design instead of
-duplicating standard topology.
+## Security considerations
+Cover only initiative-specific trust, identity, data protection, PCI/CHD,
+audit, and security review needs.
 
-## 12. Options and trade-offs
+## Testing considerations
+Cover only design-specific functional, integration, performance, resilience,
+migration, security, or disaster-recovery testing needs.
 
-For a small change, show one recommended option and alternatives only when a
-material trade-off exists. Medium and large changes may include a short option
-comparison and link to supporting detail.
+## Operations and delivery
+Cover only changed monitoring, alerting, runbooks, rollout, rollback,
+migration, and operational ownership.
 
-## 13. Recommendation and decision points
+## Options and trade-offs
+Include alternatives only when they represent a material trade-off.
+-->
+
+## 8. Recommendation and decision points
 
 **Applicable standards and approved patterns:**
 
@@ -150,27 +149,11 @@ smallest compliant design.
 **Alternatives considered:** include only alternatives with a material trade-off,
 pattern mismatch, or meaningful constraint.
 
-## 14. Security considerations
-
-Describe authentication, authorization, trust boundaries, data protection,
-PCI/CHD implications, audit, and security review needs that are specific to
-this initiative.
-
-## 15. Testing considerations
-
-Describe only design-specific functional, integration, performance, resilience,
-migration, security, or disaster-recovery testing needs.
-
-## 16. Operations and delivery
-
-Cover monitoring, alerting, runbooks, deployment, rollout, rollback, migration,
-and operational ownership. Include only what changes or is material.
-
 <!-- Embed only useful, renderable Mermaid diagrams in the relevant design-view
      sections. Small changes normally need one context/flow diagram and at most
      one deployment or component view. -->
 
-## 17. Traceability and ADRs
+## 9. Traceability and ADRs
 
 Link the requirement, selected context, affected systems, related repositories,
 and follow-on LLD. Record only decisions that need an ADR; keep evidence in

@@ -7,8 +7,10 @@ AGENTS.md, evidence/design-baseline.yaml, and evidence/hld-assessment.yaml.
 
 Produce one human-readable HLD in hld/hld.md using the repository HLD template,
 which is adapted from the Paymentology Architecture Solution Design Document
-(SDD) template. Preserve the template's section order and headings. The HLD
-is a concise architecture decision document, not an LLD or implementation
+(SDD) template. Treat the template as an extensible section menu, not a fixed
+checklist. Keep the mandatory core, add SDD views only when material, create
+subsections when useful, and omit irrelevant or empty sections. The HLD is a
+concise architecture decision document, not an LLD or implementation
 specification.
 Include a compact **Context baseline** table using the selected package versions
 in evidence/design-baseline.yaml; do not invent a version when it is marked
@@ -24,6 +26,8 @@ Use exactly one canonical context-gap register under `Context gaps` and one
 canonical risk register under `Risks`. Other sections must reference gap or
 risk IDs instead of repeating their descriptions. Do not repeat the same
 recommendation in multiple sections.
+Always retain those two canonical registers; if no gaps or risks are found,
+state that explicitly rather than deleting the register headings.
 Clearly distinguish confirmed facts, proposed decisions, and context gaps. Do
 not invent components, APIs, repositories, tables, cloud services, endpoints,
 SLA values, retention rules, or integrations. Keep detailed API schemas, SQL,
