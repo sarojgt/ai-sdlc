@@ -23,6 +23,10 @@ jobs:
 
       - name: Lint GitHub Actions workflows
         uses: raven-actions/actionlint@v2
+        with:
+          # GitHub supports copilot-requests for Copilot CLI inference, but
+          # actionlint's embedded permission schema may lag that platform scope.
+          flags: '-ignore "unknown permission scope.*copilot-requests"'
 
       - name: Validate shell syntax
         run: bash -n ai-sdlc/tooling/*.sh ai-sdlc/tooling/providers/*.sh

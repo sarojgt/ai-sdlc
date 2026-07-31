@@ -7,7 +7,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  models: read
+  copilot-requests: write
 
 concurrency:
   group: hld-review-feedback-${{ github.event.pull_request.number }}-${{ github.event.review.id }}
