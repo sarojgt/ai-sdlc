@@ -76,7 +76,7 @@ from starting early.
       is the default.
 - [x] HLD loop checkpoints and explicit resume support added for interrupted
       or timed-out runs, with GitHub checkpoint commits pushed after each
-      generation/review phase.
+      generation/review phase and requirement/context hash checks on resume.
 - [x] HLD request and run metadata consolidated into one `hld-run.yaml` file.
 - [x] Deterministic before/after HLD lifecycle hooks record execution evidence.
 - [x] AI progress messages added during long-running generation and review.

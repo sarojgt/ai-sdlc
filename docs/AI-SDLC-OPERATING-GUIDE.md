@@ -129,6 +129,9 @@ connectors are future integrations and are not required by the current flow.
 
 - GitHub HLD runs push checkpoint commits after generation, review, and failure
   handling; a rerun with `resume` can continue from the latest pushed state.
+- Failed or interrupted checkpoints are automatically eligible for resume;
+  successful checkpoints remain skipped. Resume is refused if the requirement
+  or context manifest hash has changed.
 - The workflow restores repository tooling after the AI run so generated
   agents cannot delete lifecycle validators or workflow files.
 - HLD branches are updated with normal commits; the workflow does not force-push.
