@@ -59,11 +59,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          context_notes="$(python3 ai-sdlc/tooling/release_context_notes.py)"
           framework_tag="${{ steps.version.outputs.framework_tag }}"
           if [ -n "$framework_tag" ]; then
             gh release create "$framework_tag" \
               --target "${GITHUB_SHA}" \
               --title "$framework_tag" \
+              --notes "$context_notes" \
               --generate-notes
           fi
           while IFS= read -r artifact; do
@@ -72,6 +74,7 @@ jobs:
             gh release create "$tag" \
               --target "${GITHUB_SHA}" \
               --title "$tag" \
+              --notes "$context_notes" \
               --generate-notes
           done <<'EOF'
           ${{ steps.version.outputs.artifact_tags }}

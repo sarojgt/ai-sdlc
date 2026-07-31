@@ -13,6 +13,7 @@ from pathlib import Path
 TOOLING = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TOOLING))
 from context_versions import package_for  # noqa: E402
+from release_context_notes import main as render_context_notes  # noqa: E402
 
 
 class LifecycleToolTests(unittest.TestCase):
@@ -132,6 +133,9 @@ class LifecycleToolTests(unittest.TestCase):
         self.assertEqual(package_for("ai-sdlc/context/consistent/architecture/api-standards.md"), "architecture")
         self.assertEqual(package_for("ai-sdlc/context/guardrails/security/secure-logging.md"), "security")
         self.assertEqual(package_for("ai-sdlc/context/consistent/technology/tech-radar.md"), "technology")
+
+    def test_context_release_notes_renderer_is_available(self) -> None:
+        self.assertEqual(render_context_notes(), 0)
 
 
 if __name__ == "__main__":
