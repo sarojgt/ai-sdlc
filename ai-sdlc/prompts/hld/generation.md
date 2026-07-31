@@ -6,9 +6,8 @@ AGENTS.md, evidence/design-baseline.yaml, and evidence/hld-assessment.yaml.
 {{ revision_instructions }}
 
 Produce one human-readable HLD in hld/hld.md using the repository HLD template,
-which is adapted from the Paymentology Architecture Solution Design Document
-(SDD) template. Treat the template as an extensible section menu, not a fixed
-checklist. Keep the mandatory core, add SDD views only when material, create
+Treat the repository HLD template as an extensible section menu, not a fixed
+checklist. Keep its mandatory core, add design views only when material, create
 subsections when useful, and omit irrelevant or empty sections. The HLD is a
 concise architecture decision document, not an LLD or implementation
 specification.

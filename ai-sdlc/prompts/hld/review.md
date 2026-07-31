@@ -5,12 +5,15 @@ context and guardrails, initiative-relative context, and prior feedback.
 If `{{ feedback_file }}` is not `None`, verify that each feedback item is
 resolved, explicitly deferred to a human decision, or still requires action.
 
-Check the canonical HLD structure, assessment consistency, affected components,
-APIs, data, events, integrations, security, deployment, migration, operations,
-governance, standards, traceability, context gaps, risks, and the generated
-diagram validation evidence. The generation gate owns Mermaid syntax and
-rendering; review whether the diagrams are useful, accurate, and proportionate
-to the HLD instead of duplicating the syntax gate.
+Check the mandatory HLD core, assessment consistency, affected components, APIs,
+data, events, integrations, security, deployment, migration, operations,
+governance, standards, traceability, context gaps, risks, and generated diagram
+validation evidence. Treat the HLD template as extensible: optional sections
+and design views may be omitted when irrelevant, and useful subsections may be
+added when the context requires them. Do not reject an HLD for missing optional
+sections. The generation gate owns Mermaid syntax and rendering; review whether
+present diagrams are useful, accurate, and proportionate instead of duplicating
+the syntax gate.
 Reject unsupported claims, contradictions, duplicated content, unnecessary LLD
 detail, and diagrams that do not render. Judge conciseness proportionally; do
 not use a line-count threshold. Check that one canonical gap register and one

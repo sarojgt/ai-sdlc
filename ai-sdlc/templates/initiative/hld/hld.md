@@ -24,9 +24,8 @@ policy:
 
 # HLD: {{ initiative.title }}
 
-<!-- Adapted from the Paymentology Architecture SDD template. Keep the main
-     document concise and decision-oriented; move substantial detail to linked
-     supporting artifacts. -->
+<!-- Reusable HLD template. Keep the main document concise and decision-oriented;
+     move substantial detail to linked supporting artifacts. -->
 
 ## 1. Change assessment
 
@@ -84,10 +83,10 @@ not fill gaps with guesses.
 
 ## 7. Solution design
 
-Add only the relevant SDD views below. Use subsections freely, and omit views
+Add only the relevant design views below. Use subsections freely, and omit views
 that do not affect the decision. Keep diagrams beside the view they explain.
 
-<!-- Optional SDD sections to add when material:
+<!-- Optional sections to add when material:
 
 ## High-level business requirements
 Link the requirements, epic, or business case satisfied by this design.
