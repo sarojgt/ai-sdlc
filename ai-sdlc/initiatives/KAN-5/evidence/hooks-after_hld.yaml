@@ -1,0 +1,8 @@
+hooks:
+  phase: "after_hld"
+  completed_at: "2026-07-31T11:24:27.206561+00:00"
+  completed:
+    - validate_agent_response
+    - validate_das_artifacts
+    - calculate_content_hashes
+    - attach_run_evidence
