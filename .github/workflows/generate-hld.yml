@@ -16,7 +16,7 @@ on:
         description: "Generator model ID or auto. See ai-sdlc/config/copilot-model-catalog.md."
         required: false
         type: string
-        default: claude-haiku-4.5
+        default: gpt-5.6-luna
       reviewer_model:
         description: "Reviewer model ID; must differ from generator. See ai-sdlc/config/copilot-model-catalog.md."
         required: false
@@ -140,7 +140,7 @@ jobs:
 
       - name: Validate independent model selection
         env:
-          GENERATOR_MODEL: ${{ inputs.generator_model || 'claude-haiku-4.5' }}
+          GENERATOR_MODEL: ${{ inputs.generator_model || 'gpt-5.6-luna' }}
           REVIEWER_MODEL: ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}
         run: |
           set -euo pipefail
@@ -175,7 +175,7 @@ jobs:
 
       - name: Run bounded HLD generation and review loop
         env:
-          GENERATOR_MODEL: ${{ inputs.generator_model || 'claude-haiku-4.5' }}
+          GENERATOR_MODEL: ${{ inputs.generator_model || 'gpt-5.6-luna' }}
           REVIEWER_MODEL: ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}
           # The impact-assessment agent selects small, medium, or large.
           # A manual profile override would undermine proportional HLDs.
@@ -213,7 +213,7 @@ jobs:
           GH_TOKEN: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
           HLD_BRANCH: ${{ steps.prepare.outputs.name }}
           INITIATIVE_ID: ${{ needs.resolve.outputs.initiative_id }}
-          GENERATOR_MODEL: ${{ inputs.generator_model || 'claude-haiku-4.5' }}
+          GENERATOR_MODEL: ${{ inputs.generator_model || 'gpt-5.6-luna' }}
           REVIEWER_MODEL: ${{ inputs.reviewer_model || 'gemini-3.5-flash' }}
         run: |
           set -euo pipefail
