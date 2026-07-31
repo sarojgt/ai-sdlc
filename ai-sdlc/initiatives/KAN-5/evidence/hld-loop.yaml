@@ -7,6 +7,6 @@ hld_loop:
   generator_model: "gpt-5.6-luna"
   reviewer_provider: "github-copilot"
   reviewer_model: "claude-haiku-4.5"
-  feedback_file: "feedback/batches/review-4828076618.md"
+  feedback_file: "feedback/batches/review-4828168291.md"
   prompt_set: "hld-prompts-v1"
   human_architecture_approval_required: true

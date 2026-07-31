@@ -162,14 +162,14 @@ sequenceDiagram
     participant API as "Existing card-management API"
     participant State as "Authoritative card-state capability"
     participant Ops as "Existing audit and observability"
-    Actor->>Entry: "Temporary-block request"
-    Entry->>Auth: "Authenticate and resolve access context"
-    Auth-->>Entry: "Allow or deny"
-    Entry->>API: "Authorized request with correlation context"
-    API->>State: "Validate and apply temporary block"
-    State-->>Ops: "Safe audit and telemetry"
-    State-->>API: "Outcome"
-    API-->>Actor: "Existing success or error contract"
+    Actor->>Entry: Temporary-block request
+    Entry->>Auth: Authenticate and resolve access context
+    Auth-->>Entry: Allow or deny
+    Entry->>API: Authorized request with correlation context
+    API->>State: Validate and apply temporary block
+    State-->>Ops: Safe audit and telemetry
+    State-->>API: Outcome
+    API-->>Actor: Existing success or error contract
 ```
 
 ```mermaid
@@ -177,8 +177,8 @@ flowchart LR
     Due["Recorded expiry time"] --> Timer["Approved existing time-based capability"]
     Timer --> State["Authoritative card-state capability"]
     State --> Check{"Current state permits restoration?"}
-    Check -->|Yes| Restore["Remove temporary restriction"]
-    Check -->|No| Preserve["Preserve later valid state"]
+    Check -->|"Yes"| Restore["Remove temporary restriction"]
+    Check -->|"No"| Preserve["Preserve later valid state"]
     Restore --> Ops["Safe audit and telemetry"]
     Preserve --> Ops
 ```
