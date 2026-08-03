@@ -151,3 +151,7 @@ Mermaid parsing and browser rendering are optional authoring aids; neither is a
 readiness or merge gate. Never describe a diagram as rendered unless the
 renderer actually ran. Preserve every prior review artifact; never delete or
 overwrite an earlier AI or human review.
+
+For ordinary HLD comments that should start a revision, use the explicit
+`/ai-sdlc revise-hld` command after all feedback is ready. Do not trigger a
+revision for casual comments.

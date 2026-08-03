@@ -26,9 +26,13 @@ def main() -> int:
     if not isinstance(comments, list):
         raise SystemExit("Review comments must be a JSON list")
 
+    # Inline review comments are scoped to the HLD. PR-level comments have no
+    # path and are retained when explicitly submitted through the feedback
+    # command path.
     comments = [
         comment for comment in comments
-        if str(comment.get("path", "")).startswith(f"ai-sdlc/initiatives/{initiative.name}/hld/")
+        if not comment.get("path")
+        or str(comment.get("path", "")).startswith(f"ai-sdlc/initiatives/{initiative.name}/hld/")
     ]
     relative = args.output_file or f"feedback/batches/review-{args.review_id}.md"
     output = initiative / relative

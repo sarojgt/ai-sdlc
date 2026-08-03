@@ -99,6 +99,11 @@ AI_SDLC_HLD_RESUME=1 just ai-sdlc-hld <ID> codex <generator-model> codex <review
 just ai-sdlc-hld-feedback <ID> <provider> <model>
 ```
 
+For ordinary PR conversation or inline comments, add `/ai-sdlc revise-hld` to
+the comment when the full feedback batch is ready. The workflow then records
+that comment as immutable feedback and runs the same bounded revision loop.
+Casual comments do not trigger an AI run.
+
 Local adapters currently include Codex and GitHub Copilot. Other providers
 must implement the shared adapter contract; examples using Claude, Gemini, or
 Qwen are future adapter examples unless the provider exists in

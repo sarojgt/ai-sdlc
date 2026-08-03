@@ -72,6 +72,28 @@ class LifecycleToolTests(unittest.TestCase):
             self.assertIn("Please address", batch.read_text(encoding="utf-8"))
             self.assertIn("Clarify pagination", batch.read_text(encoding="utf-8"))
 
+    def test_feedback_batch_accepts_explicit_pull_request_comment(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            initiative = root / "TEST-INITIATIVE"
+            (initiative / "hld").mkdir(parents=True)
+            (initiative / "hld" / "hld.md").write_text("# HLD\n", encoding="utf-8")
+            body = root / "comment.md"
+            comments = root / "comments.json"
+            body.write_text("/ai-sdlc revise-hld Please clarify the migration risk.\n", encoding="utf-8")
+            comments.write_text(json.dumps([{
+                "body": body.read_text(encoding="utf-8"),
+                "html_url": "https://github.com/example/review",
+            }]), encoding="utf-8")
+            result = self.run_tool(
+                str(TOOLING / "create_feedback_batch.py"), str(initiative), "--review-id", "comment-7",
+                "--reviewer", "architect", "--review-commit", "abc", "--review-body-file", str(body),
+                "--comments-file", str(comments),
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            batch = initiative / "feedback" / "batches" / "review-comment-7.md"
+            self.assertIn("migration risk", batch.read_text(encoding="utf-8"))
+
     def test_hld_gate_requires_matching_approved_hld(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             initiative = self.initiative(Path(directory))
