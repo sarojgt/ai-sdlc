@@ -3,7 +3,7 @@ hld_loop:
   initiative: "KAN-5"
   profile: "medium"
   iteration: 1
-  phase: "generator"
+  phase: "reviewer"
   generator_provider: "github-copilot"
   generator_model: "gpt-5.6-luna"
   reviewer_provider: "github-copilot"
@@ -11,7 +11,7 @@ hld_loop:
   review_file: "feedback/reviews/ai-review-iteration-1.md"
   requirement_sha256: "1c60353c30497a80f2e618319d2fc5f666d4d69f3290dd9fc6af3f27834d6f0c"
   context_manifest_sha256: "6faf9c4d48a36ffe23f06bded5332c6776882ea3994205663062a3ee0645d1e0"
-  repository_commit: "19c1f92c1e349a16146eb222cff7ae292ace5a77"
+  repository_commit: "4278d85826d356019c6246639805ef02ff12ba05"
   feedback_file: ""
   prompt_set: "hld-prompts-v1"
   agent_timeout_seconds: 1800
