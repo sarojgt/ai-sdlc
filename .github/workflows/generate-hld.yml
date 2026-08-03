@@ -301,6 +301,11 @@ jobs:
               --title "feat(hld): generate HLD for $INITIATIVE_ID" \
               --body-file "$body_file" \
               --draft
+          fi
+
+          if gh pr view "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft' | grep -qx true; then
+            gh pr ready "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY"
+            echo "HLD PR is ready for human Solution Architect / ARB review."
           else
             echo "Updated existing HLD PR for $HLD_BRANCH without force-push."
           fi

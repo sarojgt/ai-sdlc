@@ -10,7 +10,13 @@ skills:
     input: [approved_requirement, consistent_context, relative_context, guardrails]
     output: hld
     human_owner: solution_architect
-    required_outputs: [multiple_options, tradeoffs, risks, diagrams, rollback, adrs]
+    required_outputs: [change_assessment, context_gap_register, risk_register, recommendation, traceability]
+    conditional_outputs:
+      - multiple_options_when_material_tradeoff_exists
+      - tradeoff_analysis_when_options_are_present
+      - diagrams_when_a_visual_explains_the_decision
+      - rollout_or_rollback_when_delivery_or_migration_is_affected
+      - adrs_when_a_decision_requires_a_separate_record
     prohibited_actions: [approve_architecture, generate_implementation_before_approval]
   - id: lld-generation
     entrypoint: "ai-sdlc-skill lld-generation"
