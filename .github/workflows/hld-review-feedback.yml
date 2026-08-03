@@ -132,6 +132,7 @@ jobs:
         run: python3 ai-sdlc/tooling/validate_hld_artifacts.py "ai-sdlc/initiatives/$INITIATIVE_ID"
 
       - name: Commit feedback-driven HLD update
+        id: publish
         env:
           INITIATIVE_ID: ${{ steps.scope.outputs.initiative_id }}
           HLD_BRANCH: ${{ github.event.pull_request.head.ref }}
@@ -144,10 +145,58 @@ jobs:
             "ai-sdlc/initiatives/$INITIATIVE_ID/evidence"
           if git diff --cached --quiet; then
             echo "No HLD changes were produced."
+            echo "updated=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git commit -m "fix(hld): address architect review feedback"
           git push origin "$HLD_BRANCH"
+          echo "updated=true" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve processed review threads
+        if: steps.publish.outputs.updated == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REVIEW_ID: ${{ github.event.review.id }}
+        run: |
+          set -euo pipefail
+          owner="${GITHUB_REPOSITORY%%/*}"
+          repo="${GITHUB_REPOSITORY##*/}"
+          review_threads="$(gh api graphql \
+            -F owner="$owner" \
+            -F repo="$repo" \
+            -F number="$PR_NUMBER" \
+            -f query='query($owner:String!, $repo:String!, $number:Int!) {
+              repository(owner:$owner, name:$repo) {
+                pullRequest(number:$number) {
+                  reviewThreads(first:100) {
+                    nodes {
+                      id
+                      isResolved
+                      comments(first:100) {
+                        nodes { pullRequestReview { databaseId } }
+                      }
+                    }
+                  }
+                }
+              }
+            }' \
+            --jq '.data.repository.pullRequest.reviewThreads.nodes[] |
+              select(.isResolved == false) |
+              select([.comments.nodes[].pullRequestReview.databaseId | tostring] | index(env.REVIEW_ID)) |
+              .id')"
+
+          while IFS= read -r thread_id; do
+            test -n "$thread_id" || continue
+            gh api graphql \
+              -f query='mutation($threadId:ID!) {
+                resolveReviewThread(input:{threadId:$threadId}) {
+                  thread { isResolved }
+                }
+              }' \
+              -f threadId="$thread_id" >/dev/null
+          done <<< "$review_threads"
 
       - name: Report successful feedback batch
         env:

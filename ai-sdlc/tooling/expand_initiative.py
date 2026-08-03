@@ -39,23 +39,26 @@ guardrails before invoking an agent.
 Create this content only after the requirement is approved and the relevant
 context has been assembled.
 
-Expected proposal content:
+The HLD uses a reusable core plus optional design sections. Add only content
+that is material to the initiative; create subsections or linked supporting
+documents when more detail is needed.
+
+Core content:
 
 - Solution concept
-- Constraints and guardrails
-- Non-functional requirements
-- Multiple architecture options
-- Trade-off analysis
 - Recommended option
-- Delivery plan
-- Cloud or deployment view
-- Mermaid context, C4 Level 1, C4 Level 2, deployment, and sequence diagrams
-  where applicable; include an ERD when meaningful data ownership or
-  persistence is part of the HLD
 - Risks and mitigations
-- Migration and rollback
-- Proposed ADRs
-- Open questions
+
+Optional content when relevant:
+
+- Business requirements and architecture principles
+- Non-functional requirements
+- Options and trade-offs
+- Security, data, logical, process, deployment, testing, and operations views
+- Rollout, migration, rollback, ADRs, and open questions
+
+Use Mermaid diagrams only when they clarify a material decision; include an
+ERD when data ownership or persistence is part of the HLD.
 
 Architecture approval is recorded only after human Solution Architect or ARB
 review. An HLD approval unlocks engineering design; the AI cannot grant it.

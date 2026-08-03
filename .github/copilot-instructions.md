@@ -141,3 +141,8 @@ branches such as `feat/initiative-card-search`, `feat/hld-card-search`,
 Before handing off work, report changed files, checks run, unresolved context
 gaps, and the next required human gate. A successful AI review is not a human
 approval.
+
+For Mermaid diagrams, also follow
+`.github/instructions/mermaid-diagrams.instructions.md`. It defines portable
+Markdown authoring rules and distinguishes CLI validation from optional VS Code
+preview commands.
