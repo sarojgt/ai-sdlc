@@ -295,7 +295,7 @@ jobs:
           if [ "$loop_status" = "ai_review_passed" ] && [ "$latest_decision" != "changes_requested" ]; then
             gate_message='AI review passed. Human Solution Architect / ARB approval is still required; AI has not approved architecture.'
           elif [ "$loop_status" = "discovery_required" ]; then
-            gate_message='The AI review identified unresolved foundational context gaps. This HLD remains a discovery-gated draft and is not implementation-ready.'
+            gate_message='The AI review identified unresolved foundational context gaps. This HLD is ready for discovery review but is not implementation-ready.'
           else
             gate_message="The HLD loop is blocked with status \`$loop_status\`; review the latest evidence before human architecture review."
           fi
@@ -318,18 +318,13 @@ jobs:
               --base main \
               --head "$HLD_BRANCH" \
               --title "feat(hld): generate HLD for $INITIATIVE_ID" \
-              --body-file "$body_file" \
-              --draft
+              --body-file "$body_file"
           fi
 
-          if [ "$loop_status" = "ai_review_passed" ] && [ "$latest_decision" != "changes_requested" ]; then
-            if gh pr view "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft' | grep -qx true; then
-              gh pr ready "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY"
-              echo "HLD PR is ready for human Solution Architect / ARB review."
-            fi
-          else
-            echo "HLD PR remains draft: loop_status=$loop_status latest_decision=$latest_decision"
+          if gh pr view "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft' | grep -qx true; then
+            gh pr ready "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY"
           fi
+          echo "HLD PR is ready for human review: loop_status=$loop_status latest_decision=$latest_decision"
 
       - name: Publish HLD workflow summary
         if: always()
