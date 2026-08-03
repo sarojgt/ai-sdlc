@@ -1,0 +1,14 @@
+change_size: "medium"
+complexity: "high"
+recommended_profile: "medium"
+rationale: "The bounded change extends an existing card-management API and must reuse established platform capabilities, but it changes card usability and requires reliable timed restoration, tenant and regional authorization, confidential-data handling, auditability, observability, and defined failure and rollback behavior. The requirement identifies no new service or infrastructure, so large is not evidenced."
+affected_services: 2
+affected_repositories: 0
+integration_points: 7
+context_gaps:
+  - "CONTEXT GAP: The context manifest has no selected items or content hash, and no initiative-relative context is present. Owner: initiative and architecture owners. Action: assemble the applicable context pack and record selected context before LLD decisions."
+  - "CONTEXT GAP: The owning card-management and card-state services, their repositories, API route/version, state model, and existing block/unblock contract are unknown. Owner: Card service/API owner. Action: provide service catalog, repository, API, and state-machine evidence."
+  - "CONTEXT GAP: The approved expiry mechanism, retry and failure handling, idempotency behavior, and restoration behavior when another state change occurs are unknown. Owner: Card platform and SRE owners. Action: provide the existing scheduler/event pattern and operational runbook."
+  - "CONTEXT GAP: The approved minimum/maximum duration, authorized portal and operations roles, scopes, client/region resolution path, and API Gateway/BFF/IMS route are unknown. Owner: Product, Risk, Card, and Identity owners. Action: confirm policy and authorization evidence."
+  - "CONTEXT GAP: The persistence model, CHD/Common Workload zone, client-isolation boundary, migration/compatibility impact, and deployment environment are unknown. Owner: Card data, Security, and Platform owners. Action: provide data classification, schema, deployment, and migration evidence."
+  - "CONTEXT GAP: The required audit schema, telemetry/redaction, dashboards, alerts, SLOs, notification expectation, and external gateway involvement are unknown. Owner: Operations/SRE, Security, Product, and API owners. Action: confirm existing standards and integration inventory."
