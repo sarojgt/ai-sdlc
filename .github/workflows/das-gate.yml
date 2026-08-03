@@ -112,6 +112,30 @@ jobs:
           EOF
           fi
 
+      - name: Validate HLD provenance and readiness evidence
+        if: steps.scope.outputs.validation_scope == 'all' || steps.scope.outputs.validation_scope == 'initiatives'
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.scope.outputs.validation_scope }}" = "all" ]; then
+            initiatives="$(find ai-sdlc/initiatives -mindepth 1 -maxdepth 1 -type d -print | sort)"
+          else
+            initiatives=""
+            while IFS= read -r initiative_id; do
+              test -n "$initiative_id" || continue
+              initiatives="$initiatives ai-sdlc/initiatives/$initiative_id"
+            done <<'EOF'
+          ${{ steps.scope.outputs.initiatives }}
+          EOF
+          fi
+          for initiative in $initiatives; do
+            test -f "$initiative/hld/hld.md" || continue
+            # Legacy examples may predate the provenance contract. Any HLD
+            # with a design baseline is required to pass the current contract.
+            test -f "$initiative/evidence/design-baseline.yaml" || continue
+            AI_SDLC_SKIP_MERMAID_RENDER=1 \
+              python3 ai-sdlc/tooling/validate_hld_artifacts.py "$initiative"
+          done
+
       - name: Run lifecycle tool regression tests
         if: steps.scope.outputs.tooling_changed == 'true' || steps.scope.outputs.validation_scope == 'all'
         run: |

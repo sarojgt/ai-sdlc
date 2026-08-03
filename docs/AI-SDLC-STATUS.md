@@ -93,9 +93,13 @@ from starting early.
       and approved patterns.
 - [x] HLD alternatives are limited to meaningful trade-offs or constraints.
 - [x] Mermaid diagrams embedded in the primary HLD document.
-- [x] HLD structure, evidence consistency, duplication, and structural Mermaid
-      validation checks added before an HLD PR is published; browser rendering
-      is optional in CI because hosted-runner Chromium sandbox policies vary.
+- [x] HLD structure and evidence consistency are validated before publication;
+      Mermaid parsing and rendering remain optional authoring aids.
+- [x] HLD loop evidence records the latest generator/reviewer phase, decision,
+      hashes, and review file; failed or discovery-gated runs cannot become
+      ready HLD PRs.
+- [x] Review feedback preserves every prior review artifact and verifies that
+      processed GitHub review threads are actually resolved.
 - [x] Canonical HLD path standardized as `initiatives/<ID>/hld/hld.md`.
 - [x] Older demo initiatives archived under `ai-sdlc/examples/archive/`.
 - [x] Incidental `.DS_Store` and graph workspace artifacts removed/ignored.

@@ -237,8 +237,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "ai-sdlc/initiatives/$INITIATIVE_ID/hld" \
-            "ai-sdlc/initiatives/$INITIATIVE_ID/evidence" \
-            "ai-sdlc/initiatives/$INITIATIVE_ID/feedback"
+            "ai-sdlc/initiatives/$INITIATIVE_ID/evidence"
+          for feedback_dir in \
+            "ai-sdlc/initiatives/$INITIATIVE_ID/feedback/reviews" \
+            "ai-sdlc/initiatives/$INITIATIVE_ID/feedback/batches"; do
+            [ -e "$feedback_dir" ] && git add "$feedback_dir"
+          done
           if git diff --cached --quiet; then
             echo "No additional HLD checkpoint changes to publish."
             exit 0
@@ -260,6 +264,7 @@ jobs:
             "ai-sdlc/initiatives/${{ needs.resolve.outputs.initiative_id }}"
 
       - name: Publish HLD branch without force-push
+        if: always()
         env:
           GH_TOKEN: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
           HLD_BRANCH: ${{ steps.prepare.outputs.name }}
@@ -271,14 +276,28 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "ai-sdlc/initiatives/$INITIATIVE_ID/hld" \
-            "ai-sdlc/initiatives/$INITIATIVE_ID/evidence" \
-            "ai-sdlc/initiatives/$INITIATIVE_ID/feedback"
+            "ai-sdlc/initiatives/$INITIATIVE_ID/evidence"
+          for feedback_dir in \
+            "ai-sdlc/initiatives/$INITIATIVE_ID/feedback/reviews" \
+            "ai-sdlc/initiatives/$INITIATIVE_ID/feedback/batches"; do
+            [ -e "$feedback_dir" ] && git add "$feedback_dir"
+          done
           if git diff --cached --quiet; then
             echo "No final HLD changes to publish."
           else
             git commit -m "feat(hld): generate HLD for $INITIATIVE_ID"
             git remote set-url origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
             git push origin "$HLD_BRANCH"
+          fi
+
+          loop_status="$(sed -n 's/^  status: *//p' "ai-sdlc/initiatives/$INITIATIVE_ID/evidence/hld-loop.yaml" | head -1 | tr -d '"')"
+          latest_decision="$(sed -n 's/^  latest_decision: *//p' "ai-sdlc/initiatives/$INITIATIVE_ID/evidence/hld-loop.yaml" | head -1 | tr -d '"')"
+          if [ "$loop_status" = "ai_review_passed" ] && [ "$latest_decision" != "changes_requested" ]; then
+            gate_message='AI review passed. Human Solution Architect / ARB approval is still required; AI has not approved architecture.'
+          elif [ "$loop_status" = "discovery_required" ]; then
+            gate_message='The AI review identified unresolved foundational context gaps. This HLD remains a discovery-gated draft and is not implementation-ready.'
+          else
+            gate_message="The HLD loop is blocked with status \`$loop_status\`; review the latest evidence before human architecture review."
           fi
 
           if ! gh pr view "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
@@ -292,7 +311,7 @@ jobs:
               "Requirement: [requirement.md](${requirement_url})" \
               "Generator: \`github-copilot / ${GENERATOR_MODEL}\`" \
               "Reviewer: \`github-copilot / ${REVIEWER_MODEL}\`" \
-              'The bounded AI review loop passed. This draft remains pending human Solution Architect / ARB approval. AI has not approved architecture.' \
+              "$gate_message" \
               > "$body_file"
             gh pr create \
               --repo "$GITHUB_REPOSITORY" \
@@ -303,9 +322,36 @@ jobs:
               --draft
           fi
 
-          if gh pr view "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft' | grep -qx true; then
-            gh pr ready "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY"
-            echo "HLD PR is ready for human Solution Architect / ARB review."
+          if [ "$loop_status" = "ai_review_passed" ] && [ "$latest_decision" != "changes_requested" ]; then
+            if gh pr view "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY" --json isDraft --jq '.isDraft' | grep -qx true; then
+              gh pr ready "$HLD_BRANCH" --repo "$GITHUB_REPOSITORY"
+              echo "HLD PR is ready for human Solution Architect / ARB review."
+            fi
           else
-            echo "Updated existing HLD PR for $HLD_BRANCH without force-push."
+            echo "HLD PR remains draft: loop_status=$loop_status latest_decision=$latest_decision"
           fi
+
+      - name: Publish HLD workflow summary
+        if: always()
+        env:
+          INITIATIVE_ID: ${{ needs.resolve.outputs.initiative_id }}
+        run: |
+          set -euo pipefail
+          evidence="ai-sdlc/initiatives/$INITIATIVE_ID/evidence/hld-loop.yaml"
+          status="$(sed -n 's/^  status: *//p' "$evidence" | head -1 | tr -d '"' || true)"
+          decision="$(sed -n 's/^  latest_decision: *//p' "$evidence" | head -1 | tr -d '"' || true)"
+          review="$(sed -n 's/^  latest_review_file: *//p' "$evidence" | head -1 | tr -d '"' || true)"
+          {
+            echo "## HLD orchestration summary"
+            echo "- Initiative: \`$INITIATIVE_ID\`"
+            echo "- HLD loop status: \`$status\`"
+            echo "- Latest AI review decision: \`$decision\`"
+            echo "- Latest review evidence: \`${review:-not available}\`"
+            if [ "$status" = "discovery_required" ]; then
+              echo "- Gate: unresolved foundational context requires discovery before architecture approval."
+            elif [ "$status" = "ai_review_passed" ]; then
+              echo "- Gate: human Solution Architect / ARB approval is required."
+            else
+              echo "- Gate: HLD remains blocked until the loop completes successfully."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

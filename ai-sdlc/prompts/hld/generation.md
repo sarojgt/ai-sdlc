@@ -21,6 +21,14 @@ Apply confirmed enterprise standards and approved patterns. Recommend the
 smallest compliant design and reuse existing capabilities where evidence
 supports reuse. Include alternatives only for material trade-offs.
 
+Before using a generic component label such as "existing API" or "state
+service", search the assembled context, manifest, repository inventory, ADRs,
+and examples for the actual service, repository, API, database, event, or
+platform name. Use the concrete name when evidence exists. If it does not,
+label the component as unconfirmed and add a context gap with an owner and
+retrieval action. Do not turn an unverified capability into a confirmed
+architecture decision.
+
 Use exactly one canonical context-gap register under `Context gaps` and one
 canonical risk register under `Risks`. Other sections must reference gap or
 risk IDs instead of repeating their descriptions. Do not repeat the same
@@ -32,6 +40,11 @@ not invent components, APIs, repositories, tables, cloud services, endpoints,
 SLA values, retention rules, or integrations. Keep detailed API schemas, SQL,
 classes, test cases, migration scripts, and runbooks for the LLD or linked
 supporting documents.
+
+If a missing service boundary, authoritative data owner, expiry mechanism,
+security boundary, or deployment boundary blocks the recommendation, make the
+HLD a discovery-gated design: state the smallest decision that can be made now,
+identify the discovery action, and do not present the HLD as implementation-ready.
 
 Keep hld.md concise and decision-focused for the selected profile:
 {{ profile_instructions }}

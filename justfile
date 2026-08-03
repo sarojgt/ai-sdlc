@@ -62,6 +62,14 @@ ai-sdlc-validate-all:
 ai-sdlc-context initiative:
     python3 ./ai-sdlc/tooling/build_context_pack.py "ai-sdlc/initiatives/{{initiative}}"
 
+# Optionally validate embedded Mermaid blocks with the pinned parser.
+ai-sdlc-mermaid-validate initiative:
+    @if npm ci --prefix ai-sdlc/tooling/mermaid --ignore-scripts && node ai-sdlc/tooling/mermaid/validate.mjs "ai-sdlc/initiatives/{{initiative}}/hld/hld.md"; then echo "Optional Mermaid validation completed."; else echo "Optional Mermaid validation unavailable or reported issues; continuing."; fi
+
+# Run the full HLD contract and provenance checks. Mermaid remains advisory.
+ai-sdlc-hld-validate initiative:
+    python3 ./ai-sdlc/tooling/validate_hld_artifacts.py "ai-sdlc/initiatives/{{initiative}}"
+
 # Compare an HLD baseline with newer context tags; never regenerates the HLD.
 ai-sdlc-context-drift initiative:
     python3 ./ai-sdlc/tooling/evaluate_context_drift.py "ai-sdlc/initiatives/{{initiative}}"

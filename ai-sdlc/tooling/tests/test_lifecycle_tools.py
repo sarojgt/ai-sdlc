@@ -14,6 +14,8 @@ TOOLING = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TOOLING))
 from context_versions import package_for  # noqa: E402
 from release_context_notes import main as render_context_notes  # noqa: E402
+from validate_hld_consistency import validate_consistency  # noqa: E402
+from validate_hld_readiness import has_blocking_gap  # noqa: E402
 
 
 class LifecycleToolTests(unittest.TestCase):
@@ -136,6 +138,44 @@ class LifecycleToolTests(unittest.TestCase):
 
     def test_context_release_notes_renderer_is_available(self) -> None:
         self.assertEqual(render_context_notes(), 0)
+
+    def test_hld_readiness_detects_blocking_context_gaps(self) -> None:
+        hld = """## Context gaps
+
+| Gap ID | Missing fact | Blocks decision? |
+|---|---|---|
+| GAP-001 | Service owner | Yes |
+"""
+        self.assertTrue(has_blocking_gap(hld))
+        self.assertFalse(has_blocking_gap(hld.replace("| Yes |", "| No |")))
+
+    def test_hld_provenance_chain_is_consistent(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "TEST-INITIATIVE"
+            (target / "evidence").mkdir(parents=True)
+            (target / "hld").mkdir()
+            (target / "requirement.md").write_text("# Requirement\n", encoding="utf-8")
+            (target / "context-manifest.yaml").write_text(
+                'initiative: "TEST-INITIATIVE"\ncontext_pack:\n  content_sha256: "pack"\n',
+                encoding="utf-8",
+            )
+            requirement_hash = hashlib.sha256((target / "requirement.md").read_bytes()).hexdigest()
+            manifest_hash = hashlib.sha256((target / "context-manifest.yaml").read_bytes()).hexdigest()
+            (target / "evidence" / "hld-assessment.yaml").write_text(
+                f'recommended_profile: "medium"\nrequirement_sha256: "{requirement_hash}"\n'
+                f'context_manifest_sha256: "{manifest_hash}"\n', encoding="utf-8"
+            )
+            (target / "evidence" / "design-baseline.yaml").write_text(
+                'initiative:\n  id: "TEST-INITIATIVE"\n'
+                f'requirement:\n  content_sha256: "{requirement_hash}"\n'
+                f'context:\n  manifest_sha256: "{manifest_hash}"\n', encoding="utf-8"
+            )
+            (target / "evidence" / "hld-loop.yaml").write_text(
+                'hld_loop:\n  status: running\n  profile: "medium"\n'
+                f'  requirement_sha256: "{requirement_hash}"\n'
+                f'  context_manifest_sha256: "{manifest_hash}"\n', encoding="utf-8"
+            )
+            validate_consistency(target)
 
 
 if __name__ == "__main__":

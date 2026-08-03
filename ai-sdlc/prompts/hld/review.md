@@ -19,6 +19,14 @@ detail, and diagrams that do not render. Judge conciseness proportionally; do
 not use a line-count threshold. Check that one canonical gap register and one
 canonical risk register are used.
 
+Treat unresolved gaps about the actual service/repository boundary, authoritative
+data owner, expiry or scheduling mechanism, security boundary, or deployment
+boundary as discovery blockers when the recommendation depends on them. Return
+`changes_requested` unless the HLD explicitly documents a human-owned discovery
+gate and is not presented as implementation-ready. Prefer concrete names from
+context over generic labels; flag any generic label that could have been
+resolved from available evidence.
+
 Write only `{{ review_output_file }}`. Never delete, overwrite, or modify any
 previous AI review file. Start with this exact YAML front matter:
 

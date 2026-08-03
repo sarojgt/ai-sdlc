@@ -140,9 +140,13 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "ai-sdlc/initiatives/$INITIATIVE_ID/feedback" \
-            "ai-sdlc/initiatives/$INITIATIVE_ID/hld" \
+          git add "ai-sdlc/initiatives/$INITIATIVE_ID/hld" \
             "ai-sdlc/initiatives/$INITIATIVE_ID/evidence"
+          for feedback_dir in \
+            "ai-sdlc/initiatives/$INITIATIVE_ID/feedback/reviews" \
+            "ai-sdlc/initiatives/$INITIATIVE_ID/feedback/batches"; do
+            [ -e "$feedback_dir" ] && git add "$feedback_dir"
+          done
           if git diff --cached --quiet; then
             echo "No HLD changes were produced."
             echo "updated=false" >> "$GITHUB_OUTPUT"
@@ -182,9 +186,10 @@ jobs:
                 }
               }
             }' \
-            --jq '.data.repository.pullRequest.reviewThreads.nodes[] |
+            | jq -r --argjson review_id "$REVIEW_ID" \
+              '.data.repository.pullRequest.reviewThreads.nodes[] |
               select(.isResolved == false) |
-              select([.comments.nodes[].pullRequestReview.databaseId | tostring] | index(env.REVIEW_ID)) |
+              select([.comments.nodes[].pullRequestReview.databaseId] | index($review_id)) |
               .id')"
 
           while IFS= read -r thread_id; do
@@ -198,6 +203,25 @@ jobs:
               -f threadId="$thread_id" >/dev/null
           done <<< "$review_threads"
 
+          remaining="$(gh api graphql \
+            -F owner="$owner" \
+            -F repo="$repo" \
+            -F number="$PR_NUMBER" \
+            -f query='query($owner:String!, $repo:String!, $number:Int!) {
+              repository(owner:$owner, name:$repo) { pullRequest(number:$number) {
+                reviewThreads(first:100) { nodes { isResolved comments(first:100) {
+                  nodes { pullRequestReview { databaseId } }
+                } } }
+              } }
+            }' \
+            | jq --argjson review_id "$REVIEW_ID" '[.data.repository.pullRequest.reviewThreads.nodes[] |
+              select(.isResolved == false) |
+              select([.comments.nodes[].pullRequestReview.databaseId] | index($review_id))] | length')"
+          test "$remaining" -eq 0 || {
+            echo "Review-thread resolution postcondition failed: $remaining thread(s) remain unresolved." >&2
+            exit 1
+          }
+
       - name: Report successful feedback batch
         env:
           GH_TOKEN: ${{ github.token }}
@@ -205,3 +229,23 @@ jobs:
           FEEDBACK_FILE: ${{ steps.feedback.outputs.feedback_file }}
         run: |
           gh pr comment "$PR_NUMBER" --body "Processed one submitted architecture review as feedback batch \`$FEEDBACK_FILE\`. The HLD revision and bounded AI review completed; human Solution Architect approval is still required."
+
+      - name: Publish review workflow summary
+        if: always()
+        env:
+          INITIATIVE_ID: ${{ steps.scope.outputs.initiative_id }}
+          FEEDBACK_FILE: ${{ steps.feedback.outputs.feedback_file }}
+        run: |
+          set -euo pipefail
+          evidence="ai-sdlc/initiatives/$INITIATIVE_ID/evidence/hld-loop.yaml"
+          status="$(sed -n 's/^  status: *//p' "$evidence" | head -1 | tr -d '"' || true)"
+          decision="$(sed -n 's/^  latest_decision: *//p' "$evidence" | head -1 | tr -d '"' || true)"
+          {
+            echo "## HLD feedback workflow summary"
+            echo "- Initiative: \`$INITIATIVE_ID\`"
+            echo "- Feedback batch: \`${FEEDBACK_FILE:-not available}\`"
+            echo "- HLD loop status: \`$status\`"
+            echo "- Latest AI review decision: \`$decision\`"
+            echo "- Previous review evidence was preserved; no review file was deleted."
+            echo "- Human Solution Architect / ARB approval remains required."
+          } >> "$GITHUB_STEP_SUMMARY"
