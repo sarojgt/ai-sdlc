@@ -8,7 +8,7 @@ process is documented in the [AI-SDLC Operating Guide](../docs/AI-SDLC-OPERATING
 ```text
 ai-sdlc/
   context/                 shared business, architecture, and guardrails
-  config/                  roles, gates, loop policy, provider catalog
+  config/                  roles, gates, HLD profiles, provider catalog
   prompts/hld/             versioned assessment, generation, review prompts
   design/                  lifecycle and adapter design references
   schemas/                 machine-readable validation contracts
@@ -42,6 +42,12 @@ The requirement remains outside the context directory. Markdown is the human
 source of truth; YAML records metadata, approvals, hashes, and evidence.
 `just ai-sdlc-context <ID>` assembles a deterministic, hashed context pack
 from explicit relative context plus the repository context registry.
+
+HLD generation uses `config/hld-profiles.yaml` as the single source for loop
+limits, timeouts, diagram guidance, and profile-specific editorial guidance.
+The preflight assessment names affected items and selects relevant sections
+from `templates/initiative/hld/section-catalog.md`; the generated HLD template
+contains only the mandatory review core.
 
 ## Local interface
 

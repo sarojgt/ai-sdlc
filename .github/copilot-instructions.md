@@ -63,7 +63,8 @@ manually add that boilerplate to the intake PR.
   context before designing.
 - Assess change size, complexity, affected services, repositories, APIs, data,
   integrations, security, deployment, and migration impact.
-- Generate a concise HLD with Mermaid diagrams and standards-based options.
+- Generate a concise HLD with only decision-relevant sections, standards-based
+  options, and optional diagrams when a visual materially improves review.
 - Record missing facts as context gaps; do not invent enterprise components.
 - Run bounded AI review loops only where configured.
 - Stop for human Solution Architect or ARB approval before LLD.

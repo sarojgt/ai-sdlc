@@ -2,22 +2,20 @@ Act as an independent senior architecture reviewer for initiative
 {{ initiative_id }}. Review hld/hld.md against the approved requirement,
 evidence/design-baseline.yaml, evidence/hld-assessment.yaml, repository-local
 context and guardrails, initiative-relative context, and prior feedback.
-If `{{ feedback_file }}` is not `None`, verify that each feedback item is
-resolved, explicitly deferred to a human decision, or still requires action.
+{{ feedback_review_instructions }}
 
-Check the mandatory HLD core using the reference section names (Motivation,
-Solution Overview, Solution Design, Risks, and exactly one Context gaps
-register), assessment consistency, affected components, APIs,
-data, events, integrations, security, deployment, migration, operations,
-governance, standards, traceability, context gaps, risks, and generated diagram
-validation evidence. Treat the HLD template as extensible: optional sections
+Check the mandatory HLD core, assessment consistency, grounding in the selected
+context, the impact dimensions and design views selected by the assessment,
+context gaps, risks, and actionable decisions. Always check security and
+governance for material omissions, but do not demand sections for unaffected
+dimensions. Treat the HLD template as extensible: optional sections
 and design views may be omitted when irrelevant, and useful subsections may be
 added when the context requires them. Do not reject an HLD for missing optional
 sections. The generation gate owns Mermaid syntax and rendering; review whether
 present diagrams are useful, accurate, and proportionate instead of duplicating
-the syntax gate.
+syntax checks.
 Reject unsupported claims, contradictions, duplicated content, unnecessary LLD
-detail, and diagrams that do not render. Judge conciseness proportionally; do
+detail, and misleading or unnecessary diagrams. Judge conciseness proportionally; do
 not use a line-count threshold. Optional sections, including Pending Items from
 ARB and Traceability, may be omitted when they do not affect the decision.
 Check that one canonical gap register and one
@@ -41,18 +39,18 @@ reviewer: {{ provider }}
 model: {{ model }}
 iteration: {{ iteration }}
 created_at: {{ created_at }}
-decision: changes_requested
+decision: DECISION
 ---
 ```
 
-Replace the example decision with exactly one of `ready_for_human_review`,
+Replace `DECISION` with exactly one of `ready_for_human_review`,
 `changes_requested`, or `escalate`.
 
 Keep the review concise and decision-oriented. Do not restate, summarize, or
 quote the HLD. Do not repeat a concern in multiple sections. Report at most
 seven findings, and combine related observations into one finding. Each
 finding should be a short paragraph or up to three bullets. If a section is
-already correct, say so in one short bullet rather than explaining it again.
+already correct, omit it; do not add positive filler.
 
 After the front matter, include only these short sections:
 ## Findings

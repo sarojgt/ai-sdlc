@@ -61,6 +61,8 @@ from starting early.
 - [x] Provider-neutral adapter boundary documented for future providers.
 - [x] HLD assessment, generation, and review prompts externalized as versioned
       repository Markdown instead of inline shell strings.
+- [x] HLD profile guidance consolidated in `hld-profiles.yaml`; rendered prompt
+      regression tests prevent profile drift and unresolved placeholders.
 - [x] Human-readable Markdown as the primary artifact format.
 - [x] YAML metadata and evidence model established.
 - [x] DAS metadata and schema foundation added.
@@ -84,15 +86,20 @@ from starting early.
 - [x] AI progress messages added during long-running generation and review.
 - [x] HLD impact assessment added for size, complexity/risk, services,
       repositories, integrations, data, security, deployment, and governance.
+- [x] HLD assessment preserves named affected items with evidence and selects
+      only relevant document sections and design views.
 - [x] HLD preflight assessment selects the detail profile before full HLD
       generation and can recover a classification for an existing HLD.
 - [x] Resume mode reuses an existing HLD after a post-generation failure.
 - [x] Profile guidance uses proportional detail and linked supporting
       documents instead of a hard HLD line-count gate.
+- [x] HLD template reduced to the mandatory human-review core; optional
+      reference sections are maintained in a separate inclusion catalog.
 - [x] HLD recommendation uses enterprise principles, guardrails, standards,
       and approved patterns.
 - [x] HLD alternatives are limited to meaningful trade-offs or constraints.
-- [x] Mermaid diagrams embedded in the primary HLD document.
+- [x] Useful Mermaid diagrams can be embedded in the primary HLD document;
+      diagrams are optional and proportionate to the decision.
 - [x] HLD structure and evidence consistency are validated before publication;
       Mermaid parsing and rendering remain optional authoring aids.
 - [x] HLD loop evidence records the latest generator/reviewer phase, decision,

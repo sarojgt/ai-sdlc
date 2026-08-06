@@ -132,7 +132,7 @@ hld_loop:
   context_manifest_sha256: "$context_manifest_hash"
   repository_commit: "$(git rev-parse HEAD)"
   feedback_file: "$feedback_file"
-  prompt_set: "hld-prompts-v1"
+  prompt_set: "hld-prompts-v2"
   agent_timeout_seconds: $agent_timeout_seconds
   human_architecture_approval_required: true
 EOF
@@ -286,7 +286,7 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
     echo "Generated HLD does not contain a valid change_size classification." >&2
     exit 10
   }
-  echo "[AI-SDLC] Validating generated HLD structure and Mermaid diagrams before AI review..."
+  echo "[AI-SDLC] Validating the HLD contract before AI review (diagram checks are advisory)..."
   python3 "$root/tooling/validate_hld_artifacts.py" "$target"
   python3 "$root/tooling/run_lifecycle_hooks.py" after_hld "$target"
   checkpoint_commit "generator"
@@ -353,7 +353,7 @@ hld_loop:
   context_manifest_sha256: "$context_manifest_hash"
   repository_commit: "$(git rev-parse HEAD)"
   feedback_file: "$feedback_file"
-  prompt_set: "hld-prompts-v1"
+  prompt_set: "hld-prompts-v2"
   human_architecture_approval_required: true
 EOF
       checkpoint_commit "complete"

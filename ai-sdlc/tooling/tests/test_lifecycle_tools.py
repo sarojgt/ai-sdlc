@@ -16,6 +16,11 @@ from context_versions import package_for  # noqa: E402
 from release_context_notes import main as render_context_notes  # noqa: E402
 from validate_hld_consistency import validate_consistency  # noqa: E402
 from validate_hld_readiness import has_blocking_gap  # noqa: E402
+from validate_hld_artifacts import (  # noqa: E402
+    validate_core_content,
+    validate_core_headings,
+    visible_headings,
+)
 
 
 class LifecycleToolTests(unittest.TestCase):
@@ -198,6 +203,83 @@ class LifecycleToolTests(unittest.TestCase):
                 f'  context_manifest_sha256: "{manifest_hash}"\n', encoding="utf-8"
             )
             validate_consistency(target)
+
+    def test_prompt_profiles_are_rendered_from_authoritative_config(self) -> None:
+        result = self.run_tool(
+            str(TOOLING / "render_prompt.py"), "--name", "hld-generation",
+            "--initiative-id", "TEST-INITIATIVE", "--profile", "small",
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("Omit Pending Items from ARB, Traceability", result.stdout)
+        self.assertIn("no more than 2 Mermaid diagrams", result.stdout)
+        self.assertNotIn("{{", result.stdout)
+
+    def test_review_prompt_omits_invalid_none_condition(self) -> None:
+        result = self.run_tool(
+            str(TOOLING / "render_prompt.py"), "--name", "hld-review",
+            "--initiative-id", "TEST-INITIATIVE", "--profile", "small",
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("There is no submitted feedback batch", result.stdout)
+        self.assertNotIn("If `None`", result.stdout)
+
+    def test_revision_prompt_preserves_unaffected_sections(self) -> None:
+        result = self.run_tool(
+            str(TOOLING / "render_prompt.py"), "--name", "hld-generation",
+            "--initiative-id", "TEST-INITIATIVE", "--profile", "medium",
+            "--mode", "revision", "--feedback-file", "feedback/batches/review-1.md",
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("preserve unaffected approved content", result.stdout)
+        self.assertIn("feedback/batches/review-1.md", result.stdout)
+
+    def test_hld_core_accepts_numbered_headings_with_content(self) -> None:
+        hld = """## 1. Motivation
+Needed outcome.
+## 2. Solution Overview
+Use the existing service.
+## 3. Solution Design
+The existing API owns the change.
+## 4. Risks
+No material initiative-specific risks are known.
+## 5. Context Gaps
+No decision-blocking context gaps are known.
+"""
+        headings = visible_headings(hld)
+        validate_core_headings(headings)
+        validate_core_content(hld)
+
+    def test_hld_core_rejects_empty_template_registers(self) -> None:
+        hld = """## Motivation
+Needed outcome.
+## Solution Overview
+Use the existing service.
+## Solution Design
+The existing API owns the change.
+## Risks
+| ID | Risk |
+|---|---|
+## Context Gaps
+| ID | Gap |
+|---|---|
+"""
+        with self.assertRaisesRegex(ValueError, "no substantive content"):
+            validate_core_content(hld)
+
+    def test_solution_design_content_may_live_in_selected_subsection(self) -> None:
+        hld = """## Motivation
+Needed outcome.
+## Solution Overview
+Use the existing service.
+## Solution Design
+### API and Integration Design
+The existing API owns the change.
+## Risks
+No material initiative-specific risks are known.
+## Context Gaps
+No decision-blocking context gaps are known.
+"""
+        validate_core_content(hld)
 
 
 if __name__ == "__main__":
