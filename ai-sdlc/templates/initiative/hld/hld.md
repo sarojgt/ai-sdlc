@@ -22,142 +22,198 @@ policy:
   implementation_locked_until: architecture.approved
 ---
 
-# HLD: {{ initiative.title }}
+# Solution Design: {{ initiative.title }}
 
-<!-- Reusable HLD template. Keep the main document concise and decision-oriented;
-     move substantial detail to linked supporting artifacts. -->
+<!--
+This is a section menu, not a checklist. Keep the final HLD short enough for a
+human architecture review. Retain the required decision sections, add only
+sections that affect this initiative, and remove unused guidance and empty
+tables. Put substantial detail in a linked HLD part or LLD when needed.
+-->
 
-## 1. Change assessment
+## 1. Motivation
 
-Classify the change as **small**, **medium**, or **large**. Record only impacts
-that are material to this initiative; do not restate standard platform
-capabilities already supplied by the target deployment pattern.
+<!-- REQUIRED: explain why the change is needed. -->
 
-| Dimension | Assessment | Evidence or context gap |
-|---|---|---|
-| Change size | small / medium / large / program-level | |
-| Complexity / risk | low / moderate / high / critical | |
-| Services or repositories | count and names | |
-| Internal integrations | count and names | |
-| External integrations | count and names | |
-| Data and security impact | low / medium / high | |
-| Runtime or deployment impact | low / medium / high | |
-| Migration or compatibility impact | low / medium / high | |
-| Recommended governance path | standard / enhanced / ARB | |
+<!-- State the business or technical reason for the change and the intended outcome. -->
 
-**Assessment summary:** one short paragraph explaining why this classification was chosen.
+## 2. Authors & Approvals
 
-## 2. Motivation and outcome
-
-State the business problem, intended outcome, and measurable success signal.
-
-## 3. Authors and approvals
+<!-- Approval status is evidence only; architecture approval is human-owned. -->
 
 | Role | Person or team | Status |
 |---|---|---|
-| Business owner | | |
+| Business Owner | | |
 | Solution Architect / ARB | | Pending |
-| Infrastructure / Platform | | |
-| Engineering lead | | |
+| Engineering Lead | | |
 | Security | | |
 
-## 4. Solution overview
+## 3. Solution Overview
 
-Summarize the recommended solution in one short paragraph.
+<!-- REQUIRED: summarise the recommended direction. -->
 
-## 5. Context gaps
+<!-- Summarise the recommended solution in one or two short paragraphs. -->
 
-Keep one canonical context-gap register in this section. Other sections must
-reference gap IDs only. Separate confirmed facts from proposed changes and do
-not fill gaps with guesses.
+**Change size:** small / medium / large
+**Impact summary:** affected services, repositories, integrations, data,
+security, deployment, and migration impact in one concise line.
+
+### Goals
+
+<!-- Include when useful. -->
+
+### Non-Goals
+
+<!-- Include when useful. -->
+
+## 4. High Level Business Requirements
+
+<!-- Include the requirements that drive the architecture decision. Do not copy the full requirement. -->
+
+| ID | Requirement | Acceptance signal |
+|---|---|---|
+
+## 5. Architecture Principles Applied
+
+<!-- Reference approved principles and patterns only where they constrain this design. -->
+
+| ID | Architecture Principle | Application to this design |
+|---|---|---|
+
+## 6. Non-Functional Requirements
+
+<!-- Keep only applicable subsections and measurable targets. Do not invent values. -->
+
+### Availability and Reliability
+
+### Performance and Scalability
+
+### Maintainability
+
+### Observability
+
+### Security and Compliance
+
+### Data Quality
+
+### Disaster Recovery
+
+## 7. Assumptions
+
+| ID | Assumption | Owner |
+|---|---|---|
+
+## 8. Risks
+
+<!-- REQUIRED: state material risks, or explicitly state that none are known. -->
+
+| ID | Risk | Impact | Mitigation / Owner |
+|---|---|---|---|
+
+## 9. Solution Design
+
+<!-- REQUIRED: include only the design views needed to explain the decision. -->
+
+<!--
+Select only the views needed to explain the decision. Typical choices are
+Context, High Level Architecture Diagram, Logical View, Information/Data View,
+Physical/Deployment View, API and Integration Design, Event and Message Flow,
+Component Model, Security Design, Networking Considerations, and Migration and
+Rollout. Do not include every view by default.
+-->
+
+### Context
+
+<!-- C4 Level 1: actors, system boundary, and major external interactions. -->
+
+### High Level Architecture Diagram
+
+<!-- Add a Mermaid diagram only when it clarifies a material decision. -->
+
+## Context gaps
+
+<!-- Keep one canonical register. Do not repeat these gaps elsewhere. -->
 
 | Gap ID | Missing fact | Owner | Retrieval action | Blocks decision? |
 |---|---|---|---|---|
-| GAP-001 | | | | |
 
-## 6. Risks
+### Logical View
 
-| Risk ID | Risk | Impact | Mitigation or owner |
+### Information/Data View
+
+<!-- Add ERD, data ownership, segregation, or lifecycle only when material. -->
+
+### Physical/Deployment View
+
+<!-- Include regions, environments, workload zones, and platform boundaries only when changed or relevant. -->
+
+### Component Model
+
+### API and Integration Design
+
+### Event and Message Flow
+
+### Security Design
+
+### Networking Considerations
+
+### Migration and Rollout
+
+<!-- Remove unused subsections from the generated document. -->
+
+## 10. Security Considerations
+
+<!-- Include only initiative-specific security decisions and required review. -->
+
+## 11. Testing Considerations
+
+<!-- Summarise design-specific testing; detailed test cases belong in the LLD. -->
+
+## 12. Operations Considerations
+
+### Observability and Alerting
+
+### Runbooks and Support
+
+### Disaster Recovery
+
+### RTO and RPO Requirements
+
+### DR Strategy
+
+## 13. Commercial View
+
+<!-- Include only when cost, licensing, data volume, or capacity materially affects the decision. -->
+
+### Data Volumes
+
+### Cost Estimation
+
+### Final Cost Estimation
+
+## 14. Key Design Decisions
+
+| ID | Design Aspect | Decision | Rationale | Status |
+|---|---|---|---|---|
+
+## 15. Open Items & Decisions Required
+
+<!-- Include unresolved questions that do not belong in the context-gap register. -->
+
+| ID | Item | Owner | Status |
 |---|---|---|---|
-| RISK-001 | | | |
 
-## 7. Solution design
+## 16. Pending Items from ARB
 
-Add only the relevant design views below. Use subsections freely, and omit views
-that do not affect the decision. Keep diagrams beside the view they explain.
+<!-- Include only when ARB review is required or has outstanding items. -->
 
-<!-- Optional sections to add when material:
+| ID | Item | Owner | Status |
+|---|---|---|---|
 
-## High-level business requirements
-Link the requirements, epic, or business case satisfied by this design.
+## 17. Traceability
 
-## Architecture principles applied
-Reference only the approved principles and patterns that constrain this design.
+<!-- Link the requirement, context baseline, affected services, repositories, ADRs, and follow-on LLDs. -->
 
-## Non-functional requirements
-Cover relevant performance, availability, security, scalability, cost,
-operability, and compliance constraints without inventing target values.
+## Architecture Approval
 
-## Assumptions and scope boundaries
-Record confirmed assumptions and explicit exclusions.
-
-### Context view
-C4 Level 1: actors, system boundary, and major external interactions.
-
-### Logical view
-C4 Level 2/container view of affected or relevant existing components.
-
-### Information and data view
-ERD or data flow only when data ownership, storage, or movement is material.
-
-### Process and interaction view
-Sequence or activity view for material runtime, asynchronous, retry, or
-failure behavior.
-
-### Physical and deployment view
-Relevant workload zone, regional deployment, platform boundary, and operations.
-Reference approved platform topology instead of duplicating it.
-
-## Security considerations
-Cover only initiative-specific trust, identity, data protection, PCI/CHD,
-audit, and security review needs.
-
-## Testing considerations
-Cover only design-specific functional, integration, performance, resilience,
-migration, security, or disaster-recovery testing needs.
-
-## Operations and delivery
-Cover only changed monitoring, alerting, runbooks, rollout, rollback,
-migration, and operational ownership.
-
-## Options and trade-offs
-Include alternatives only when they represent a material trade-off.
--->
-
-## 8. Recommendation and decision points
-
-**Applicable standards and approved patterns:**
-
-| Standard / pattern | How it applies | Evidence |
-|---|---|---|
-| | | |
-
-**Recommended option:** one concise statement explaining why this is the
-smallest compliant design.
-
-**Alternatives considered:** include only alternatives with a material trade-off,
-pattern mismatch, or meaningful constraint.
-
-<!-- Embed only useful, renderable Mermaid diagrams in the relevant design-view
-     sections. Small changes normally need one context/flow diagram and at most
-     one deployment or component view. -->
-
-## 9. Traceability and ADRs
-
-Link the requirement, selected context, affected systems, related repositories,
-and follow-on LLD. Record only decisions that need an ADR; keep evidence in
-YAML and human decisions in this document.
-
-## Architecture approval
-
-Solution Architect / ARB: pending
+Solution Architect / ARB: Pending

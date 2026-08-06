@@ -147,6 +147,8 @@ from starting early.
 - [x] Generate an HLD through a provider adapter.
 - [x] Run an independent AI HLD review.
 - [x] Iterate only on useful review feedback.
+- [x] Use the reference Solution Design section names with relevance-based
+      section selection and concise small/medium/large profile guidance.
 - [x] Stop at the human architecture gate.
 - [~] Generate LLD only after recorded HLD approval.
 - [ ] Generate implementation plans from approved LLD.

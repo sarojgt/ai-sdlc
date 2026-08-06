@@ -88,7 +88,7 @@ The HLD workflow is:
 3. Generate or update `hld/hld.md` through the configured provider adapter.
 4. Run the bounded independent AI review loop. The reviewer must be a
    different provider/model from the generator.
-5. Open or update a draft HLD PR for human Solution Architect/ARB review.
+5. Open or update a reviewable HLD PR for human Solution Architect/ARB review.
 6. Stop until a human approval record is present; feedback causes a bounded
    rerun, while unresolved context gaps remain explicitly visible.
 
@@ -100,7 +100,7 @@ When an approved initiative scaffold is merged, the GitHub Actions HLD
 orchestrator may invoke Copilot CLI automatically. Use the configured
 generator and reviewer model inputs; the reviewer must use a different model
 from the generator. The orchestrator runs the existing bounded HLD loop and
-creates a draft HLD PR only after AI review passes. Do not bypass the workflow
+creates a reviewable HLD PR only after AI review passes. Do not bypass the workflow
 by approving architecture or changing protected approval records.
 
 Read the root `AGENTS.md` and the initiative intake guide before changing
