@@ -13,10 +13,10 @@ from shutil import which
 
 VALID_PROFILES = {"small", "medium", "large"}
 CORE_HEADING_ALTERNATIVES = {
-    "assessment": ("change assessment", "impact assessment"),
     "problem or motivation": ("motivation", "problem", "outcome"),
     "solution or recommendation": ("solution overview", "recommendation"),
-    "traceability": ("traceability",),
+    "solution design": ("solution design",),
+    "risks": ("risks",),
 }
 
 

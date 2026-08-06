@@ -5,7 +5,9 @@ context and guardrails, initiative-relative context, and prior feedback.
 If `{{ feedback_file }}` is not `None`, verify that each feedback item is
 resolved, explicitly deferred to a human decision, or still requires action.
 
-Check the mandatory HLD core, assessment consistency, affected components, APIs,
+Check the mandatory HLD core using the reference section names (Motivation,
+Solution Overview, Solution Design, Risks, and exactly one Context gaps
+register), assessment consistency, affected components, APIs,
 data, events, integrations, security, deployment, migration, operations,
 governance, standards, traceability, context gaps, risks, and generated diagram
 validation evidence. Treat the HLD template as extensible: optional sections
@@ -16,8 +18,11 @@ present diagrams are useful, accurate, and proportionate instead of duplicating
 the syntax gate.
 Reject unsupported claims, contradictions, duplicated content, unnecessary LLD
 detail, and diagrams that do not render. Judge conciseness proportionally; do
-not use a line-count threshold. Check that one canonical gap register and one
-canonical risk register are used.
+not use a line-count threshold. Optional sections, including Pending Items from
+ARB and Traceability, may be omitted when they do not affect the decision.
+Check that one canonical gap register and one
+canonical risk register are used, and that the chosen sections are proportionate
+to the assessed change size.
 
 Treat unresolved gaps about the actual service/repository boundary, authoritative
 data owner, expiry or scheduling mechanism, security boundary, or deployment

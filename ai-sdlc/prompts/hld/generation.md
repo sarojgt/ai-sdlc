@@ -5,11 +5,22 @@ AGENTS.md, evidence/design-baseline.yaml, and evidence/hld-assessment.yaml.
 
 {{ revision_instructions }}
 
-Produce one human-readable HLD in hld/hld.md using the repository HLD template,
-Treat the repository HLD template as an extensible section menu, not a fixed
-checklist. Keep its mandatory core, add design views only when material, create
-subsections when useful, and omit irrelevant or empty sections. The HLD is a
-concise architecture decision document, not an LLD or implementation
+Produce one human-readable HLD in hld/hld.md using the repository HLD template.
+The template is a section menu, not a checklist. Use the reference section
+names exactly: Motivation, Authors & Approvals, Solution Overview, High Level
+Business Requirements, Architecture Principles Applied, Non-Functional
+Requirements, Assumptions, Risks, Solution Design, Key Design Decisions, Open
+Items & Decisions Required, Pending Items from ARB, and Traceability. Pending
+Items from ARB and Traceability are optional and should be included only when
+they contain useful content.
+
+Always include the mandatory core: Motivation, Solution Overview, Solution
+Design, Risks, and exactly one Context gaps register. The template provides
+placeholders and guidance for these sections. Select only the other sections
+and Solution Design subsections relevant to this initiative. Remove unused
+headings, placeholder tables, and template comments from the final document.
+Do not create a section merely because it is present in the template. The HLD
+is a concise architecture decision document, not an LLD or implementation
 specification.
 Include a compact **Context baseline** table using the selected package versions
 in evidence/design-baseline.yaml; do not invent a version when it is marked
@@ -48,6 +59,17 @@ identify the discovery action, and do not present the HLD as implementation-read
 
 Keep hld.md concise and decision-focused for the selected profile:
 {{ profile_instructions }}
+
+Use this editorial rule throughout: each section should answer a decision,
+constraint, risk, or ownership question. Prefer a short table or bullets over
+long prose. Do not repeat the requirement, context, risk, NFR, or
+recommendation in multiple sections; link back to the canonical entry or use
+its ID. Do not describe standard platform capabilities that are unchanged by
+this initiative. For small changes, keep the HLD to the minimum decision
+record. For medium or large changes, keep hld.md as the review summary and
+create a focused linked supporting document only when detail would make the
+summary harder to review. The presence of a section in the template does not
+make it mandatory.
 
 Embed useful Mermaid diagrams directly in the relevant Context, Logical,
 Information/Data, Process/Interaction, or Physical/Deployment view. Use fenced mermaid

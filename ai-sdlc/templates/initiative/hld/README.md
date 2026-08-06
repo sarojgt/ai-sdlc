@@ -1,24 +1,48 @@
-# High-Level Design
+# Solution Design / High-Level Design
 
 The AI creates a proposal here after the requirement is approved.
 
-The HLD has a reusable core and optional design sections. Add only content
-that is material to the initiative; create subsections or linked supporting
-documents when more detail is needed.
+The template follows the section names used by the company’s existing solution
+design documents. It is a section menu, not a checklist. The generated HLD must
+be concise and decision-oriented: retain only sections that affect this
+initiative, remove empty sections and placeholder tables, and use short tables
+or bullets instead of long narrative.
 
-Core content:
+The mandatory core is:
 
-- Solution concept
-- Recommended option
-- Risks and mitigations
+- Motivation
+- Solution Overview
+- Risks
+- Solution Design
+- One Context gaps register
 
-Optional content when relevant:
+The AI must always generate this core, even when a section contains a concise
+statement such as “None identified.”
 
-- Business requirements and architecture principles
-- Non-functional requirements
-- Options and trade-offs
-- Security, data, logical, process, deployment, testing, and operations views
-- Rollout, migration, rollback, ADRs, and open questions
+The following sections are selected by the AI only when relevant:
+
+- Authors & Approvals
+- High Level Business Requirements
+- Architecture Principles Applied
+- Non-Functional Requirements
+- Assumptions
+- Context, Logical, Information/Data, and Physical/Deployment Views
+- API and Integration Design
+- Event and Message Flow
+- Security, Networking, Testing, and Operations Considerations
+- Migration and Rollout
+- Commercial View
+- Open Items & Decisions Required
+- Pending Items from ARB, when applicable
+- Traceability, when cross-artifact links need to be recorded in the human document
+
+Key Design Decisions is also optional and should be included only when the
+initiative has decisions that need an explicit decision record.
+
+Small changes normally use one HLD. Medium and large changes may use a short
+parent HLD with focused linked supporting HLD or LLD documents. Do not move
+detail out merely to reduce a line count; move it when it would make the main
+architecture decision harder for a human to review.
 
 Use Mermaid diagrams only when they clarify a material decision; include an
 ERD when data ownership or persistence is part of the HLD.

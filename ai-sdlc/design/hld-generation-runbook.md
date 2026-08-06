@@ -66,10 +66,10 @@ The HLD generator must not accept a raw Jira/GitHub description as its only inpu
 4. Build context pack
 5. Validate context pack and permissions
 6. Invoke Solution Architect agent skill
-7. Write HLD proposal and diagrams
+7. Write a concise HLD proposal and only the diagrams needed for the decision
 8. Validate HLD structure and traceability
 9. Run architecture quality checks
-10. Open draft design PR
+10. Open a reviewable design PR
 11. Request Solution Architect review
 12. Pause workflow
 ```
@@ -185,17 +185,19 @@ The agent must label statements as:
 
 ## HLD content minimum
 
-The generated HLD must include:
+The generated HLD must include the following decision content, using the
+reference section names from the template. It must not include every available
+section:
 
-1. Impact assessment: change size (small, medium, large, or program-level), complexity/risk (low, moderate, high, or critical), affected services/repositories, internal and external integrations, data/security, deployment, migration, and governance path.
-2. Problem, business outcome, scope, and boundaries.
+1. A concise change-size and impact summary.
+2. Motivation, Solution Overview, and relevant High Level Business Requirements.
 3. Confirmed context and explicit context gaps with owners and retrieval actions.
-4. Current-state and target architecture at decision level.
-5. Only the options needed for an architectural decision and a trade-off table.
-6. Recommended direction and human decision points.
-7. Security, privacy, NFR, resilience, cost, rollout, and rollback summary.
-8. Useful Mermaid diagrams embedded directly in `hld.md`.
-9. Risks, proposed ADRs, open questions, and requirement traceability.
+4. Current-state and target architecture at decision level where the change requires it.
+5. Only the options needed for an architectural decision and a trade-off summary.
+6. Recommended direction, risks, and human decision points.
+7. Only the applicable security, Non-Functional Requirements, operations, rollout, and cost content.
+8. Useful Mermaid diagrams embedded directly in `hld.md`, when they clarify a decision.
+9. Key Design Decisions and Traceability.
 
 The HLD must not become an LLD. Executable SQL, class/package structure, exact
 test cases, migration scripts, and detailed deployment manifests belong after the
