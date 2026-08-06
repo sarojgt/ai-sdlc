@@ -162,11 +162,8 @@ hld_generation_result:
   status: draft
   selected_recommendation: OPT-01
   files:
-    - hld/hld.md
-    - hld/options/opt-01.md
-    - hld/options/opt-02.md
     - hld/hld.md                         # primary review artifact; diagrams embedded
-    - adrs/ADR-DEMO-001-01.md
+    - hld/options.md                     # optional; only for material alternatives
   requirements_covered:
     - REQ-DEMO-001-01
     - REQ-DEMO-001-02
@@ -190,14 +187,14 @@ reference section names from the template. It must not include every available
 section:
 
 1. A concise change-size and impact summary.
-2. Motivation, Solution Overview, and relevant High Level Business Requirements.
+2. Motivation, Solution Overview, Solution Design, and Risks.
 3. Confirmed context and explicit context gaps with owners and retrieval actions.
 4. Current-state and target architecture at decision level where the change requires it.
 5. Only the options needed for an architectural decision and a trade-off summary.
 6. Recommended direction, risks, and human decision points.
 7. Only the applicable security, Non-Functional Requirements, operations, rollout, and cost content.
-8. Useful Mermaid diagrams embedded directly in `hld.md`, when they clarify a decision.
-9. Key Design Decisions and Traceability.
+8. Optional Mermaid diagrams embedded directly in `hld.md` when they clarify a decision.
+9. Only optional sections selected by the impact assessment.
 
 The HLD must not become an LLD. Executable SQL, class/package structure, exact
 test cases, migration scripts, and detailed deployment manifests belong after the
@@ -209,17 +206,12 @@ The workflow must run these checks before opening the PR:
 
 ```text
 das-schema-valid
-required-sections-present
-requirements-covered
-multiple-options-present
-tradeoff-scorecard-present
-risks-and-mitigations-present
-security-section-present
-rollback-present
-diagrams-render
-all-context-sources-versioned
-no-secrets-or-sensitive-fixtures-in-output
-all-facts-have-evidence
+mandatory-core-present-and-nonempty
+assessment-profile-consistent
+requirement-context-and-baseline-hashes-consistent
+single-risk-and-context-gap-registers
+no-unresolved-template-placeholders
+optional-mermaid-advisory-checks
 ```
 
 If validation fails, the workflow sends the findings back to the agent for one bounded repair attempt. After the retry budget is exhausted, it opens a `needs-human-input` issue instead of continuing silently.
@@ -242,7 +234,7 @@ Agent run: RUN-DEMO-001-HLD-003
 Artifact: HLD-DEMO-001@v1
 Status: Ready for Solution Architect review
 
-The AI generated multiple options. No architecture decision has been approved.
+The AI produced a recommendation for human review. No architecture decision has been approved.
 ```
 
 The PR is assigned to the Solution Architect through CODEOWNERS. The workflow then pauses.
