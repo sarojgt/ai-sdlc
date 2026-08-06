@@ -78,6 +78,9 @@ from starting early.
 - [x] HLD profiles provide automatic small/medium/large classification,
       proportional detail guidance, and per-call timeouts; automatic selection
       is the default.
+- [x] Each concrete HLD profile defines suitability, document strategy,
+      supporting-document, option-analysis, design-view, and diagram guidance;
+      `auto` is assessment-only and profile time budgets accommodate hosted agents.
 - [x] HLD loop checkpoints and explicit resume support added for interrupted
       or timed-out runs, with GitHub checkpoint commits pushed after each
       generation/review phase and requirement/context hash checks on resume.

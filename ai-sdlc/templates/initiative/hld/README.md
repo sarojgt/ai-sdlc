@@ -28,6 +28,11 @@ parent HLD with focused linked supporting HLD or LLD documents. Do not move
 detail out merely to reduce a line count; move it when it would make the main
 architecture decision harder for a human to review.
 
+The authoritative suitability, document strategy, option-analysis, design-view,
+timeout, and loop limits for each size are defined in
+`ai-sdlc/config/hld-profiles.yaml`. `auto` is assessment-only and must resolve
+to a concrete profile before final generation.
+
 Diagrams are optional. Use Mermaid only when it clarifies a material decision;
 consider an ERD when changed data ownership or persistence is part of that
 decision.

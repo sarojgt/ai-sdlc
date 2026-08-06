@@ -211,7 +211,19 @@ class LifecycleToolTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Omit Pending Items from ARB, Traceability", result.stdout)
-        self.assertIn("no more than 2 Mermaid diagrams", result.stdout)
+        self.assertIn("A concise architecture decision record", result.stdout)
+        self.assertIn("Usually none", result.stdout)
+        self.assertNotIn("{{", result.stdout)
+
+    def test_assessment_rubric_is_rendered_from_profiles(self) -> None:
+        result = self.run_tool(
+            str(TOOLING / "render_prompt.py"), "--name", "hld-assessment",
+            "--initiative-id", "TEST-INITIATIVE", "--profile", "auto",
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("One bounded capability or service", result.stdout)
+        self.assertIn("Multiple components or one material boundary", result.stdout)
+        self.assertIn("new architectural boundary", result.stdout)
         self.assertNotIn("{{", result.stdout)
 
     def test_review_prompt_omits_invalid_none_condition(self) -> None:

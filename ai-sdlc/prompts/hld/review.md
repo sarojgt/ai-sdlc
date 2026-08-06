@@ -4,6 +4,10 @@ evidence/design-baseline.yaml, evidence/hld-assessment.yaml, repository-local
 context and guardrails, initiative-relative context, and prior feedback.
 {{ feedback_review_instructions }}
 
+Review proportionally against the selected profile contract:
+
+{{ profile_contract }}
+
 Check the mandatory HLD core, assessment consistency, grounding in the selected
 context, the impact dimensions and design views selected by the assessment,
 context gaps, risks, and actionable decisions. Always check security and

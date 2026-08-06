@@ -61,6 +61,10 @@ identify the discovery action, and do not present the HLD as implementation-read
 
 Keep hld.md concise and decision-focused for the selected `{{ profile }}`
 profile:
+
+{{ profile_contract }}
+
+Editorial guidance:
 {{ profile_instructions }}
 
 Use this editorial rule throughout: each section should answer a decision,
@@ -74,9 +78,9 @@ create a focused linked supporting document only when detail would make the
 summary harder to review. The presence of a section in the template does not
 make it mandatory.
 
-Diagrams are optional. Add no more than {{ max_diagrams }} Mermaid diagrams and
-only when a diagram materially clarifies a boundary, interaction, data flow, or
-deployment decision better than short prose. Use fenced Mermaid blocks, quoted
+Diagrams are optional. Add one only when it materially clarifies a boundary,
+interaction, data flow, or deployment decision better than short prose. Use
+fenced Mermaid blocks, quoted
 labels when punctuation is present, portable syntax, and no HTML. Advisory
 parser or rendering failures must not replace architecture judgment. Remove
 unused template guidance and placeholder rows from the final HLD. Preserve the

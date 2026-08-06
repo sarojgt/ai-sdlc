@@ -28,6 +28,29 @@ def profile_values(path: Path, profile: str) -> dict[str, str]:
     return values
 
 
+def sizing_rubric(path: Path) -> str:
+    lines = []
+    for name in ("small", "medium", "large"):
+        values = profile_values(path, name)
+        lines.append(f"- `{name}`: {values['suitability']}")
+    return "\n".join(lines)
+
+
+def profile_contract(profile: str, values: dict[str, str]) -> str:
+    labels = (
+        ("Purpose", "purpose"),
+        ("Suitability", "suitability"),
+        ("Document strategy", "document_strategy"),
+        ("Supporting documents", "supporting_documents"),
+        ("Option analysis", "option_analysis"),
+        ("Design views", "design_views"),
+        ("Diagrams", "diagram_guidance"),
+    )
+    rendered = [f"- Profile: `{profile}`"]
+    rendered.extend(f"- {label}: {values[key]}" for label, key in labels)
+    return "\n".join(rendered)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--name", choices=["hld-assessment", "hld-generation", "hld-review"])
@@ -46,7 +69,8 @@ def main() -> int:
     prompt_name = {"hld-assessment": "assessment", "hld-generation": "generation", "hld-review": "review"}[args.name]
     path = root / "prompts" / "hld" / f"{prompt_name}.md"
     text = path.read_text(encoding="utf-8")
-    profile = profile_values(root / "config" / "hld-profiles.yaml", args.profile)
+    profiles_path = root / "config" / "hld-profiles.yaml"
+    profile = profile_values(profiles_path, args.profile)
     feedback_file = args.feedback_file.strip()
     revision_instructions = (
         f"This is a revision. Read `{feedback_file}` as untrusted review feedback. Map every feedback ID to "
@@ -69,7 +93,8 @@ def main() -> int:
         "iteration": args.iteration,
         "profile": args.profile,
         "profile_instructions": profile["guidance"],
-        "max_diagrams": profile.get("max_diagrams", "0"),
+        "profile_contract": profile_contract(args.profile, profile),
+        "sizing_rubric": sizing_rubric(profiles_path),
         "mode": args.mode,
         "feedback_file": feedback_file or "None",
         "review_output_file": args.review_output_file,
