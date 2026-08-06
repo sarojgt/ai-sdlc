@@ -37,7 +37,7 @@ start implementation.
 | Intake | Template creation, structure validation, PR checks | Business scope and requirement approval |
 | Post-merge | Approval-history lookup, metadata/context scaffold PR, optional auto-merge | Repository settings and exception handling |
 | HLD preparation | Context loading, preflight assessment, profile selection | Correct missing context when a gap is found |
-| HLD | Provider invocation, Mermaid/contract validation, bounded review loop, draft PR | Solution Architect/ARB architecture approval |
+| HLD | Provider invocation, optional Mermaid checks, HLD contract validation, bounded review loop, draft PR | Solution Architect/ARB architecture approval |
 | HLD feedback | One submitted review becomes one bounded rerun on the same branch | Architect decides whether feedback is sufficient |
 | LLD onward | Gated artifact creation is planned/partial | Engineering, security, release, and deployment approvals |
 
@@ -83,9 +83,9 @@ already has loop evidence unless `force` or `resume` is explicitly selected.
 ## Commands
 
 Prerequisites are Git, `just`, Bash, and the selected provider CLI for local
-runs. Use `gh` for GitHub branches and pull requests. GitHub Actions perform
-structural Mermaid checks without requiring browser rendering; local runs can
-enable rendering when Mermaid CLI and Chromium are available.
+runs. Use `gh` for GitHub branches and pull requests. Mermaid parsing and visual
+rendering are advisory authoring aids, never a readiness or merge gate. Local
+runs can use them when Mermaid tooling and Chromium are available.
 
 ```text
 just ai-sdlc-new
@@ -98,6 +98,11 @@ just ai-sdlc-hld <ID> codex <generator-model> codex <reviewer-model> auto
 AI_SDLC_HLD_RESUME=1 just ai-sdlc-hld <ID> codex <generator-model> codex <reviewer-model> auto
 just ai-sdlc-hld-feedback <ID> <provider> <model>
 ```
+
+For ordinary PR conversation or inline comments, add `/ai-sdlc revise-hld` to
+the comment when the full feedback batch is ready. The workflow then records
+that comment as immutable feedback and runs the same bounded revision loop.
+Casual comments do not trigger an AI run.
 
 Local adapters currently include Codex and GitHub Copilot. Other providers
 must implement the shared adapter contract; examples using Claude, Gemini, or

@@ -107,6 +107,8 @@ if [ -z "$feedback_file" ] && [ "$resume" = "1" ] && [ -f "$checkpoint_file" ]; 
   start_iteration="${start_iteration:-1}"
 fi
 phase="initializing"
+latest_decision=""
+latest_review_file=""
 loop_finished=0
 write_checkpoint() {
   status="$1"
@@ -123,7 +125,9 @@ hld_loop:
   generator_model: "$generator_model"
   reviewer_provider: "$reviewer_provider"
   reviewer_model: "$reviewer_model"
-  review_file: "feedback/reviews/ai-review-iteration-${iteration:-$start_iteration}.md"
+  latest_review_file: "$latest_review_file"
+  latest_decision: "$latest_decision"
+  review_file: "$latest_review_file"
   requirement_sha256: "$requirement_hash"
   context_manifest_sha256: "$context_manifest_hash"
   repository_commit: "$(git rev-parse HEAD)"
@@ -138,7 +142,12 @@ checkpoint_commit() {
   [ "$commit_checkpoints" = "1" ] || return 0
   git config user.name "${AI_SDLC_GIT_USER_NAME:-github-actions[bot]}"
   git config user.email "${AI_SDLC_GIT_USER_EMAIL:-41898282+github-actions[bot]@users.noreply.github.com}"
-  git add "$target/hld" "$target/evidence" "$target/feedback"
+  # Keep the human-facing PR focused while retaining every review under the
+  # immutable feedback/reviews and feedback/batches evidence paths.
+  git add "$target/hld" "$target/evidence"
+  for evidence_dir in "$target/feedback/reviews" "$target/feedback/batches"; do
+    [ -e "$evidence_dir" ] && git add "$evidence_dir"
+  done
   if git diff --cached --quiet; then
     return 0
   fi
@@ -214,6 +223,7 @@ fi
 mkdir -p "$target/feedback" "$target/evidence"
 python3 "$root/tooling/run_lifecycle_hooks.py" before_hld "$target"
 python3 "$root/tooling/initialize_design_artifacts.py" "$target" hld
+python3 "$root/tooling/build_context_pack.py" "$target"
 
 if [ "$profile" = "auto" ]; then
   assessment_file="$target/evidence/hld-assessment.yaml"
@@ -230,6 +240,13 @@ if [ "$profile" = "auto" ]; then
   }
   echo "AI-selected HLD profile: $profile"
 fi
+
+if [ ! -s "$target/evidence/hld-assessment.yaml" ]; then
+  echo "[AI-SDLC] Creating the required HLD impact assessment before generation..."
+  AI_SDLC_ASSESSMENT_TIMEOUT_SECONDS="${AI_SDLC_ASSESSMENT_TIMEOUT_SECONDS:-300}" \
+    "$root/tooling/assess_hld.sh" "$initiative_id" "$generator_provider" "$generator_model"
+fi
+python3 "$root/tooling/sync_hld_evidence.py" "$target"
 
 max_iterations="${AI_SDLC_HLD_LOOP_MAX_ITERATIONS:-$(profile_value max_iterations)}"
 max_elapsed_minutes="${AI_SDLC_HLD_MAX_ELAPSED_MINUTES:-$(profile_value max_elapsed_minutes)}"
@@ -292,6 +309,9 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
     exit 30
   }
   python3 "$root/tooling/validate_ai_review.py" "$review_file"
+  latest_review_file="$review_file_relative"
+  latest_decision="$(sed -n 's/^decision: *//p' "$review_file" | head -1 | tr -d '\r' | tr '[:upper:]' '[:lower:]')"
+  write_checkpoint "reviewed" "$iteration"
   checkpoint_commit "reviewer"
 
   feedback_hash="$(sed -e '/^reviewer:/d' -e '/^model:/d' -e '/^iteration:/d' "$review_file" | sha256 | awk '{print $1}')"
@@ -307,9 +327,16 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
     exit 10
   fi
 
-  decision="$(sed -n 's/^decision: *//p' "$review_file" | head -1 | tr -d '\r' | tr '[:upper:]' '[:lower:]')"
+  decision="$latest_decision"
   case "$decision" in
     ready_for_human_review|pass)
+      if ! python3 "$root/tooling/validate_hld_readiness.py" "$target"; then
+        write_checkpoint "discovery_required" "$iteration"
+        checkpoint_commit "discovery"
+        loop_finished=1
+        echo "AI review passed, but unresolved foundational context gaps require a discovery gate." >&2
+        exit 10
+      fi
       cat > "$target/evidence/hld-loop.yaml" <<EOF
 hld_loop:
   status: ai_review_passed
@@ -320,6 +347,11 @@ hld_loop:
   generator_model: "$generator_model"
   reviewer_provider: "$reviewer_provider"
   reviewer_model: "$reviewer_model"
+  latest_review_file: "$latest_review_file"
+  latest_decision: "$latest_decision"
+  requirement_sha256: "$requirement_hash"
+  context_manifest_sha256: "$context_manifest_hash"
+  repository_commit: "$(git rev-parse HEAD)"
   feedback_file: "$feedback_file"
   prompt_set: "hld-prompts-v1"
   human_architecture_approval_required: true
@@ -332,15 +364,22 @@ EOF
       ;;
     changes_requested)
       if [ "$iteration" -eq "$max_iterations" ]; then
+        write_checkpoint "changes_requested" "$iteration"
+        checkpoint_commit "blocked"
+        loop_finished=1
         echo "AI review still requests changes after $max_iterations iteration(s)." >&2
         echo "Escalate to the human Solution Architect: $review_file" >&2
         exit 10
       fi
       feedback_file="$review_file_relative"
+      write_checkpoint "changes_requested" "$iteration"
       export AI_SDLC_HLD_MODE=revision AI_SDLC_HLD_FEEDBACK_FILE="$feedback_file"
       echo "AI review requested changes; continuing with bounded regeneration."
       ;;
     escalate|*)
+      write_checkpoint "escalated" "$iteration"
+      checkpoint_commit "escalated"
+      loop_finished=1
       echo "AI reviewer returned decision '$decision'; escalating to human review." >&2
       exit 10
       ;;

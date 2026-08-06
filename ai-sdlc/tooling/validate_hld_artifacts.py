@@ -46,7 +46,10 @@ def validate_core_headings(headings: list[str]) -> None:
 
 
 def validate_mermaid(blocks: list[str]) -> None:
+    """Run advisory diagram checks without making Mermaid a lifecycle gate."""
     mmdc = which("mmdc")
+    parser = Path(__file__).with_name("mermaid") / "validate.mjs"
+    node = which("node")
     skip_render = os.environ.get("AI_SDLC_SKIP_MERMAID_RENDER", "").lower() in {
         "1",
         "true",
@@ -59,10 +62,10 @@ def validate_mermaid(blocks: list[str]) -> None:
         )
     for index, block in enumerate(blocks, 1):
         if "<br" in block.lower():
-            raise ValueError(f"Mermaid diagram {index} uses HTML; use portable Mermaid labels")
+            print(f"Warning: Mermaid diagram {index} uses HTML; prefer portable labels", file=sys.stderr)
         first = next((line.strip().lower() for line in block.splitlines() if line.strip()), "")
         if not first.startswith(("flowchart", "graph", "sequencediagram", "classdiagram", "statediagram", "erdiagram", "journey", "gantt", "pie", "mindmap", "timeline")):
-            raise ValueError(f"Mermaid diagram {index} has unsupported or missing diagram declaration")
+            print(f"Warning: Mermaid diagram {index} has an unsupported or missing declaration", file=sys.stderr)
 
         if mmdc and not skip_render:
             with tempfile.TemporaryDirectory() as directory:
@@ -71,7 +74,14 @@ def validate_mermaid(blocks: list[str]) -> None:
                 source.write_text(block, encoding="utf-8")
                 result = subprocess.run([mmdc, "-i", str(source), "-o", str(output), "-q"], capture_output=True, text=True)
                 if result.returncode:
-                    raise ValueError(f"Mermaid diagram {index} failed to render: {result.stderr.strip()}")
+                    print(f"Warning: Mermaid diagram {index} failed optional rendering: {result.stderr.strip()}", file=sys.stderr)
+
+    if blocks and node and parser.is_file() and (parser.parent / "node_modules").is_dir():
+        hld_file = os.environ.get("AI_SDLC_MERMAID_SOURCE_FILE")
+        if hld_file:
+            result = subprocess.run([node, str(parser), hld_file], capture_output=True, text=True)
+            if result.returncode:
+                print(f"Warning: optional Mermaid parser reported issues:\n{result.stdout}{result.stderr}", file=sys.stderr)
 
 
 def main() -> int:
@@ -82,6 +92,7 @@ def main() -> int:
     hld = target / "hld" / "hld.md"
     assessment = target / "evidence" / "hld-assessment.yaml"
     loop = target / "evidence" / "hld-loop.yaml"
+    baseline = target / "evidence" / "design-baseline.yaml"
     if not hld.exists():
         print(f"Missing HLD: {hld}", file=sys.stderr)
         return 1
@@ -101,6 +112,24 @@ def main() -> int:
         loop_profile = field(loop.read_text(encoding="utf-8"), "profile")
         if loop_profile and loop_profile != profile:
             print(f"HLD loop profile mismatch: loop={loop_profile}, HLD={profile}", file=sys.stderr)
+            return 1
+
+    # Any HLD produced by the governed lifecycle must carry one consistent,
+    # hashable provenance chain. Legacy examples without lifecycle evidence are
+    # left untouched, but a partially-created evidence set is rejected.
+    if loop.exists() or baseline.exists() or assessment.exists():
+        consistency = target / "evidence" / "hld-assessment.yaml"
+        required = (assessment, loop, baseline, target / "context-manifest.yaml", target / "requirement.md")
+        missing = [str(path) for path in required if not path.is_file()]
+        if missing:
+            print(f"HLD evidence is incomplete; missing: {', '.join(missing)}", file=sys.stderr)
+            return 1
+        from validate_hld_consistency import validate_consistency
+
+        try:
+            validate_consistency(target)
+        except ValueError as error:
+            print(str(error), file=sys.stderr)
             return 1
 
     headings = visible_headings(hld_text)
@@ -123,6 +152,7 @@ def main() -> int:
         return 1
 
     try:
+        os.environ.setdefault("AI_SDLC_MERMAID_SOURCE_FILE", str(hld))
         validate_mermaid(mermaid_blocks(hld_text))
     except ValueError as error:
         print(str(error), file=sys.stderr)
