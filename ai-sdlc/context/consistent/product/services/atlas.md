@@ -10,6 +10,8 @@ sources:
   - https://github.com/Paymentology/atlas-environments
   - https://github.com/Paymentology/atlas-payportal
 retrieved: 2026-08-10
+repository_commit: baac0b2
+scan_scope: readme-source-mfe-bff-deployment-identity
 ---
 
 # Atlas Services and Portals
@@ -19,6 +21,13 @@ retrieved: 2026-08-10
 Atlas provides public and private portal shells, shared UI/platform services,
 identity, client context, and deployment orchestration for microfrontends and
 remote services.
+
+## Business capability
+
+Atlas provides the unified public and private product experience. It composes
+microfrontends, shared UI, identity, client context, BFFs, and downstream
+Banking.Live capabilities. A portal initiative must identify the shell, MFE,
+BFF, downstream API, actor type, and public/private boundary.
 
 ## Repository map
 
@@ -65,6 +74,13 @@ Confirm the target surface, region, environment, and public/private boundary.
 Identify shell, MFE, BFF, identity, client context, shared UI, deployment, and
 rollback boundaries. Avoid direct frontend-to-downstream calls when the Atlas
 BFF pattern applies.
+
+## Scan-confirmed delivery profile
+
+The `atlas-payportal` scan confirms a shell, Webpack Module Federation,
+Auth0-based AAA, shared libraries, dedicated GraphQL BFF direction, and
+downstream PayAPI integration. Terraform and environment repositories control
+deployment; exact MFE/BFF ownership is feature-specific.
 
 ## Context gaps
 

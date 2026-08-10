@@ -11,6 +11,8 @@ sources:
   - https://github.com/Paymentology/decision-engine-dsl
   - https://github.com/Paymentology/decision-engine-atlas
 retrieved: 2026-08-10
+repository_commit: b7976e1
+scan_scope: readme-build-source-database-api-deployment
 ---
 
 # Decision Engine
@@ -19,6 +21,13 @@ retrieved: 2026-08-10
 
 Decision Engine owns transaction rule-configuration capability. It is being
 migrated from PayControl into Atlas surfaces including Helm and PayPortal.
+
+## Business capability
+
+Decision Engine evaluates transaction and product rules and provides
+administrative configuration capabilities. It separates decision logic from
+API and infrastructure adapters. Initiatives must distinguish runtime
+decision execution from configuration and UI delivery.
 
 ## Repository map
 
@@ -58,6 +67,13 @@ through the Atlas UI router. BFFs and remote services run on EKS.
 
 Cover host surface, shared frontend/BFF topology, authorization, client scope,
 DSL compatibility, deployment path, and behavior preservation.
+
+## Scan-confirmed delivery profile
+
+The repository confirms a Gradle hexagonal service with `app`, `domain`, `api`,
+and `infra` modules, PostgreSQL/Liquibase persistence, PostgreSQL integration
+tests, and Kubernetes deployment. Confirm the Atlas BFF and frontend repository
+when the initiative is user-facing.
 
 ## Context gaps
 

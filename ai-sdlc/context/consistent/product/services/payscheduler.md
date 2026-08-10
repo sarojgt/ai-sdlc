@@ -10,6 +10,8 @@ sources:
   - https://paymentology.atlassian.net/wiki/spaces/TS/pages/10010918939/PECA-1056+-+Migrate+PayAPI+PayScheduler+Integration+from+DB+Socket+to+REST+API
   - https://github.com/Paymentology/payscheduler
 retrieved: 2026-08-10
+repository_commit: 95e7ff4
+scan_scope: readme-build-source-jobs-database-deployment
 ---
 
 # PayScheduler
@@ -18,6 +20,13 @@ retrieved: 2026-08-10
 
 Banking.Live scheduling, jobs, and reporting support. The Confluence catalogue
 assigns it to Clearing & Reporting.
+
+## Business capability
+
+PayScheduler runs time-based Banking.Live work such as clearing, reporting,
+maintenance, and integration jobs. It owns scheduling and job execution while
+business data remains owned by the relevant domain or database service. A
+report initiative must identify both job owner and source-data owner.
 
 ## Repository map
 
@@ -61,7 +70,13 @@ the active runtime and job execution boundary before design approval.
 ## HLD implications
 
 Cover scheduling ownership, tenant routing, database writes, job idempotency,
-failure recovery, and operational visibility.
+  failure recovery, and operational visibility.
+
+## Scan-confirmed delivery profile
+
+The repository contains Quartz/job configuration, report templates, REST
+integration support, database routing, and a Helm workload with configurable
+storage. The historical socket path is not a default for new work.
 
 ## Context gaps
 

@@ -10,6 +10,8 @@ sources:
   - https://paymentology.atlassian.net/wiki/spaces/TS/pages/6762659879/Banking+Live+dockerized+environment
   - https://github.com/Paymentology/paycontrol
 retrieved: 2026-08-10
+repository_commit: fde0aac
+scan_scope: readme-build-source-deployment-security
 ---
 
 # PayControl
@@ -18,6 +20,14 @@ retrieved: 2026-08-10
 
 Banking.Live operational control and portal surface. The Confluence service
 catalogue assigns it to Portals & Digital Transformation.
+
+## Business capability
+
+PayControl provides operational and client-control workflows for Banking.Live.
+It is a user-facing control surface rather than the authoritative owner of
+card, transaction, or decision data. New work must identify whether the actor
+is internal or external and whether the capability remains in PayControl or
+moves to Atlas.
 
 ## Repository map
 
@@ -53,7 +63,14 @@ coexistence path.
 ## HLD implications
 
 State the host surface, authentication, client context, downstream APIs, data
-classification, and migration impact.
+  classification, and migration impact.
+
+## Scan-confirmed delivery profile
+
+The repository is a React/npm frontend with JFrog-managed dependencies and a
+Helm workload. The chart uses a non-root container, a `/paycontrol` health
+path, and Datadog/environment configuration. Backend, BFF, and database
+ownership are outside this frontend repository.
 
 ## Context gaps
 

@@ -10,6 +10,8 @@ sources:
   - https://paymentology.atlassian.net/wiki/spaces/TS/pages/8452800578/BL+Accessing+Production+Databases
   - https://github.com/Paymentology/paykeydb
 retrieved: 2026-08-10
+repository_commit: 5c86b3e
+scan_scope: readme-migrations-functions-deployment-data-model
 ---
 
 # PayKey DB
@@ -26,6 +28,13 @@ treated as a security-sensitive data boundary.
 | --- | --- | --- |
 | [Paymentology/paykeydb](https://github.com/Paymentology/paykeydb) | confirmed | PayKey PostgreSQL schema and delivery repository |
 | [Paymentology/paykeyserv](https://github.com/Paymentology/paykeyserv) | confirmed | Service and database-client integration |
+
+## Business capability
+
+PayKey DB supports key-service metadata, key lifecycle/configuration, and
+security-operation records. It is a high-sensitivity security boundary and
+must never become a source for exposing cryptographic material to application
+or AI consumers.
 
 ## Technical profile
 

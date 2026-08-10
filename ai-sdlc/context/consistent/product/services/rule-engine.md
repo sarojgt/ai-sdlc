@@ -9,6 +9,8 @@ sources:
   - https://paymentology.atlassian.net/wiki/spaces/TS/pages/7400423715/Teams+vs+BL+Services
   - https://github.com/Paymentology/rule-engine-v1-load-test
 retrieved: 2026-08-10
+repository_commit: e404386
+scan_scope: readme-load-test-only
 ---
 
 # Rule Engine
@@ -18,6 +20,13 @@ retrieved: 2026-08-10
 The Confluence service catalogue identifies a Rules Engine under the Decision
 Engine team. It is a decisioning capability related to PayPower and Decision
 Engine workflows.
+
+## Business capability
+
+The Rules Engine evaluates configurable rules that influence authorization and
+transaction decisions. Rule definition, rule evaluation, decision ownership,
+versioning, rollout, tenant scope, and audit must remain explicit in every
+initiative.
 
 ## Repository map
 
@@ -59,3 +68,6 @@ behavior, performance, and operational controls.
 - The primary GitHub repository for `rules-engine.git` was not found in the
   accessible Paymentology repository search. Do not use the load-test repo as a
   substitute; obtain service-owner confirmation.
+- The local scan confirms only the auxiliary load-test repository; no service
+  implementation, database, API, deployment, or protocol facts were inferred
+  from it.

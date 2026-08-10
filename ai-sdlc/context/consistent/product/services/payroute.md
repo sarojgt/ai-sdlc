@@ -10,6 +10,8 @@ sources:
   - https://paymentology.atlassian.net/wiki/spaces/TS/pages/6762659879/Banking+Live+dockerized+environment
   - https://github.com/Paymentology/payroute
 retrieved: 2026-08-10
+repository_commit: baa6db1
+scan_scope: readme-build-source-deployment-networking
 ---
 
 # PayRoute
@@ -18,6 +20,14 @@ retrieved: 2026-08-10
 
 Banking.Live transaction-routing component used with PaySwitch and PayPower.
 The Confluence catalogue assigns it to Switching.
+
+## Business capability
+
+PayRoute selects and forwards transaction traffic between Banking.Live
+processing components and switching/network boundaries. It is a routing and
+transport boundary, not automatically the owner of card state or transaction
+data. Changes must preserve message compatibility, routing, retries, and
+certificate identity.
 
 ## Repository map
 
@@ -52,7 +62,13 @@ target Lume/Kubernetes workload and sensitive-data zone.
 ## HLD implications
 
 Describe message flow, routing decisions, failure handling, replay/SAF,
-security boundary, and observability.
+  security boundary, and observability.
+
+## Scan-confirmed delivery profile
+
+The repository is a Java 21 Helm workload with JFrog images, non-root/pod
+security settings, NetworkPolicy, probes, and JKS/certificate configuration.
+Actual network protocol, peer list, ports, and persistence are route-specific.
 
 ## Context gaps
 

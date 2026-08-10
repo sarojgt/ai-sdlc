@@ -189,6 +189,8 @@ from starting early.
 - [x] Enrich service context with reusable interface, database, scheduling,
       audit, deployment, and evidence-backed discovery maps; HLD generation is
       repository-context-only and records missing facts as owned gaps.
+- [x] Clone and scan the catalogue-referenced repositories locally, pin scan
+      commits, and add business-capability summaries to the service context.
 - [ ] Add repository/API/schema/ADR discovery adapters.
 - [ ] Add secure context filtering for sensitive content.
 - [ ] Add Confluence synchronization as a future source connector.

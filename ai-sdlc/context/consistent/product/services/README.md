@@ -32,3 +32,8 @@ HLD generation must use the assembled repository context only. If a required
 field is missing, the agent records a `CONTEXT GAP` with an owner and retrieval
 action; it must not silently search external systems or invent a service,
 database, table, or integration.
+
+The current local scan inventory is in
+[repository-scan-inventory.md](repository-scan-inventory.md). It records the
+repository commit used as evidence; the service pages remain the curated
+business and technical context.

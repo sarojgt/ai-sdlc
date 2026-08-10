@@ -11,6 +11,8 @@ sources:
   - https://github.com/Paymentology/paykeyserv
   - https://github.com/Paymentology/paykeydb
 retrieved: 2026-08-10
+repository_commit: 10ffe67
+scan_scope: readme-build-api-database-deployment-security
 ---
 
 # PayKeyService / PayKeyServ
@@ -19,6 +21,14 @@ retrieved: 2026-08-10
 
 Banking.Live key and cryptographic-support service. The service catalogue uses
 both PayKeyService and PayKeyServ naming.
+
+## Business capability
+
+PayKeyService supports cryptographic key lifecycle and secure payment
+processing operations for Banking.Live. It is a security boundary: features
+may request approved cryptographic operations but must not own or expose key
+material. Rotation, certificate identity, audit, and availability are design
+impacts.
 
 ## Repository map
 
@@ -55,6 +65,13 @@ DB as a separate database. Confirm production zone and deployment ownership.
 
 Identify key custody, trust boundaries, certificate lifecycle, access paths,
 availability, rotation, and audit evidence.
+
+## Scan-confirmed delivery profile
+
+The repository confirms a Java/Maven service with API documentation, separate
+PayCore/PayKey/PayLog datasources, Hikari pool settings, Helm deployment,
+certificate/secret configuration, and encrypted database connections. Exact
+API transport and cryptographic provider remain operation-specific.
 
 ## Context gaps
 

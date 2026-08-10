@@ -10,6 +10,8 @@ sources:
   - https://paymentology.atlassian.net/wiki/spaces/TS/pages/10010918939/PECA-1056+-+Migrate+PayAPI+PayScheduler+Integration+from+DB+Socket+to+REST+API
   - https://github.com/Paymentology/paylogdb
 retrieved: 2026-08-10
+repository_commit: 4b37d71
+scan_scope: readme-migrations-functions-deployment-data-model
 ---
 
 # PayLog DB
@@ -24,6 +26,13 @@ assigns it to the Data team.
 | Repository | Status | Use |
 | --- | --- | --- |
 | [Paymentology/paylogdb](https://github.com/Paymentology/paylogdb) | confirmed | Database schema and delivery repository |
+
+## Business capability
+
+PayLog supports operational diagnostics, API traces, errors, and service
+support records. It is not automatically the domain-audit or telemetry source
+for a new feature; the correct audit and observability destination must be
+confirmed for each requirement.
 
 ## Dependencies and boundaries
 

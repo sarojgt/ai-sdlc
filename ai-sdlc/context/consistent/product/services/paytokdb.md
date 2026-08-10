@@ -10,6 +10,8 @@ sources:
   - https://paymentology.atlassian.net/wiki/spaces/TS/pages/8452800578/BL+Accessing+Production+Databases
   - https://github.com/Paymentology/paytokdb
 retrieved: 2026-08-10
+repository_commit: 841df85
+scan_scope: readme-migrations-functions-deployment-data-model
 ---
 
 # PayTok DB
@@ -24,6 +26,13 @@ the Data team.
 | Repository | Status | Use |
 | --- | --- | --- |
 | [Paymentology/paytokdb](https://github.com/Paymentology/paytokdb) | confirmed | Database schema and delivery repository |
+
+## Business capability
+
+PayTok is the tokenization and card/token data boundary used by Banking.Live
+components. It supports token lifecycle, card processing, product, delivery,
+and related operational data. New consumers must respect token ownership and
+must not treat token data as ordinary application data.
 
 ## Dependencies and boundaries
 

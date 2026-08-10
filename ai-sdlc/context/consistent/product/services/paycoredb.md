@@ -10,6 +10,8 @@ sources:
   - https://paymentology.atlassian.net/wiki/spaces/TS/pages/8452800578/BL+Accessing+Production+Databases
   - https://github.com/Paymentology/paycoredb
 retrieved: 2026-08-10
+repository_commit: fc5ead8
+scan_scope: readme-migrations-functions-deployment-data-model
 ---
 
 # PayCore DB
@@ -24,6 +26,13 @@ the Data team and identifies PayCore as a tenant-routed database type.
 | Repository | Status | Use |
 | --- | --- | --- |
 | [Paymentology/paycoredb](https://github.com/Paymentology/paycoredb) | confirmed | Database schema and delivery repository |
+
+## Business capability
+
+PayCore is the operational Banking.Live data boundary for core account,
+product, card, transaction, limit, rule, and client/tenant processes. Database
+changes support an existing domain capability; they must not introduce a
+parallel source of truth without architecture approval.
 
 ## Dependencies and boundaries
 

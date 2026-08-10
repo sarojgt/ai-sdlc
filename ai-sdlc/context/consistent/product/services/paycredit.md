@@ -10,6 +10,8 @@ sources:
   - https://github.com/Paymentology/paycredit-ui
   - https://github.com/Paymentology/paycredit-test-automation
 retrieved: 2026-08-10
+repository_commit: d7bde9c
+scan_scope: readme-build-source-service-database-messaging-deployment
 ---
 
 # PayCredit
@@ -19,6 +21,14 @@ retrieved: 2026-08-10
 PayCredit product capability and its client-facing application surfaces. The
 existing PayCredit product context remains the domain source; this page adds
 repository discovery metadata.
+
+## Business capability
+
+PayCredit provides credit-product capabilities including revolving credit,
+instalment loans, delinquency, rewards, hardship, monitoring, reports, taxes,
+and Banking.Live integration. It is a multi-service product estate; an
+initiative must identify the bounded service, BFF, data store, and client
+surface rather than changing the root repository by default.
 
 ## Repository map
 
@@ -55,6 +65,13 @@ or a dedicated/shared client deployment.
 
 Identify product boundary, UI/API repositories, client context, data stores,
 security, deployment, and test ownership.
+
+## Scan-confirmed delivery profile
+
+The local scan confirms a Java 21/Spring Boot multi-module build, separate
+service health endpoints, PostgreSQL data domains, Feign HTTP clients, Kafka,
+Valkey/Redis, S3-compatible storage, and Helm routes/timeouts. Exact
+service-to-database ownership is feature-specific.
 
 ## Context gaps
 

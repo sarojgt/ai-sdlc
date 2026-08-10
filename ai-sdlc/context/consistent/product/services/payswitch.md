@@ -11,6 +11,8 @@ sources:
   - https://github.com/Paymentology/payswitch-context
   - https://github.com/Paymentology/payswitch-iso8583-core
 retrieved: 2026-08-10
+repository_commit: 9bb8159
+scan_scope: readme-repository-family-scheme-tooling
 ---
 
 # PaySwitch
@@ -21,6 +23,12 @@ Switching and network-integration capability. The Dockerized environment
 describes PaySwitch as appearing to PayRoute like a Mastercard MIP or another
 configured network and injecting the Common Message Object into the adapted
 ISO-8583 message.
+
+## Business capability
+
+PaySwitch represents scheme and network behavior for issuer-processing flows.
+It adapts messages and scheme rules across a family of repositories. A change
+must identify the exact scheme, adaptor, parser, key path, and deployable unit.
 
 ## Repository map
 
@@ -60,7 +68,15 @@ Confirm the production/Lume deployment units and regional topology.
 ## HLD implications
 
 Map the exact repository subset, message flow, scheme boundary, key path,
-deployment units, compatibility, and rollback.
+  deployment units, compatibility, and rollback.
+
+## Scan-confirmed delivery profile
+
+The local scan confirms that `payswitch-orchestration` synchronizes related
+repositories and supports scheme onboarding/ingestion tooling. The family
+includes ISO8583 core, scheme parser, PayPower and PKS adaptors, key manager,
+and context repositories. The primary runtime/deployment repository remains a
+change-specific discovery item.
 
 ## Context gaps
 

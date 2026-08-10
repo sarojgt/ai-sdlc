@@ -10,6 +10,8 @@ sources:
   - https://paymentology.atlassian.net/wiki/spaces/TS/pages/9493741661/Analysis+of+PayPower+Changes+to+Support+Client-Specific+Segregated+Database+Connections
   - https://github.com/Paymentology/paypower
 retrieved: 2026-08-10
+repository_commit: 2e89209
+scan_scope: readme-build-source-database-deployment-observability
 ---
 
 # PayPower
@@ -18,6 +20,13 @@ retrieved: 2026-08-10
 
 Banking.Live authorization and core processing component. The Confluence
 catalogue assigns it to the Authorizations team.
+
+## Business capability
+
+PayPower evaluates and processes authorization-related transaction decisions
+for Banking.Live. It is a high-throughput, client/tenant-sensitive boundary
+that may invoke rules, decisioning, card/token data, queues, and operational
+logging. Changes must preserve authorization outcomes, isolation, and recovery.
 
 ## Repository map
 
@@ -53,7 +62,14 @@ BL2 or Lume deployment and client isolation model for each initiative.
 ## HLD implications
 
 Cover authorization flow, client routing, database isolation, queue behavior,
-logging, and operational recovery.
+  logging, and operational recovery.
+
+## Scan-confirmed delivery profile
+
+The repository and chart confirm Java 21, Helm deployment, PayCore/PayTok/PayLog
+database configuration, SSL, connection limits, NetworkPolicy, pod security,
+health probes, and Datadog telemetry. Queue/topic and partner details remain
+flow-specific.
 
 ## Context gaps
 
