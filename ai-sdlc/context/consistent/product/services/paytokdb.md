@@ -75,6 +75,20 @@ For an initiative, identify the exact table/view/function, token boundary,
 tenant scope, indexes, retention, and authorization path from the approved
 schema and service owner.
 
+## Scan-confirmed change anchors
+
+- The repository is a Liquibase PostgreSQL schema with table, type, function,
+  and staged migration content for token/card lifecycle and operational flows.
+- Existing PayAPI access includes PayTok card/token status families and stored
+  procedures, so a new feature must distinguish lookup, token resolution, state
+  mutation, and no-PayTok paths.
+- Token, card, key-reference, residency, retention, and access-audit impacts
+  are mandatory design inputs; raw token or payment examples must not enter
+  context.
+
+These anchors are from commit `841df85`; exact schema and authoritative owner
+must be confirmed for the affected capability.
+
 ## Deployment context
 
 Confirm client/environment placement, regional residency, RDS topology, and

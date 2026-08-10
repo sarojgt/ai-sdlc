@@ -78,6 +78,22 @@ includes ISO8583 core, scheme parser, PayPower and PKS adaptors, key manager,
 and context repositories. The primary runtime/deployment repository remains a
 change-specific discovery item.
 
+## Scan-confirmed implementation anchors
+
+- `payswitch-orchestration` coordinates the repository family and scheme
+  onboarding/ingestion tooling; it is not automatically the runtime owner for
+  every PaySwitch change.
+- The family separates ISO-8583 core processing, scheme parsing, PayPower and
+  PKS adaptors, key management, and shared context. A design must name the
+  affected repository subset and deployable units.
+- Message changes require compatibility analysis for the Common Message Object,
+  ISO-8583 fields, scheme parser behavior, adaptor contracts, and key/certificate
+  handling.
+
+These anchors are based on the local family scan and orchestration commit
+`9bb8159`; exact runtime configuration, peers, ports, and deployment ownership
+remain flow-specific.
+
 ## Context gaps
 
 - Confirm the primary runtime repository and deployment manifest for PaySwitch.

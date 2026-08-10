@@ -72,6 +72,18 @@ The local scan confirms GitHub Actions workflows for dry-run/deploy operations,
 environment and client inputs, service selection, Helm/Terraform configuration,
 JFrog images, Kubernetes deployment, approvals, rollout health, and rollback.
 
+## Scan-confirmed implementation anchors
+
+- The repository contains GitHub Actions, Helm, Terraform, environment values,
+  client inputs, and component-version selection rather than application logic.
+- Deployment changes must preserve version compatibility across services,
+  databases, images, secrets, approvals, rollout health, and rollback paths.
+- AWS is represented in the scanned Terraform/deployment material; GCP remains
+  an approved exception/extension path and must be identified explicitly.
+
+These anchors are from commit `2ec927d`; target environment, region, client
+model, and release manifest must be confirmed before implementation.
+
 ## Context gaps
 
 - Confirm the current release manifest and environment branch for each change.

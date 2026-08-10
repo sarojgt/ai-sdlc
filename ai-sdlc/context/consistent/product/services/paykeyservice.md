@@ -73,6 +73,20 @@ PayCore/PayKey/PayLog datasources, Hikari pool settings, Helm deployment,
 certificate/secret configuration, and encrypted database connections. Exact
 API transport and cryptographic provider remain operation-specific.
 
+## Scan-confirmed implementation anchors
+
+- The service exposes API documentation under `docs/asciidoc` and separates
+  PayCore, PayKey, and PayLog datasource paths.
+- Hikari settings, encrypted database connections, certificates, and secret
+  configuration are service/deployment inputs; cryptographic values and key
+  material must never enter generated context or design artifacts.
+- Key creation, rotation, authentication-code, or key-copy changes require
+  security-owner review, audit events, access-policy impact, and recovery/
+  availability analysis.
+
+These anchors are from commit `10ffe67`; the exact API operation and provider
+must be confirmed for the affected capability.
+
 ## Context gaps
 
 - Confirm the canonical service and database names in the target platform.

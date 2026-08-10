@@ -76,6 +76,19 @@ For an initiative, confirm the exact log family, write path, retention/partition
 strategy, tenant scope, redaction rules, indexes, and whether the data belongs
 in PayLog or the central observability platform.
 
+## Scan-confirmed change anchors
+
+- The repository contains API error, API trace, debug, PayKey error/trace, and
+  other operational logging families delivered through Liquibase SQL.
+- PayLog is a supporting operational store, not a default domain-audit or
+  observability destination. New events should first be classified and mapped
+  to the approved central observability or domain-audit pattern.
+- Log schema changes require retention, partition/index, tenant isolation,
+  redaction, and query-owner analysis.
+
+These anchors are from commit `4b37d71`; exact log family and retention policy
+must be confirmed for the initiative.
+
 ## Deployment context
 
 Confirm client/environment placement, retention, regional residency, and

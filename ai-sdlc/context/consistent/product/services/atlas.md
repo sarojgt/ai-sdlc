@@ -82,6 +82,20 @@ Auth0-based AAA, shared libraries, dedicated GraphQL BFF direction, and
 downstream PayAPI integration. Terraform and environment repositories control
 deployment; exact MFE/BFF ownership is feature-specific.
 
+## Scan-confirmed implementation anchors
+
+- The local repository family separates public portal, environment/configuration,
+  identity, user management, client directory, transaction insights, shared UI,
+  and Decision Engine integration concerns.
+- The portal pattern is shell → microfrontend/shared UI → BFF or downstream
+  API; frontend changes should not bypass the applicable BFF authorization and
+  client-context boundary.
+- Public and private delivery use different hosting/routing paths, so a design
+  must state whether it targets PayPortal, the private Helm shell, or both.
+
+These anchors are based on the local Atlas family scan; the affected shell,
+MFE, BFF, and environment repository must still be named.
+
 ## Context gaps
 
 - Confirm the final repository topology and ownership for each Atlas initiative.

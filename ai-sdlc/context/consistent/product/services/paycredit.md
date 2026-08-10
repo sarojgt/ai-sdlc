@@ -73,6 +73,19 @@ service health endpoints, PostgreSQL data domains, Feign HTTP clients, Kafka,
 Valkey/Redis, S3-compatible storage, and Helm routes/timeouts. Exact
 service-to-database ownership is feature-specific.
 
+## Scan-confirmed implementation anchors
+
+- The main repository contains multiple Spring Boot service areas, including
+  revolving credit, instalment loans, delinquency, rewards, reports, taxes,
+  monitoring, hardship, and BL integration.
+- Feign clients and Kafka are the primary inter-service patterns identified by
+  the scan; Valkey/Redis and S3-compatible storage are supporting dependencies.
+- A PayCredit initiative must identify the exact service module, API/BFF or UI
+  surface, database domain, Kafka contract, and client deployment model.
+
+These anchors are from commit `d7bde9c`; exact service ownership, topics,
+schemas, and production deployment values remain initiative-specific.
+
 ## Context gaps
 
 - Confirm which PayCredit repositories are production-owned versus supporting

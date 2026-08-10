@@ -74,6 +74,18 @@ target workload, and identify which capability surface is changing.
 Describe rule ownership, evaluation path, versioning, data inputs, failure
 behavior, performance, and operational controls.
 
+## Scan-confirmed implementation anchors
+
+- The local load-test repository is auxiliary evidence only; it is not the
+  runtime implementation or capability owner.
+- The reusable path is distributed across PayControl setup, PayAPI actions,
+  PayCore rule persistence/procedures, and PayPower transaction evaluation.
+- Decision Engine may participate in selected flows; the HLD must prove that
+  boundary instead of assuming every rule change belongs there.
+
+These anchors preserve the distributed ownership model supported by the local
+service and database scans.
+
 ## Context gaps
 
 - Confirm the rule family, PayCore schema/procedure, PayAPI route/action, and

@@ -70,6 +70,18 @@ The repository is a Java 21 Helm workload with JFrog images, non-root/pod
 security settings, NetworkPolicy, probes, and JKS/certificate configuration.
 Actual network protocol, peer list, ports, and persistence are route-specific.
 
+## Scan-confirmed implementation anchors
+
+- The repository is a Java/Maven workload with a Helm deployment and explicit
+  certificate/network configuration rather than a domain database model.
+- Routing changes should be traced through the PayRoute boundary, PaySwitch
+  adaptor or scheme path, PayPower interaction, and configured network peer.
+- Certificate identity, NetworkPolicy, pod security, probes, and telemetry are
+  part of the deployable contract and must be included in route changes.
+
+These anchors are from commit `baa6db1`; the affected configuration is still
+required to confirm peers, ports, protocol, retries, and SAF behavior.
+
 ## Context gaps
 
 - Confirm current PaySwitch-to-PayRoute contract and runtime topology.

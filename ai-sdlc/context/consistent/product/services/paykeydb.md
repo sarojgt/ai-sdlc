@@ -57,6 +57,19 @@ or AI consumers.
 For an initiative, confirm the exact object, access path, tenant/instance
 scope, key hierarchy, audit requirement, retention, and security-owner approval.
 
+## Scan-confirmed change anchors
+
+- The database repository is delivered through staged Liquibase SQL containing
+  schema objects, functions, key templates, key users, authentication-code,
+  and key-copy operation support.
+- PayKeyService is the expected access boundary; direct application access to
+  PayKey DB requires explicit security and ownership justification.
+- Changes require encryption, least privilege, audit, redaction, migration/
+  rollback, backup/recovery, and regional placement analysis.
+
+These anchors are from commit `5c86b3e`; exact objects and security controls
+must be confirmed against the affected migration and environment.
+
 ## Deployment context
 
 Confirm regional placement, dedicated/shared environment, CHD/common-zone
