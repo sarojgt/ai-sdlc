@@ -190,6 +190,91 @@ context_sources:
     authority: engineering-platform
     freshness: current
 
+  - id: platform-atlas-services
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/atlas.md"
+    authority: atlas-platform-and-service-discovery
+    freshness: 90d
+  - id: platform-banking-live-environments
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/bl-environments.md"
+    authority: release-platform-and-repository-discovery
+    freshness: 90d
+  - id: service-decision-engine
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/decision-engine.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-payapi
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/payapi.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-paycontrol
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/paycontrol.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-paycoredb
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/paycoredb.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-paycredit
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/paycredit.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-paykeydb
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/paykeydb.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-paykeyservice
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/paykeyservice.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-paylogdb
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/paylogdb.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-paypower
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/paypower.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-payroute
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/payroute.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-payscheduler
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/payscheduler.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-payswitch
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/payswitch.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-paytokdb
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/paytokdb.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
+  - id: service-repository-scan-inventory
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/repository-scan-inventory.md"
+    authority: local-repository-scan
+    freshness: 90d
+  - id: service-rule-engine
+    class: product
+    source: "ai-sdlc/context/consistent/product/services/rule-engine.md"
+    authority: service-catalog-and-repository-discovery
+    freshness: 90d
 selection:
   include_explicit_issue_references: true
   include_direct_dependencies: true
