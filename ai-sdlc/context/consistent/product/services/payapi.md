@@ -111,6 +111,23 @@ database-access classes. It confirms capability families but does not expose
 environment secrets or production configuration values. The scan was pinned to
 `bbcc4ef` on 2026-08-10.
 
+## Scan-confirmed implementation anchors
+
+- API ownership is split across general PayAPI controllers and feature areas
+  such as transaction, card, PayCredit, tokenization, and 3DS integrations.
+- Database access is represented by DAO/repository layers and stored-procedure
+  calls rather than a single ORM-owned schema. A new data feature must identify
+  the PayCore, PayTok, PayLog, or PaySim access path before design approval.
+- The Helm chart is the deployment contract for service, Gateway API/Ingress,
+  probes, NetworkPolicy, secrets, and database configuration.
+- Scheduler-facing functionality has a REST integration path in addition to
+  legacy integration code; new work should prefer the approved REST boundary
+  after confirming the current contract.
+
+These anchors were derived from the `bbcc4ef` source, configuration, and chart
+scan. They guide repository selection but do not replace endpoint or schema
+owner confirmation.
+
 ## Deployment context
 
 Runs as part of the Banking.Live estate and is also a target service for Lume

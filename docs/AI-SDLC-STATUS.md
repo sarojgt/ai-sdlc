@@ -191,6 +191,9 @@ from starting early.
       repository-context-only and records missing facts as owned gaps.
 - [x] Clone and scan the catalogue-referenced repositories locally, pin scan
       commits, and add business-capability summaries to the service context.
+- [x] Enrich the highest-impact service pages with scan-confirmed API, data,
+      job, module, deployment, and reuse anchors from the local repository
+      snapshots; unresolved details remain explicit context gaps.
 - [ ] Add repository/API/schema/ADR discovery adapters.
 - [ ] Add secure context filtering for sensitive content.
 - [ ] Add Confluence synchronization as a future source connector.

@@ -76,6 +76,20 @@ database configuration, SSL, connection limits, NetworkPolicy, pod security,
 health probes, and Datadog telemetry. Queue/topic and partner details remain
 flow-specific.
 
+## Scan-confirmed implementation anchors
+
+- Repository areas include transaction, card, account, product, tokenization,
+  client, fee, reversal, SCA, dynamic-block, and PayLog data-access paths.
+- PayPower commonly combines authorization orchestration with database-backed
+  validation and downstream decisioning; a feature should identify whether it
+  changes the transaction path, an asynchronous queue, or a supporting lookup.
+- The repository contains Decision Engine OpenAPI schema material and a
+  PayRoute certificate asset, so decisioning and network-routing changes need
+  separate contract and certificate-rotation analysis.
+
+These anchors are from commit `2e89209`. Exact queue names, transaction stages,
+and partner protocols must still be confirmed from the affected flow.
+
 ## Context gaps
 
 - Confirm current rule/decision engine versions and integration contracts.

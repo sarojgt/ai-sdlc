@@ -76,6 +76,22 @@ Helm workload. The chart uses a non-root container, a `/paycontrol` health
 path, and Datadog/environment configuration. Backend, BFF, and database
 ownership are outside this frontend repository.
 
+## Scan-confirmed implementation anchors
+
+- PayControl is a React frontend with route and feature modules for operational
+  configuration, cards, accounts, reports, message analysis, cryptographic
+  tools, client administration, and PayScheduler tasks.
+- Auth0 configuration is runtime-injected and the frontend supports a CHD
+  feature flag that can remove CHD functionality from production bundles.
+- Its role is normally UI and configuration orchestration; API, rule
+  persistence, database access, and transaction-time evaluation belong to
+  downstream services unless the initiative proves otherwise.
+- JFrog-hosted npm dependencies and the Helm workload are delivery constraints
+  for frontend changes.
+
+These anchors are from commit `fde0aac`; the active backend/BFF and deployment
+owner must still be confirmed for each initiative.
+
 ## Context gaps
 
 - Confirm which remaining capabilities are still PayControl-owned.

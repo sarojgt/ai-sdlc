@@ -75,6 +75,24 @@ and `infra` modules, PostgreSQL/Liquibase persistence, PostgreSQL integration
 tests, and Kubernetes deployment. Confirm the Atlas BFF and frontend repository
 when the initiative is user-facing.
 
+## Scan-confirmed implementation anchors
+
+- The core service follows a hexagonal split: `app`, `domain`, `api`, and
+  `infra`. New decision behavior should keep domain logic independent of HTTP,
+  persistence, and deployment adapters.
+- The repository contains administrative decision-tree APIs, transaction
+  history/configuration repositories, rule assignment and evaluation stores,
+  and scheduled-job logging tables.
+- Database changes are delivered through the dedicated database module and
+  Liquibase SQL, with integration tests able to run against Testcontainers or a
+  local database.
+- User-facing work may span Decision Engine, an Atlas shell/BFF, and PayAPI;
+  the HLD must identify which layer owns the API contract, authorization, and
+  client/tenant context.
+
+These anchors are from commit `b7976e1`; exact API paths, rule schema, and
+runtime integration must be confirmed for the affected capability.
+
 ## Context gaps
 
 - Confirm the final Atlas repository topology and BFF split before approval.

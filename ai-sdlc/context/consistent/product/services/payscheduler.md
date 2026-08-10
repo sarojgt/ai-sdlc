@@ -78,6 +78,20 @@ The repository contains Quartz/job configuration, report templates, REST
 integration support, database routing, and a Helm workload with configurable
 storage. The historical socket path is not a default for new work.
 
+## Scan-confirmed implementation anchors
+
+- The repository exposes versioned OpenAPI job and job-chain contracts,
+  including job creation and job history paths.
+- It contains job families for settlement, chargeback, presentment, cardholder
+  reports, billing, SMS, file processing, throttling, and triggered-rule
+  reports.
+- Job changes should define schedule ownership, tenant/client scope, locking or
+  concurrency behavior, retry/backlog handling, idempotency, and report/file
+  delivery. Reuse an existing job family when it fits.
+
+These anchors are from commit `95e7ff4`; the exact job, persistence, and
+delivery contract must be selected from the requested capability.
+
 ## Context gaps
 
 - Confirm current REST contract and deployment manifest.

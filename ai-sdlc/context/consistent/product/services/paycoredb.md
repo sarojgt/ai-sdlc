@@ -79,6 +79,24 @@ For an initiative, record the exact table/view/function, access path, tenant
 scope, indexes, and classification only after confirming them from the relevant
 schema version and service owner.
 
+## Scan-confirmed change anchors
+
+- Database delivery is staged as `initialise`, `prepare`, `migrate`, and
+  `replace`; table, index, and type changes belong in migration, while
+  functions, triggers, and views belong in replace.
+- Liquibase changelog state is recorded separately for the stages, so a design
+  must include ordering, rollback or forward-fix behavior, and upgrade safety.
+- The repository contains queue and scheduler-related objects alongside core
+  transaction, card, account, product, rule, and reporting objects. Do not
+  infer ownership from a table name alone; identify the calling service and
+  migration history.
+- Validation includes changed-SQL checks and new-versus-upgraded database
+  comparison; these should be included in the LLD/test strategy for schema
+  changes.
+
+These facts are from commit `fc5ead8`. Exact table names, indexes, privileges,
+and production topology remain initiative-specific.
+
 For the Rules Engine capability, PayCore DB is the authoritative persistence
 and procedure surface. PayControl configures rules, PayAPI exposes related
 actions, and PayPower consumes the rules during transaction evaluation. Record
