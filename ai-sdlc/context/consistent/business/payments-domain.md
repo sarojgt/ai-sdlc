@@ -1,3 +1,12 @@
+---
+context_id: domain-payments
+context_type: consistent
+authority: payments-domain-owner
+status: draft-baseline
+owner: payments-domain-owner
+review_cadence: six-monthly
+---
+
 # Payments Domain Context
 
 Owner: Payments Domain Owner  

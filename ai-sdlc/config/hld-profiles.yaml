@@ -1,25 +1,49 @@
 hld_profiles:
   auto:
-    max_iterations: 5
-    max_elapsed_minutes: 45
+    purpose: "Assessment only; select the smallest adequate concrete profile before generation."
+    suitability: "Not a final HLD profile. Use the preflight evidence to select small, medium, or large."
+    document_strategy: "Do not generate a final HLD while the profile remains auto."
+    supporting_documents: "Decided by the selected concrete profile."
+    option_analysis: "Decided by material trade-offs in the selected concrete profile."
+    design_views: "Selected from assessed impact; never include every available view by default."
+    diagram_guidance: "Diagrams are optional and selected only when they improve the human decision."
+    max_iterations: 4
+    max_elapsed_minutes: 60
     agent_timeout_minutes: 15
-    max_diagrams: 6
-    guidance: "Run the preflight impact assessment first, select small, medium, or large, then apply the matching level of detail. Do not guess missing facts."
+    guidance: "Run preflight assessment and resolve to small, medium, or large before generation. Do not guess missing facts or use auto as the final HLD classification."
   small:
+    purpose: "A concise architecture decision record for a bounded change."
+    suitability: "One bounded capability or service using an established pattern, with no new ownership, trust, or deployment boundary and a reversible rollout."
+    document_strategy: "Keep one short hld.md containing only the mandatory core and relevant optional sections."
+    supporting_documents: "Discouraged; add one only when essential evidence would obscure the main decision."
+    option_analysis: "Include alternatives only when a material trade-off exists; do not manufacture options."
+    design_views: "Use only a view needed to clarify the changed boundary or interaction."
+    diagram_guidance: "Usually none; include a diagram only when it is clearer than concise prose."
     max_iterations: 2
-    max_elapsed_minutes: 12
-    agent_timeout_minutes: 5
-    max_diagrams: 2
+    max_elapsed_minutes: 30
+    agent_timeout_minutes: 15
     guidance: "Always retain the mandatory core: Motivation, Solution Overview, Solution Design, Risks, and one Context gaps register. Select only relevant optional sections such as High Level Business Requirements, Architecture Principles Applied, Non-Functional Requirements, Assumptions, and Key Design Decisions. Omit Pending Items from ARB, Traceability, and unchanged platform detail when they have no useful content. Link supporting detail only when needed; do not use line count as a quality gate."
   medium:
+    purpose: "An architecture decision with selected technical views for material component, API, data, integration, or platform impact."
+    suitability: "Multiple components or one material boundary decision contained within a known domain and operating model."
+    document_strategy: "Keep hld.md as the reviewable decision summary and include only assessment-selected sections and views."
+    supporting_documents: "Create a focused supporting artifact only when detail would make hld.md harder to review."
+    option_analysis: "Compare alternatives when a material architectural trade-off exists."
+    design_views: "Use only the assessment-selected logical, data, integration, security, deployment, or rollout views."
+    diagram_guidance: "Use a small number of purposeful diagrams only where they clarify material boundaries or flows."
     max_iterations: 3
-    max_elapsed_minutes: 20
-    agent_timeout_minutes: 7
-    max_diagrams: 4
+    max_elapsed_minutes: 45
+    agent_timeout_minutes: 20
     guidance: "Include only the material alternatives, trade-offs, risks, rollout, and operational impact. Keep the primary HLD reviewable, use the reference section names, and link deeper detail instead of expanding every available subsection."
   large:
-    max_iterations: 5
-    max_elapsed_minutes: 30
-    agent_timeout_minutes: 10
-    max_diagrams: 6
+    purpose: "A concise parent architecture decision coordinating cross-domain, multi-repository, migration, security, regulatory, or availability concerns."
+    suitability: "A new architectural boundary, cross-domain or multi-repository change, or material migration, security, regulatory, availability, or programme risk."
+    document_strategy: "Keep hld.md as the parent decision summary and divide complex concerns into focused linked design parts."
+    supporting_documents: "Expected for independent security, data, deployment, migration, options, or domain views when they are substantial."
+    option_analysis: "Compare viable options and material trade-offs; state why the recommendation is preferred."
+    design_views: "Use assessment-selected views and divide them by concern or domain rather than expanding one monolithic document."
+    diagram_guidance: "Use only diagrams that materially support the parent decision or a focused design part."
+    max_iterations: 4
+    max_elapsed_minutes: 60
+    agent_timeout_minutes: 25
     guidance: "Keep hld.md as a decision summary using the reference section names. Create linked supporting documents for security, deployment, migration, options, or other depth only when the detail would make the main review difficult."

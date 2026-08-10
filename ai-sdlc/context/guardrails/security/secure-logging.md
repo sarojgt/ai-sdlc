@@ -1,5 +1,5 @@
 ---
-context_id: secure-logging-and-data-classification
+context_id: secure-logging
 context_type: guardrail
 authority: security
 status: imported-snapshot

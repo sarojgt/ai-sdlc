@@ -1,3 +1,12 @@
+---
+context_id: security-baseline
+context_type: guardrail
+authority: security
+status: draft-baseline
+owner: security
+review_cadence: quarterly
+---
+
 # Security Baseline
 
 Owner: Security  
