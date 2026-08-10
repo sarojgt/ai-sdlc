@@ -45,6 +45,14 @@ assigns it to Clearing & Reporting.
 | External dependencies | SFTP/file destinations may be job-specific; confirm per task type |
 | Security/observability | Basic Auth is documented for PayAPI REST integration; secrets, certificates, probes, and scheduler metrics require confirmation |
 
+## Confirmed scheduling capability
+
+Quartz and the PayAPI REST migration are confirmed platform patterns. The
+repository context does not yet prove that PayScheduler owns card-block expiry
+or another particular delayed-job flow. Treat expiry, retry, concurrency,
+reconciliation, and job persistence as discovery items rather than assuming a
+new scheduler is required.
+
 ## Deployment context
 
 Runs in the Banking.Live estate and has a Lume/Kubernetes service shape. Confirm
@@ -61,3 +69,5 @@ failure recovery, and operational visibility.
 - Confirm whether a feature changes scheduler ownership or only its API client.
 - Confirm REST ports, pool/transaction settings, queue or consumer behavior,
   job persistence, and any SFTP or external delivery protocol.
+- Confirm whether an existing job can execute card-state expiry and identify
+  its owner, schedule, idempotency, backlog alert, and recovery behavior.

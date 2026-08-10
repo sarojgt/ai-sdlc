@@ -33,6 +33,23 @@ owned in the Confluence catalogue by Admin APIs & Portals.
 - Reuse approved IMS/API Gateway, authentication, client-context, and
   observability patterns.
 
+## Confirmed implementation map
+
+Repository evidence identifies the existing card-status surface as a likely
+extension point for card-state operations:
+
+| Area | Confirmed evidence |
+| --- | --- |
+| Route family | `CardController` contains `/pws/pws_set_card_status/` and `/pcjs/pcjs_card_status_edit/` routes |
+| Processing | `SetCardStatusProcessor` and `EditCardStatusProcessor` validate and authorize card-status changes |
+| Data access | `CardDb` owns the card-status database calls and records API timing/log information |
+| Database paths | Existing status changes call PayCore and PayTok stored procedures through separate connection pools |
+| Authorization | Existing paths use client/session authorization or auth-code validation; exact actor/scopes remain feature-specific |
+| Audit | `ApiLogDB` is used for request/response and outcome logging; safe-field policy remains mandatory |
+
+This is evidence for reuse, not a decision that every new card capability must
+use an existing route.
+
 ## Technical profile
 
 | Area | Confirmed context |
@@ -58,7 +75,10 @@ downstream services, deployment target, and backward compatibility.
 
 ## Context gaps
 
-- Confirm current service owner and repository default branch before a change.
-- Confirm the exact API and database path from the repository for each feature.
-- Confirm HTTP port, connection pool, downstream integration list, and
-  deployment values from the affected branch/chart.
+- Confirm the owning team and target branch for the affected feature.
+- Confirm the exact route/version, actor permissions, request/response/error
+  contract, idempotency, and gateway exposure.
+- Confirm whether the feature uses PayCore, PayTok, both, or another store; name
+  the stored procedure/table/function and read/write path.
+- Confirm the effective pool, timeout, downstream integration, port, chart, and
+  deployment repository from the affected branch/environment.

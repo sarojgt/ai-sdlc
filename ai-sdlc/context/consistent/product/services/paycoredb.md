@@ -59,6 +59,13 @@ change.
 | Sensitive data | May include CHD, payment, account, customer, and security-related data. Do not copy columns, values, credentials, or secrets into this context. |
 | Source of truth | The database repository changelog plus approved runtime/schema evidence; service documentation alone is insufficient for table selection. |
 
+For card blocking specifically, repository evidence includes the
+`T_BLOCKED_ENTITIES_TOKS` model, `f_act_BlockCard`,
+`pws_get_card_block_expiry`, and `pws_set_card_block_expiry`. The model stores a
+token reference, block-established time, expiry time, matching scope fields,
+and precedence information. Confirm the active schema migration, access
+wrapper, expiry processing, indexes, and tenant/client semantics before reuse.
+
 For an initiative, record the exact table/view/function, access path, tenant
 scope, indexes, and classification only after confirming them from the relevant
 schema version and service owner.
@@ -79,3 +86,5 @@ replication/read strategy, and data-retention requirements.
   repository or approved runtime evidence.
 - Confirm the complete domain-to-table inventory and retention policy; the
   examples above are intentionally representative rather than exhaustive.
+- Confirm card-state versus dynamically-blocked-entity ownership and the
+  approved restoration/reconciliation mechanism.

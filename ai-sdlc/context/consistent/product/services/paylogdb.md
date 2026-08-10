@@ -57,6 +57,12 @@ the repository-backed shape, not a complete production data dictionary.
 | Sensitive data | Logs can contain request identifiers, client identifiers, stack traces, and message details. Treat payloads as potentially sensitive and redact by policy. |
 | Source of truth | `Paymentology/paylogdb` migrations, service logging configuration, and approved retention/observability policy. |
 
+The initial migration includes API error/trace families such as
+`log_payapi_error`, `log_payapi_trace`, `log_paykey_error`, and diagnostic
+records such as `debug_log`. These are operational evidence stores, not a
+default domain-audit model. Confirm the approved audit destination and redact
+card, token, identity, and request payload data before adding new events.
+
 For an initiative, confirm the exact log family, write path, retention/partition
 strategy, tenant scope, redaction rules, indexes, and whether the data belongs
 in PayLog or the central observability platform.
@@ -77,3 +83,5 @@ observability relationship, and migration impact.
   for the proposed data.
 - Confirm the complete table/retention inventory and production partitioning;
   this page intentionally avoids copying operational log payloads.
+- Confirm whether the initiative needs PayLog, the central observability
+  platform, or a governed domain-audit store.

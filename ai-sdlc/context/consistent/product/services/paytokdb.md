@@ -57,6 +57,11 @@ reviewing the current PayTok migrations before selecting a table or field.
 | Sensitive data | Token, encrypted payment, key-reference, customer, and card-related data may be present. Do not place PAN, secrets, token values, cryptographic material, or production examples in context documents. |
 | Source of truth | `Paymentology/paytokdb` migrations and approved tokenization/security evidence. Service names or function names alone do not prove a safe query path. |
 
+Existing PayAPI status flows show PayTok participation through the `p_tok`,
+`toks`, and `p_tok_staging` card/token state families and stored-procedure
+calls such as `pws_set_card_status_v1`. Confirm whether a new feature needs a
+PayTok read, a status mutation, token resolution only, or no PayTok access.
+
 For an initiative, identify the exact table/view/function, token boundary,
 tenant scope, indexes, retention, and authorization path from the approved
 schema and service owner.
@@ -77,3 +82,5 @@ retention, migration, and auditability.
 - Confirm the complete domain-to-table inventory and retention/residency policy;
   this page intentionally provides categories rather than a sensitive schema
   dump.
+- Confirm the exact token/card mapping, stored procedure, indexes, and whether
+  PayTok is authoritative for the proposed state.

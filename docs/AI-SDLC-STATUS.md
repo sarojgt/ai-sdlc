@@ -186,6 +186,9 @@ from starting early.
       PayControl, PayPower, PayScheduler, PayRoute, PayKeyService, PayCore DB,
       PayTok DB, PayLog DB, Rules Engine, Decision Engine, PayCredit, PaySwitch,
       Atlas, and BL environments; unresolved mappings remain explicit gaps.
+- [x] Enrich service context with reusable interface, database, scheduling,
+      audit, deployment, and evidence-backed discovery maps; HLD generation is
+      repository-context-only and records missing facts as owned gaps.
 - [ ] Add repository/API/schema/ADR discovery adapters.
 - [ ] Add secure context filtering for sensitive content.
 - [ ] Add Confluence synchronization as a future source connector.
