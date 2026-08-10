@@ -21,6 +21,26 @@ scan_scope: readme-build-source-database-deployment-observability
 Banking.Live API/application boundary and integration surface. The service is
 owned in the Confluence catalogue by Admin APIs & Portals.
 
+## Business capability
+
+PayAPI exposes Banking.Live business capabilities to portal, operations, and
+integrating-service consumers. It translates approved API contracts into
+domain actions, validates client and requester context, invokes the relevant
+PayCore/PayTok/PayLog or partner path, and returns governed responses and
+errors.
+
+Typical business changes include new or changed client-facing endpoints,
+card/account/payment operations, rule or decisioning actions, tokenization
+flows, reporting/integration APIs, and API documentation. PayAPI is an
+application boundary, not automatically the owner of every business record:
+the HLD must identify the authoritative domain service, database, stored
+procedure, event, or downstream API for each change.
+
+Primary consumers include Atlas/portal BFFs, internal Banking.Live operations,
+PayScheduler, PayControl, and other approved service integrations. Public and
+internal access paths, client/region scope, authentication, authorization, and
+data classification must be identified per capability.
+
 ## Repository map
 
 | Repository | Status | Use |
