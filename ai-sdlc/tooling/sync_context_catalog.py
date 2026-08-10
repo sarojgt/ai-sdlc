@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check or safely append missing context-index entries."""
+"""Discover context documents and safely synchronize their catalog metadata."""
 
 from __future__ import annotations
 
@@ -14,6 +14,70 @@ from context_selection import parse_index, words  # noqa: E402
 
 
 STOPWORDS = {"context", "consistent", "guardrails", "architecture", "platform", "technology", "business", "product", "security", "principles", "and"}
+
+
+def frontmatter_value(text: str, field: str) -> str:
+    match = re.search(rf"^{re.escape(field)}:\s*([^\n]+)", text, re.MULTILINE)
+    return match.group(1).strip().strip('"') if match else ""
+
+
+def inferred_class(path: Path) -> str:
+    parts = set(path.parts)
+    if "guardrails" in parts:
+        return "guardrail"
+    if "business" in parts:
+        return "domain"
+    if "technology" in parts:
+        return "technology"
+    if "architecture" in parts or "platform" in parts:
+        return "enterprise"
+    return "product"
+
+
+def discover_local_sources(repo_root: Path, configured: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Find human-authored context documents not yet present in the registry."""
+    known = {entry["id"] for entry in configured}
+    context_root = repo_root / "ai-sdlc" / "context"
+    discovered: list[dict[str, str]] = []
+    if not context_root.is_dir():
+        return discovered
+    for path in sorted(context_root.rglob("*.md")):
+        if path.name.lower() == "readme.md":
+            continue
+        text = path.read_text(encoding="utf-8")
+        context_id = frontmatter_value(text, "context_id")
+        if not context_id or context_id in known:
+            continue
+        relative = path.relative_to(repo_root).as_posix()
+        discovered.append({
+            "id": context_id,
+            "class": inferred_class(path.relative_to(context_root)),
+            "source": relative,
+            "authority": frontmatter_value(text, "authority") or "context-owner-review-required",
+            "freshness": "90d",
+        })
+    return discovered
+
+
+def append_registry_entries(path: Path, entries: list[dict[str, str]]) -> None:
+    if not entries:
+        return
+    block = "\n".join(
+        "\n".join([
+            f"  - id: {entry['id']}",
+            f"    class: {entry['class']}",
+            f"    source: \"{entry['source']}\"",
+            f"    authority: {entry['authority']}",
+            f"    freshness: {entry['freshness']}",
+        ]) for entry in entries
+    )
+    text = path.read_text(encoding="utf-8").rstrip() + "\n"
+    marker = "\nselection:"
+    if marker in text:
+        text = text.replace(marker, f"\n{block}{marker}", 1)
+    else:
+        text += block + "\n"
+    path.write_text(text, encoding="utf-8")
 
 
 def heading_titles(text: str) -> list[str]:
@@ -52,8 +116,15 @@ def main() -> int:
     registry = repo_root / "ai-sdlc" / "config" / "context-sources.yaml"
     index_path = repo_root / "ai-sdlc" / "config" / "context-index.yaml"
     source_entries = sources(registry)
+    discovered = discover_local_sources(repo_root, source_entries)
+    if discovered:
+        print("Unregistered local context documents: " + ", ".join(entry["id"] for entry in discovered))
     _, _, index_entries = parse_index(index_path)
     missing = [entry for entry in source_entries if entry["id"] not in index_entries]
+    if args.update and discovered:
+        append_registry_entries(registry, discovered)
+        source_entries.extend(discovered)
+        missing.extend(discovered)
     if not missing:
         print(f"Context catalog is up to date: {len(source_entries)} sources indexed.")
         return 0

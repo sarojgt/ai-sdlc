@@ -1,0 +1,52 @@
+---
+context_id: platform-banking-live-environments
+context_type: consistent
+authority: release-platform-and-repository-discovery
+status: imported-snapshot
+owner: banking-live-release-platform
+review_cadence: verify-against-repository-and-release-catalog-before-material-design
+sources:
+  - https://paymentology.atlassian.net/wiki/spaces/TS/pages/6975914067/Banking.Live+Release+Management
+  - https://paymentology.atlassian.net/wiki/spaces/TS/pages/6762659879/Banking+Live+dockerized+environment
+  - https://github.com/Paymentology/bl-environments
+retrieved: 2026-08-10
+---
+
+# Banking.Live Environments
+
+## Service role
+
+Environment and release configuration for the Banking.Live component estate.
+The Dockerized guide states that concrete component versions are controlled by
+the `bl-environments` repository.
+
+## Repository map
+
+| Repository | Status | Use |
+| --- | --- | --- |
+| [Paymentology/bl-environments](https://github.com/Paymentology/bl-environments) | confirmed | Environment manifests and release selection |
+
+## Dependencies and boundaries
+
+- Coordinates versions of PayAPI, PayPower, PayScheduler, PayCore DB, PayTok DB,
+  PayControl, PayKeyServ, PayRoute, PayLog DB, and related components.
+- It is an orchestration/configuration boundary, not the owner of application
+  behavior.
+- Do not modify environment manifests before the approved HLD/LLD and release
+  gates.
+
+## Deployment context
+
+Supports Banking.Live development, test, UAT, production, and local Dockerized
+variants. Confirm BL2 versus Lume, region, client model, and sensitive zone.
+
+## HLD implications
+
+Map component versions, environment promotion, compatibility, rollback,
+secrets, deployment ownership, and regional/client impact.
+
+## Context gaps
+
+- Confirm the current release manifest and environment branch for each change.
+- Confirm whether Lume uses this repository directly or a separate platform
+  orchestration path.

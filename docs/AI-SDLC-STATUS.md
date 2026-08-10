@@ -182,6 +182,10 @@ from starting early.
       context packages on `main`.
 - [x] Provide manual, evidence-only context drift evaluation; it never
       regenerates an HLD automatically.
+- [x] Add concise Banking.Live service/repository context for PayAPI,
+      PayControl, PayPower, PayScheduler, PayRoute, PayKeyService, PayCore DB,
+      PayTok DB, PayLog DB, Rules Engine, Decision Engine, PayCredit, PaySwitch,
+      Atlas, and BL environments; unresolved mappings remain explicit gaps.
 - [ ] Add repository/API/schema/ADR discovery adapters.
 - [ ] Add secure context filtering for sensitive content.
 - [ ] Add Confluence synchronization as a future source connector.
