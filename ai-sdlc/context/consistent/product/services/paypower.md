@@ -28,6 +28,11 @@ for Banking.Live. It is a high-throughput, client/tenant-sensitive boundary
 that may invoke rules, decisioning, card/token data, queues, and operational
 logging. Changes must preserve authorization outcomes, isolation, and recovery.
 
+For rules and decisioning, PayPower is the transaction-time evaluation and
+authorization-check consumer. Rule changes therefore require analysis of
+PayCore definitions/procedures, PayAPI actions, PayControl setup, evaluation
+ordering, cache/version refresh, and transaction performance.
+
 ## Repository map
 
 | Repository | Status | Use |

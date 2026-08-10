@@ -29,6 +29,10 @@ card, transaction, or decision data. New work must identify whether the actor
 is internal or external and whether the capability remains in PayControl or
 moves to Atlas.
 
+For rules and decisioning, PayControl is the setup/configuration and operational
+control surface. It should not be treated as the runtime owner of transaction
+evaluation or as the authoritative rule database.
+
 ## Repository map
 
 | Repository | Status | Use |

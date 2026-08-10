@@ -79,6 +79,12 @@ For an initiative, record the exact table/view/function, access path, tenant
 scope, indexes, and classification only after confirming them from the relevant
 schema version and service owner.
 
+For the Rules Engine capability, PayCore DB is the authoritative persistence
+and procedure surface. PayControl configures rules, PayAPI exposes related
+actions, and PayPower consumes the rules during transaction evaluation. Record
+the exact rule family, function/procedure, versioning, and rollout behavior for
+each change.
+
 ## Deployment context
 
 PayCore is deployed per the Banking.Live client/environment model. Confirm RDS,

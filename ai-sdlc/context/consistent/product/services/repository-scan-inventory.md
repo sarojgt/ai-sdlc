@@ -64,11 +64,10 @@ substitute for service-owner confirmation.
 | [payswitch-pks-adaptor](https://github.com/Paymentology/payswitch-pks-adaptor) | `b0f5dfc` | [PaySwitch](payswitch.md) |
 | [payswitch-scheme-parser](https://github.com/Paymentology/payswitch-scheme-parser) | `fcfb756` | [PaySwitch](payswitch.md) |
 | [paytokdb](https://github.com/Paymentology/paytokdb) | `841df85` | [PayTok DB](paytokdb.md) |
-| [rule-engine-v1-load-test](https://github.com/Paymentology/rule-engine-v1-load-test) | `e404386` | [Rule Engine](rule-engine.md) |
+| [rule-engine-v1-load-test](https://github.com/Paymentology/rule-engine-v1-load-test) | `e404386` | [Rule Engine](rule-engine.md), auxiliary only |
 
-## Remaining discovery rule
+## Distributed capability note
 
-The rule-engine implementation repository is not represented by the available
-load-test repository. Do not infer service behavior from that auxiliary scan;
-the primary implementation and deployment repository still require owner
-confirmation.
+The Rules Engine is represented by the PayControl, PayAPI, PayCore DB, and
+PayPower context pages. The listed load-test repository is auxiliary evidence;
+it is not treated as the capability owner or runtime implementation.

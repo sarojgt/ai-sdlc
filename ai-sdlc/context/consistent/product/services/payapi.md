@@ -49,6 +49,14 @@ extension point for card-state operations:
 | Authorization | Existing paths use client/session authorization or auth-code validation; exact actor/scopes remain feature-specific |
 | Audit | `ApiLogDB` is used for request/response and outcome logging; safe-field policy remains mandatory |
 
+## Rules and decisioning boundary
+
+PayAPI is the API/action boundary for rule-related setup and integration. It
+does not own transaction-time evaluation: PayPower performs evaluation during
+authorization, while PayCore DB remains the persisted rule/procedure surface.
+PayControl is the setup and operational configuration surface. Identify the
+rule family and API action before selecting a repository or database change.
+
 This is evidence for reuse, not a decision that every new card capability must
 use an existing route.
 
