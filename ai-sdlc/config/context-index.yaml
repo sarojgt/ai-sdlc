@@ -1,0 +1,250 @@
+context_index:
+  version: "2"
+  advisory_token_budget: 30000
+  default_sections:
+    - "HLD implications"
+    - "HLD requirements"
+    - "Required decisions"
+    - "Architecture principles"
+    - "Guardrails"
+  entries:
+    - id: enterprise-architecture
+      summary: "Enterprise architecture principles, decision boundaries, and approved design direction."
+      keywords: [architecture, principle, boundary, decision, platform, reuse, ownership]
+      selected_sections: ["Enterprise Architecture Principles", "Architecture Principles"]
+      priority: required
+      applies_to: [all]
+    - id: security-baseline
+      summary: "Mandatory security, privacy, data-handling, and human-approval guardrails."
+      keywords: [security, confidential, sensitive, privacy, approval, risk, data]
+      selected_sections: ["Security Baseline", "Mandatory controls"]
+      priority: required
+      applies_to: [all]
+    - id: domain-payments
+      summary: "Payment domain language, actors, transaction concepts, and business boundaries."
+      keywords: [payment, transaction, issuer, card, customer, merchant, authorization]
+      selected_sections: ["Payments Domain Context", "HLD implications"]
+      priority: high
+      applies_to: [payments, cards, banking-live]
+    - id: payment-hub-context
+      summary: "Payment Hub responsibilities, lifecycle concepts, and integration landscape."
+      keywords: [payment-hub, transaction, payment, issuer, lifecycle, integration]
+      selected_sections: ["Domain responsibilities", "Explicit boundaries", "HLD implications"]
+      priority: high
+      applies_to: [payment-hub, payments]
+    - id: global-issuer-processor
+      summary: "Global issuer-processing operating model, regional execution, and architecture implications."
+      keywords: [issuer, processor, global, regional, country, client, deployment]
+      selected_sections: ["Business meaning", "Strategic architecture implications", "HLD implications"]
+      priority: medium
+      applies_to: [issuer-processing, banking-live]
+    - id: target-platform-architecture
+      summary: "Target platform shape, cloud direction, shared services, data, and isolation."
+      keywords: [target, platform, cloud, kubernetes, k8s, shared, data, isolation]
+      selected_sections: ["Platform shape", "Cloud direction", "Shared services", "HLD implications"]
+      priority: high
+      applies_to: [platform, banking-live, lume]
+      requires: [cloud-platform-principles, client-data-isolation]
+    - id: lume-strategic-platform
+      summary: "Lume strategic platform direction, deployment migration, and client connectivity."
+      keywords: [lume, strategic, migration, deployment, client, connectivity, platform]
+      selected_sections: ["Strategic outcomes", "Deployment and migration direction", "HLD implications"]
+      priority: high
+      applies_to: [lume, banking-live]
+      requires: [lume-deployment-models, banking-live-deployments-and-migration]
+    - id: lume-deployment-models
+      summary: "Lume Professional, Enterprise, Enterprise Plus, shared services, and governance models."
+      keywords: [lume, professional, enterprise, dedicated, shared, deployment, client]
+      selected_sections: ["Professional", "Enterprise", "Enterprise Plus", "HLD implications"]
+      priority: high
+      applies_to: [lume, deployment, client]
+    - id: lume-tactical-vs-target
+      summary: "Lume tactical versus target model and transitional design questions."
+      keywords: [lume, tactical, target, transition, legacy, migration, exception]
+      selected_sections: ["Target model", "Tactical model", "Required design questions"]
+      priority: high
+      applies_to: [lume, modernization, legacy]
+    - id: banking-live-deployments-and-migration
+      summary: "BL2 and legacy deployment models, environments, migration, and Lume transition rules."
+      keywords: [banking-live, bl2, legacy, environment, migration, lume, regional, client]
+      selected_sections: ["Strategic direction", "BL2 / legacy deployment models", "Lume offering models", "AI SDLC decision rules"]
+      priority: high
+      applies_to: [banking-live, migration, deployment]
+      requires: [client-data-isolation, lume-deployment-models]
+    - id: client-data-isolation
+      summary: "Client, tenant, regional, dedicated, and shared deployment data-isolation rules."
+      keywords: [client, tenant, regional, dedicated, shared, isolation, environment]
+      selected_sections: ["Baseline direction", "HLD implications"]
+      priority: high
+      applies_to: [client, banking-live, lume]
+    - id: api-standards
+      summary: "Approved API design, compatibility, versioning, errors, and integration conventions."
+      keywords: [api, endpoint, route, contract, version, error, pagination, idempotency]
+      selected_sections: ["Design position", "Reliability and errors", "HLD implications"]
+      priority: high
+      applies_to: [api, integration, service]
+      requires: [authentication-and-authorization, observability-principles]
+    - id: cloud-platform-principles
+      summary: "Cloud provider direction, portability, automation, and platform responsibility boundaries."
+      keywords: [cloud, aws, gcp, kubernetes, k8s, portability, automation, platform]
+      selected_sections: ["Direction", "Portability and automation", "HLD implications"]
+      priority: high
+      applies_to: [cloud, platform, deployment]
+    - id: webhook-platform-principles
+      summary: "Shared webhook platform ownership, delivery, reliability, security, and reuse rules."
+      keywords: [webhook, callback, delivery, retry, event, notification, integration]
+      selected_sections: ["Ownership and boundary", "Required capabilities", "HLD implications"]
+      priority: medium
+      applies_to: [webhook, integration, notification]
+      requires: [observability-principles, enterprise-capabilities-and-reuse]
+    - id: event-streaming-principles
+      summary: "Kafka/event-streaming ownership, governance, reliability, observability, and security."
+      keywords: [kafka, event, streaming, topic, consumer, producer, message, async]
+      selected_sections: ["Platform and ownership", "Governance", "Reliability and observability", "HLD implications"]
+      priority: high
+      applies_to: [event, streaming, async, integration]
+      requires: [observability-principles, enterprise-capabilities-and-reuse]
+    - id: secure-logging
+      summary: "Secure logging, sensitive data classification, prohibited data, and telemetry rules."
+      keywords: [logging, log, sensitive, chd, pan, token, telemetry, redaction, data]
+      selected_sections: ["Core rules", "Prohibited data", "Generally allowed operational data", "HLD and LLD implications"]
+      priority: required_when_impacted
+      applies_to: [service, security, cardholder-data]
+    - id: arb-governance
+      summary: "Architecture Review Board expectations, evidence, and AI-SDLC governance mapping."
+      keywords: [arb, architecture, review, approval, decision, governance, evidence]
+      selected_sections: ["When review is expected", "Submission expectations", "AI SDLC mapping"]
+      priority: required
+      applies_to: [all]
+    - id: authentication-and-authorization
+      summary: "Auth0, IMS, API authorization, client identity, and portal access boundaries."
+      keywords: [auth0, ims, authorization, identity, permission, portal, api]
+      selected_sections: ["Responsibility boundaries", "Internal and public portal model", "HLD requirements"]
+      priority: high
+      applies_to: [api, portal, identity, security]
+      requires: [ims-and-api-gateway, secure-logging]
+    - id: ims-and-api-gateway
+      summary: "IMS and API Gateway responsibility boundaries, request flow, and regional authorization."
+      keywords: [ims, gateway, api, route, authorization, region, client]
+      selected_sections: ["Responsibility boundaries", "Internal service shape", "HLD implications"]
+      priority: high
+      applies_to: [api, portal, identity]
+      requires: [authentication-and-authorization]
+    - id: portal-atlas
+      summary: "Internal and public shells, MFEs, BFFs, gateway paths, and portal ownership."
+      keywords: [portal, mfe, bff, shell, graphql, payportal, helm]
+      selected_sections: ["Frontend structure", "BFF pattern", "HLD implications"]
+      priority: high
+      applies_to: [portal, frontend, api]
+      requires: [authentication-and-authorization, ims-and-api-gateway]
+    - id: chd-and-common-workload-zones
+      summary: "CHD/Common Workload placement, isolation, and cross-zone data-flow controls."
+      keywords: [chd, pci, cde, common, workload, zone, cardholder, data, redaction]
+      selected_sections: ["Zone model", "Connectivity direction", "Data and database placement", "HLD requirements"]
+      priority: required_when_impacted
+      applies_to: [cardholder-data, pci, security, deployment]
+      requires: [secure-logging, cloud-platform-principles, client-data-isolation]
+    - id: enterprise-capabilities-and-reuse
+      summary: "Reusable enterprise services and the rule against creating duplicate capabilities."
+      keywords: [reuse, shared, kafka, webhook, capability, service, platform]
+      selected_sections: ["Capability catalogue", "Reuse decision sequence", "Required HLD section"]
+      priority: high
+      applies_to: [service, integration, platform]
+      requires: [observability-principles]
+    - id: observability-principles
+      summary: "Shared logs, metrics, traces, alerting, and operational evidence."
+      keywords: [observability, log, metric, trace, alert, monitoring, telemetry, audit]
+      selected_sections: ["Minimum service standard", "Correlation and transaction traceability", "HLD requirements"]
+      priority: high
+      applies_to: [service, operations, security]
+      requires: [secure-logging]
+    - id: paymentology-tech-radar
+      summary: "Approved and evaluated technologies, languages, runtimes, messaging, data, and delivery tools."
+      keywords: [technology, tech-radar, language, framework, runtime, database, kafka, kubernetes, aws, gcp]
+      selected_sections: ["Ring meanings", "HLD decision rules"]
+      priority: high
+      applies_to: [technology, platform, service]
+    - id: jfrog-artifactory
+      summary: "JFrog Artifactory ownership, binary storage, authentication, and delivery conventions."
+      keywords: [jfrog, artifactory, artifact, binary, package, repository, delivery]
+      selected_sections: ["Delivery conventions", "Authentication and ownership", "HLD implications"]
+      priority: medium
+      applies_to: [delivery, platform, service]
+    - id: banking-live
+      summary: "Banking.Live/Lume capability context, platform direction, and HLD implications."
+      keywords: [banking-live, lume, capability, client, issuer, platform]
+      selected_sections: ["Capability context", "HLD implications"]
+      priority: high
+      applies_to: [banking-live, lume]
+    - id: banking-live-estate
+      summary: "Banking.Live application, database, service estate, and required discovery boundaries."
+      keywords: [banking-live, service, database, repository, paycore, payapi, estate, migration]
+      selected_sections: ["Application components", "Database estate", "Required estate discovery for an initiative"]
+      priority: high
+      applies_to: [banking-live, estate, migration]
+    - id: decision-and-rule-engines
+      summary: "Decision and rule engine boundaries, reuse, lifecycle, and governance."
+      keywords: [rule, rules, decision, engine, policy, evaluate, authorization]
+      selected_sections: ["Capability boundary", "Reuse before build", "Rule lifecycle and governance", "HLD requirements"]
+      priority: medium
+      applies_to: [decisioning, rules, banking-live]
+    - id: tokenization-and-token-service-partners
+      summary: "Tokenization ecosystem, partners, security boundaries, and integration reuse rules."
+      keywords: [token, tokenization, card, partner, payment, pan, network]
+      selected_sections: ["Ecosystem and boundaries", "Security and data handling", "Reuse and integration rules", "HLD requirements"]
+      priority: high
+      applies_to: [cards, tokenization, partner]
+    - id: acs-3ds-apata
+      summary: "ACS/3DS responsibility model, Apata partnership, and authentication lifecycle."
+      keywords: [acs, 3ds, apata, authentication, challenge, issuer, partner]
+      selected_sections: ["Responsibility model", "Typical BL lifecycle", "HLD requirements", "Reuse and partner rules"]
+      priority: medium
+      applies_to: [3ds, authentication, partner]
+    - id: paycredit
+      summary: "PayCredit product, identity, platform themes, and integration boundaries."
+      keywords: [paycredit, credit, customer, identity, account, platform]
+      selected_sections: ["Known platform themes", "Identity and access", "HLD implications"]
+      priority: medium
+      applies_to: [paycredit, banking-live]
+    - id: program-management
+      summary: "Program management responsibilities, architecture patterns, and product boundaries."
+      keywords: [program, management, account, product, customer, workflow]
+      selected_sections: ["Responsibilities and boundaries", "Architecture patterns", "HLD implications"]
+      priority: medium
+      applies_to: [program-management, banking-live]
+    - id: disputes-management
+      summary: "Disputes platform reference architecture, security/data boundaries, and lifecycle."
+      keywords: [dispute, chargeback, case, card, transaction, security]
+      selected_sections: ["Reference architecture", "Security and data boundaries", "HLD implications"]
+      priority: medium
+      applies_to: [disputes, cards, payments]
+    - id: mtls-and-zero-touch-pki
+      summary: "mTLS, certificate identity, Zero Touch PKI, rotation, and trust boundaries."
+      keywords: [mtls, tls, certificate, pki, partner, trust, rotation]
+      selected_sections: ["Use mTLS when", "Certificate lifecycle", "HLD requirements", "Relationship to Auth0 and IMS"]
+      priority: required_when_impacted
+      applies_to: [security, partner, service]
+    - id: initiative-issue
+      summary: "The approved business work item and its current requirement intake."
+      keywords: [requirement, business, issue, acceptance, scope, stakeholder]
+      selected_sections: ["all"]
+      priority: required
+      applies_to: [initiative]
+    - id: service-repository
+      summary: "Affected service repository, ownership, APIs, dependencies, ADRs, and current implementation evidence."
+      keywords: [repository, service, api, owner, adr, dependency, implementation]
+      selected_sections: ["README", "Architecture", "API", "ADR"]
+      priority: required_when_impacted
+      applies_to: [estate, implementation]
+    - id: approved-designs
+      summary: "Relevant previously approved HLDs and architecture decisions used as precedent."
+      keywords: [approved, design, hld, architecture, precedent, pattern, decision]
+      selected_sections: ["Solution Overview", "Solution Design", "Key Design Decisions"]
+      priority: optional
+      applies_to: [precedent, architecture]
+    - id: runtime-evidence
+      summary: "Current deployment, health, incident, cost, topology, and operational evidence."
+      keywords: [runtime, deployment, incident, health, cost, topology, performance, operations]
+      selected_sections: ["all"]
+      priority: required_when_impacted
+      applies_to: [runtime, operations, performance]

@@ -1,0 +1,110 @@
+name: Context Catalog
+
+on:
+  pull_request:
+    paths:
+      - "ai-sdlc/config/context-sources.yaml"
+      - "ai-sdlc/config/context-index.yaml"
+      - "ai-sdlc/config/context-layers.yaml"
+      - "ai-sdlc/context/**"
+      - "ai-sdlc/tooling/context_selection.py"
+      - "ai-sdlc/tooling/build_context_pack.py"
+      - "ai-sdlc/tooling/sync_context_catalog.py"
+      - "ai-sdlc/tooling/validate_context_catalog.py"
+  push:
+    branches: [main]
+    paths:
+      - "ai-sdlc/config/context-sources.yaml"
+      - "ai-sdlc/context/**"
+  workflow_dispatch:
+    inputs:
+      update_catalog:
+        description: "Create or update a catalog synchronization PR"
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  validate:
+    name: validate-context-catalog
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Validate catalog coverage and metadata
+        run: |
+          set -euo pipefail
+          python3 ai-sdlc/tooling/sync_context_catalog.py
+          python3 ai-sdlc/tooling/validate_context_catalog.py
+
+      - name: Run context tooling tests
+        run: python3 -m unittest discover -s ai-sdlc/tooling/tests -p 'test_*.py'
+
+  prepare-sync-pr:
+    name: prepare-context-catalog-pr
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && inputs.update_catalog == true)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Generate missing catalog stubs
+        id: sync
+        run: |
+          set -euo pipefail
+          python3 ai-sdlc/tooling/sync_context_catalog.py --update
+          python3 ai-sdlc/tooling/validate_context_catalog.py
+          if git diff --quiet -- ai-sdlc/config/context-index.yaml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create catalog synchronization pull request
+        id: create_pr
+        if: steps.sync.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
+          branch: chore/context-catalog-sync
+          commit-message: "chore(context): sync context catalog"
+          title: "chore(context): sync context catalog"
+          body: |
+            This PR was generated because a context source was added without a
+            corresponding catalog entry.
+
+            It contains only generated catalog metadata. The catalog workflow
+            may auto-merge this PR because it does not grant architecture,
+            product, security, or release approval.
+
+            The catalog synchronizer never deletes or overwrites existing entries.
+          labels: ai-sdlc, automation
+          delete-branch: true
+
+      - name: Enable automatic catalog PR merge
+        if: steps.create_pr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.AI_SDLC_AUTOMATION_TOKEN || github.token }}
+          PR_NUMBER: ${{ steps.create_pr.outputs.pull-request-number }}
+        run: |
+          set -euo pipefail
+          gh pr merge "$PR_NUMBER" --auto --squash --repo "$GITHUB_REPOSITORY"

@@ -2,9 +2,14 @@ Act as the Solution Architect HLD generation agent for initiative
 {{ initiative_id }}. Read the approved requirement, AGENTS.md,
 context-manifest.yaml, evidence/design-baseline.yaml,
 evidence/hld-assessment.yaml, the HLD template, and the HLD section catalog.
-Treat context-manifest.yaml as the context allowlist: read the exact selected
-source paths, respect their declared authority, version, and hash, and do not
-substitute unrelated repository content for missing facts.
+Treat context-manifest.yaml as the context allowlist and read
+`evidence/context-pack.md` first. The generated pack contains selected excerpts
+from the allowlisted sources. Use the manifest's `selected_sections`, source
+hashes, authorities, and versions as provenance; do not read every selected
+source file in full by default. Retrieve an additional section only when the
+pack lacks a fact needed for the design, and record the resulting context gap
+or retrieval in the evidence. Never substitute unrelated repository content
+for missing facts.
 
 {{ revision_instructions }}
 

@@ -148,6 +148,88 @@ class LifecycleToolTests(unittest.TestCase):
             result = self.run_tool(str(TOOLING / "build_context_pack.py"), str(initiative), "--check")
             self.assertEqual(result.returncode, 1)
 
+    def test_context_pack_records_selected_sections_and_advisory_budget(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            initiative = Path(directory) / "TEST-INITIATIVE"
+            relative = initiative / "context" / "relative"
+            relative.mkdir(parents=True)
+            (initiative / "requirement.md").write_text(
+                "# API requirement\n\nAdd an authenticated portal API with observability.\n",
+                encoding="utf-8",
+            )
+            (relative / "api.md").write_text(
+                "# Existing API\n\nCurrent route.\n\n## HLD implications\n\nReuse the gateway.\n",
+                encoding="utf-8",
+            )
+            result = self.run_tool(str(TOOLING / "build_context_pack.py"), str(initiative), "--explain")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            manifest = (initiative / "context-manifest.yaml").read_text(encoding="utf-8")
+            pack = (initiative / "evidence" / "context-pack.md").read_text(encoding="utf-8")
+            self.assertIn("selection_policy_version", manifest)
+            self.assertIn("advisory_token_budget", manifest)
+            self.assertIn("selected_sections", manifest)
+            self.assertIn("Existing API", pack)
+            self.assertIn("explicit initiative context", result.stdout)
+
+    def test_context_budget_is_advisory(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            initiative = Path(directory) / "TEST-INITIATIVE"
+            relative = initiative / "context" / "relative"
+            relative.mkdir(parents=True)
+            (initiative / "requirement.md").write_text("# API\n\n" + ("important context " * 5000), encoding="utf-8")
+            (relative / "large.md").write_text("# Large context\n\n" + ("detail " * 20000), encoding="utf-8")
+            result = self.run_tool(str(TOOLING / "build_context_pack.py"), str(initiative))
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("continuing without blocking", result.stdout)
+
+    def test_context_selection_ignores_generic_repository_path_words(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            initiative = Path(directory) / "TEST-INITIATIVE"
+            relative = initiative / "context" / "relative"
+            relative.mkdir(parents=True)
+            (initiative / "requirement.md").write_text("# Unrelated capability\n\nA unique ledger capability.\n", encoding="utf-8")
+            (relative / "ledger.md").write_text("# Ledger\n\nThe current ledger owner.\n", encoding="utf-8")
+            result = self.run_tool(str(TOOLING / "build_context_pack.py"), str(initiative), "--explain")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("enterprise-architecture", result.stdout)
+            self.assertNotIn("portal-atlas", result.stdout)
+
+    def test_context_catalog_covers_configured_sources(self) -> None:
+        result = self.run_tool(str(TOOLING / "validate_context_catalog.py"))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("sources indexed", result.stdout)
+
+    def test_context_catalog_sync_appends_only_missing_entries(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = root / "ai-sdlc" / "config"
+            source = root / "ai-sdlc" / "context" / "new.md"
+            config.mkdir(parents=True)
+            source.parent.mkdir(parents=True)
+            source.write_text("# New Context\n\n## HLD implications\n\nUse this context.\n", encoding="utf-8")
+            (config / "context-sources.yaml").write_text(
+                "context_sources:\n"
+                "  - id: new-context\n"
+                "    class: enterprise\n"
+                "    source: \"ai-sdlc/context/new.md\"\n"
+                "    authority: architecture\n"
+                "    freshness: 90d\n",
+                encoding="utf-8",
+            )
+            (config / "context-index.yaml").write_text(
+                "context_index:\n  version: \"1\"\n  entries:\n",
+                encoding="utf-8",
+            )
+            check = self.run_tool(str(TOOLING / "sync_context_catalog.py"), "--root", str(root))
+            self.assertEqual(check.returncode, 1)
+            update = self.run_tool(str(TOOLING / "sync_context_catalog.py"), "--root", str(root), "--update")
+            self.assertEqual(update.returncode, 0, update.stderr)
+            updated = (config / "context-index.yaml").read_text(encoding="utf-8")
+            self.assertIn("id: new-context", updated)
+            again = self.run_tool(str(TOOLING / "sync_context_catalog.py"), "--root", str(root), "--update")
+            self.assertEqual(again.returncode, 0, again.stderr)
+            self.assertEqual(updated, (config / "context-index.yaml").read_text(encoding="utf-8"))
+
     def test_reviewer_allowlist_rejects_untrusted_login(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             policy = Path(directory) / "governance.yaml"
@@ -292,6 +374,12 @@ No material initiative-specific risks are known.
 No decision-blocking context gaps are known.
 """
         validate_core_content(hld)
+
+    def test_review_artifact_names_are_not_reused_by_a_new_run(self) -> None:
+        loop = (TOOLING / "hld_loop.sh").read_text(encoding="utf-8")
+        self.assertIn('export AI_SDLC_HLD_REVIEW_FILE="$review_file_relative"', loop)
+        self.assertIn('if [ -e "$target/$review_file_relative" ]; then', loop)
+        self.assertIn('ai-review-iteration-$iteration-run-$started_at.md', loop)
 
 
 if __name__ == "__main__":

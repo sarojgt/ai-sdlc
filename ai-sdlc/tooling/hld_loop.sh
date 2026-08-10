@@ -299,10 +299,16 @@ for iteration in $(seq "$start_iteration" "$max_iterations"); do
 
   phase="reviewer"
   write_checkpoint "running" "$iteration"
+  # Set the destination before invoking the provider.  Providers use this
+  # variable to render the same path into their prompt and must never overwrite
+  # a review from an earlier run.
+  review_file_relative="feedback/reviews/ai-review-iteration-$iteration.md"
+  if [ -e "$target/$review_file_relative" ]; then
+    review_file_relative="feedback/reviews/ai-review-iteration-$iteration-run-$started_at.md"
+  fi
+  export AI_SDLC_HLD_REVIEW_FILE="$review_file_relative"
   run_agent_within_budget "$root/tooling/review_hld.sh" "$initiative_id" "$reviewer_provider" "$reviewer_model" "$iteration"
 
-  review_file_relative="feedback/reviews/ai-review-iteration-$iteration.md"
-  export AI_SDLC_HLD_REVIEW_FILE="$review_file_relative"
   review_file="$target/$review_file_relative"
   test -f "$review_file" || {
     echo "AI reviewer did not produce: $review_file" >&2

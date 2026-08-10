@@ -1,3 +1,12 @@
+---
+context_id: enterprise-architecture
+context_type: consistent
+authority: architecture-board
+status: draft-baseline
+owner: architecture-board
+review_cadence: quarterly
+---
+
 # Enterprise Architecture Principles
 
 Owner: Architecture Board  

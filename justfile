@@ -62,6 +62,22 @@ ai-sdlc-validate-all:
 ai-sdlc-context initiative:
     python3 ./ai-sdlc/tooling/build_context_pack.py "ai-sdlc/initiatives/{{initiative}}"
 
+# Explain the selected context and advisory token usage for an initiative.
+ai-sdlc-context-explain initiative:
+    python3 ./ai-sdlc/tooling/build_context_pack.py "ai-sdlc/initiatives/{{initiative}}" --explain
+
+# Validate that every configured source has context-index metadata.
+ai-sdlc-context-catalog-validate:
+    python3 ./ai-sdlc/tooling/validate_context_catalog.py
+
+# Check for new context sources without changing the catalog.
+ai-sdlc-context-catalog-check:
+    python3 ./ai-sdlc/tooling/sync_context_catalog.py
+
+# Append review-required stubs for new context sources; never overwrites entries.
+ai-sdlc-context-catalog-update:
+    python3 ./ai-sdlc/tooling/sync_context_catalog.py --update
+
 # Optionally validate embedded Mermaid blocks with the pinned parser.
 ai-sdlc-mermaid-validate initiative:
     @if npm ci --prefix ai-sdlc/tooling/mermaid --ignore-scripts && node ai-sdlc/tooling/mermaid/validate.mjs "ai-sdlc/initiatives/{{initiative}}/hld/hld.md"; then echo "Optional Mermaid validation completed."; else echo "Optional Mermaid validation unavailable or reported issues; continuing."; fi

@@ -91,7 +91,12 @@ If the requirement changes during the run, the run is cancelled and a new contex
 
 ### Step 2 — Assemble context
 
-The context builder retrieves:
+The context builder starts with the context kernel and then selects only
+relevant sources and Markdown sections using the context index. It records the
+selection reason and source hash for every item. It does not load the whole
+repository context by default.
+
+The selected context may include:
 
 - enterprise architecture principles;
 - business and product context;
@@ -111,6 +116,11 @@ initiatives/DEMO-001/evidence/context-report-CTX-DEMO-001-v3.md
 ```
 
 The context report must show included, excluded, stale, and unauthorized sources.
+
+The context token budget is advisory rather than a gate. If the estimate is
+high, the builder reports the condition and prefers summaries or selected
+sections, but it continues the run. Context selection must never hide a
+missing fact; unresolved facts become owned context gaps in the HLD.
 
 ### Step 3 — Invoke the AI adapter
 
