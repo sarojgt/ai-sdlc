@@ -32,6 +32,18 @@ Engine workflows.
 - Separate rule definition, evaluation, decision ownership, and UI concerns.
 - Apply versioning, rollout, audit, tenant, and observability controls.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | Primary implementation runtime and framework are not confirmed; the listed load-test repository is not the service implementation |
+| Data stores | No authoritative database mapping confirmed |
+| Database connectivity/pool | Unknown; requires the primary repository and runtime configuration |
+| Communication | Evaluation protocol and transport are not confirmed |
+| Internal dependencies | PayPower and Decision Engine are related capabilities |
+| External dependencies | No external dependency confirmed |
+| Security/observability | Rule versioning, audit, tenant scope, sensitive inputs, and evaluation telemetry are required |
+
 ## Deployment context
 
 Confirm whether the affected flow is BL2, Lume, or an Atlas/Decision Engine

@@ -32,6 +32,18 @@ the Data team and identifies PayCore as a tenant-routed database type.
 - Client isolation, CHD classification, read/write ownership, and migration
   impact must be assessed for every change.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | PostgreSQL schema delivery through Liquibase SQL-formatted changelogs |
+| Data stores | PayCore PostgreSQL database with initialise, prepare, migrate, and replace stages |
+| Database connectivity/pool | Client services own connection pools; database deployment uses Liquibase host/credential configuration |
+| Communication | PostgreSQL/JDBC connections; callers and read/write paths must be identified per feature |
+| Internal dependencies | PayAPI, PayPower, PayScheduler, and other BL services depending on the affected schema |
+| External dependencies | RDS/Aurora or approved PostgreSQL placement is environment-specific |
+| Security/observability | CHD/data isolation, least privilege, migration audit, backup/recovery, and database telemetry are required |
+
 ## Deployment context
 
 PayCore is deployed per the Banking.Live client/environment model. Confirm RDS,

@@ -33,6 +33,18 @@ owned in the Confluence catalogue by Admin APIs & Portals.
 - Reuse approved IMS/API Gateway, authentication, client-context, and
   observability patterns.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | Java; Maven `uber-jar`; Kubernetes Helm chart |
+| Data stores | PostgreSQL is supported by the chart; exact databases and schemas are feature-specific |
+| Database connectivity/pool | Configuration is repository-managed; driver, pool, and timeout values require service configuration discovery |
+| Communication | HTTP/API surface; PayScheduler target integration is REST; historical DB-plus-TCP-socket integration is being replaced |
+| Internal dependencies | PayScheduler, PayCore, IMS/API Gateway, client context, and observability services as applicable |
+| External dependencies | Feature-specific partner integrations require discovery |
+| Security/observability | Gateway/authentication, secrets, NetworkPolicy, probes, metrics, traces, and logs require feature confirmation |
+
 ## Deployment context
 
 Runs as part of the Banking.Live estate and is also a target service for Lume
@@ -48,3 +60,5 @@ downstream services, deployment target, and backward compatibility.
 
 - Confirm current service owner and repository default branch before a change.
 - Confirm the exact API and database path from the repository for each feature.
+- Confirm HTTP port, connection pool, downstream integration list, and
+  deployment values from the affected branch/chart.

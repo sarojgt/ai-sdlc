@@ -32,6 +32,18 @@ The Confluence catalogue assigns it to Switching.
   PayRoute-owned.
 - Routing, SAF, and client context must be confirmed for the affected flow.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | Java 21; Maven/Maven Wrapper; Kubernetes Helm chart |
+| Data stores | No primary database ownership confirmed from the repository README |
+| Database connectivity/pool | Unknown; do not assume PayCore access without configuration evidence |
+| Communication | Transaction-routing and network/switching communication; exact HTTP, TCP, socket, or message protocol is flow-specific |
+| Internal dependencies | PaySwitch, PayPower, client context, certificates, and shared observability |
+| External dependencies | Card/network/scheme endpoints are flow-specific |
+| Security/observability | JKS certificates/secrets, NetworkPolicy, pod security, probes, and telemetry are supported by the chart |
+
 ## Deployment context
 
 Part of the Banking.Live estate and local Dockerized environment. Confirm the
@@ -45,3 +57,5 @@ security boundary, and observability.
 ## Context gaps
 
 - Confirm current PaySwitch-to-PayRoute contract and runtime topology.
+- Confirm ports, protocol, connection pools, database access, network peers,
+  retry/SAF behavior, and certificate identity from affected configuration.

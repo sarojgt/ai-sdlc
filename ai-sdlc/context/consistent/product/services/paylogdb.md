@@ -32,6 +32,18 @@ assigns it to the Data team.
 - Assess whether new data belongs here or in the centralized observability
   platform; do not use PayLog as a default telemetry store.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | PostgreSQL schema delivery through Liquibase; repository notes RDS compatibility testing |
+| Data stores | PayLog PostgreSQL database |
+| Database connectivity/pool | Client services own pools; exact values require caller and environment configuration |
+| Communication | PostgreSQL/JDBC connections and queue-driven service flows where configured |
+| Internal dependencies | PayPower and PayScheduler are documented consumers; other callers require repository discovery |
+| External dependencies | No external endpoint confirmed |
+| Security/observability | Retention, sensitive-data filtering, tenant isolation, database audit, and centralized observability boundaries are required |
+
 ## Deployment context
 
 Confirm client/environment placement, retention, regional residency, and

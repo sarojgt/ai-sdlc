@@ -34,6 +34,18 @@ repository discovery metadata.
 Confirm client-facing exposure, identity, APIs, data classification, and
 integration with Banking.Live or Atlas before selecting a repository.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | Java 21+, Maven, Spring Boot microservices with DevTools |
+| Data stores | PostgreSQL databases for credit, delinquency, instalment loans, monitoring, rewards, and taxes |
+| Database connectivity/pool | Spring datasource configuration; exact pool values require service configuration discovery |
+| Communication | Feign HTTP clients between services; Kafka messaging; actuator and Swagger HTTP endpoints |
+| Internal dependencies | Revolving Credit, Fast Orchestration, Lidia, BFF, BL Integration, Instalment Loan, Monitoring, Reward, Delinquency, Reports, Taxes, and Hardship services |
+| External/platform dependencies | Valkey/Redis cache, LocalStack/S3-compatible storage, Kafka, and Banking.Live integration |
+| Security/observability | Service authentication, credentials, health/info endpoints, logs, metrics, traces, and data classification require environment confirmation |
+
 ## Deployment context
 
 Confirm whether the initiative targets a public portal, internal portal, Lume,

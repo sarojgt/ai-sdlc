@@ -33,6 +33,18 @@ catalogue assigns it to the Authorizations team.
 - Each queue may map to a client-specific PayLog database; confirm current
   runtime configuration before relying on this behavior.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | Java 21; Maven `uber-jar`; Kubernetes Helm deployment |
+| Data stores | PostgreSQL databases: PayCore, PayLog, and PayTok |
+| Database connectivity/pool | Helm configuration documents per-database SSL and connection settings including maximum connections; confirm effective Hikari values per environment |
+| Communication | Application/API endpoints plus queue-based processing; exact TCP/socket use is not confirmed |
+| Internal dependencies | PayCore, PayTok, PayLog, Rule Engine, Decision Engine, and shared platform services |
+| External dependencies | Scheme/partner integrations are feature-specific and require discovery |
+| Security/observability | SSL database connections, NetworkPolicy, pod security, Datadog tracing/metrics/logs, and health probes |
+
 ## Deployment context
 
 Part of the Banking.Live estate and local Dockerized environment. Confirm the
@@ -47,3 +59,5 @@ logging, and operational recovery.
 
 - Confirm current rule/decision engine versions and integration contracts.
 - Confirm current deployment manifests and regional topology.
+- Confirm queue/topic names, HTTP ports, pool timeouts, transaction boundaries,
+  and external partner protocols from configuration and runtime evidence.

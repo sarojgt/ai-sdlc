@@ -32,6 +32,18 @@ the Data team.
 - PayScheduler documents PayTok as one of the tenant-routed database types.
 - Do not treat token data as ordinary application data.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | PostgreSQL schema delivery through Liquibase SQL-formatted changelogs |
+| Data stores | PayTok PostgreSQL database with staged schema migration |
+| Database connectivity/pool | Client services own pools; exact pool and timeout values require caller configuration |
+| Communication | PostgreSQL/JDBC connections; token service and caller paths require discovery |
+| Internal dependencies | PayPower, PayAPI, PayScheduler, tokenization services, and PayKey-related controls as applicable |
+| External dependencies | Token partners or networks are feature-specific |
+| Security/observability | Token handling, encryption, residency, retention, access audit, and secure logging are mandatory |
+
 ## Deployment context
 
 Confirm client/environment placement, regional residency, RDS topology, and

@@ -43,6 +43,18 @@ remote services.
 - Public MFEs use S3/CloudFront; private MFEs use the shared private UI router;
   BFFs and remote services run on EKS.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | React/JavaScript microfrontend shell and shared UI repositories; backend/BFF runtime is service-specific |
+| Data stores | Atlas repositories may own service-specific stores; no single Atlas database is implied |
+| Database connectivity/pool | Shells should not connect directly to databases; BFF/remote-service configuration requires discovery |
+| Communication | Webpack Module Federation, browser HTTP/GraphQL to BFFs, Auth0, and downstream PayAPI/other APIs |
+| Internal dependencies | Atlas environments, UI kit, identity, client directory, transaction insights, Decision Engine, and shared platform services |
+| External dependencies | Auth0, AWS S3/CloudFront, and partner/product APIs as applicable |
+| Security/observability | Shell token propagation, ACLs, BFF authorization, CSP, telemetry, and public/private separation are required |
+
 ## Deployment context
 
 Atlas environment configuration and orchestration determine release behavior.

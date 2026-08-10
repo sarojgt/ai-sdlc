@@ -37,6 +37,18 @@ migrated from PayControl into Atlas surfaces including Helm and PayPortal.
 - Helm is private; PayPortal is public. Shell authentication and context come
   from Atlas, while Decision Engine owns internal routing and flows.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | Decision Engine v3 core service; hexagonal modules include app, domain, API, and infrastructure |
+| Data stores | PostgreSQL database with Liquibase and a dedicated database module |
+| Database connectivity/pool | Spring datasource configuration is used; exact pool and timeout values require environment configuration |
+| Communication | Administrative API and transaction-processing interfaces; Atlas migration uses BFFs and downstream PayAPI context |
+| Internal dependencies | PayAPI, Atlas shells, Decision Engine DSL, identity/client context, and shared UI/platform services |
+| External dependencies | No external partner endpoint confirmed |
+| Security/observability | Auth0/Atlas shell context, service authorization, deployment secrets, probes, traces, and rule-evaluation audit are required |
+
 ## Deployment context
 
 Public MFEs follow the S3/CloudFront delivery model. Private MFEs are bundled

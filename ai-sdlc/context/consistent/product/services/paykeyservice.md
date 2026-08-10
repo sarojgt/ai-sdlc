@@ -34,6 +34,18 @@ both PayKeyService and PayKeyServ naming.
 - Apply mTLS, Zero Touch PKI, secrets, and access-control guardrails.
 - Never place key material, secrets, or production credentials in AI context.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | Java service; Maven `uber-jar`; API specification is under `docs/asciidoc` |
+| Data stores | PayCore, PayKey, and PayLog PostgreSQL datasources are documented |
+| Database connectivity/pool | HikariCP is documented with per-datasource min-idle, max-connections, timeout, keepalive, idle-timeout, and max-lifetime settings |
+| Communication | Service API is documented; exact HTTP/TCP/socket contract requires API source confirmation |
+| Internal dependencies | PayCore, PayKey DB, PayLog, certificates, and cryptographic consumers |
+| External dependencies | No external partner endpoint confirmed |
+| Security/observability | Encrypted connections, certificate/PKI controls, and audit logging are mandatory; never expose key values |
+
 ## Deployment context
 
 The Dockerized environment exposes PayKeyServ as a separate service and PayKey

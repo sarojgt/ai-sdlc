@@ -35,6 +35,18 @@ the `bl-environments` repository.
 - Do not modify environment manifests before the approved HLD/LLD and release
   gates.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | GitHub Actions, Helm, Terraform, and environment configuration rather than an application runtime |
+| Data stores | No application database ownership; deployment state is held by Kubernetes/Helm and platform systems |
+| Database connectivity/pool | Not applicable to the environment repository |
+| Communication | GitHub Actions, container registry, Kubernetes API, Helm, Terraform, and service endpoints during deployment |
+| Internal dependencies | PayAPI, PayPower, PayRoute, PayScheduler, PayControl, database components, and environment manifests |
+| External/platform dependencies | AWS is current Terraform scope; GCP remains an extension point; JFrog/container registry is used |
+| Security/observability | GitHub environments, protected approvals, secrets, deployment evidence, rollout health, and rollback history are required |
+
 ## Deployment context
 
 Supports Banking.Live development, test, UAT, production, and local Dockerized

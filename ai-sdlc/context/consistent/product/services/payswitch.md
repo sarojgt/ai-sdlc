@@ -40,6 +40,18 @@ ISO-8583 message.
   are related boundaries, not one deployable by default.
 - Preserve message compatibility, mTLS/PKI, key custody, and observability.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | Repository family includes orchestration, ISO-8583 core, scheme parser, and adaptors; primary runtime is not one repository |
+| Data stores | No single PaySwitch database ownership confirmed |
+| Database connectivity/pool | Unknown; inspect the affected family repository and deployment manifest |
+| Communication | ISO-8583 and scheme/network message processing; exact TCP, socket, HTTP, or queue paths are flow-specific |
+| Internal dependencies | PayRoute, PayPower adaptor, PKS adaptor, key manager, CMO, and scheme parsers |
+| External dependencies | Card schemes, networks, and issuer/processor endpoints are feature-specific |
+| Security/observability | mTLS/PKI, key custody, message redaction, correlation, metrics, and operational tracing are required |
+
 ## Deployment context
 
 The Dockerized guide includes PaySwitch in the Banking.Live local environment.

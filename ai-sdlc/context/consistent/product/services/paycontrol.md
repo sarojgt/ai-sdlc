@@ -32,6 +32,18 @@ catalogue assigns it to Portals & Digital Transformation.
 - Decision Engine functionality is being migrated from PayControl into Atlas;
   the migration guide is the source for that boundary.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | React-based frontend; npm dependencies are obtained from JFrog |
+| Data stores | No direct database ownership confirmed from the repository README |
+| Database connectivity/pool | Not applicable to the frontend based on current evidence; confirm backend/BFF paths |
+| Communication | Browser/API calls; exact HTTP clients and downstream endpoints require source discovery |
+| Internal dependencies | PayAPI and portal/shared libraries; Atlas migration introduces shell/BFF boundaries |
+| External dependencies | Auth0 is used for login; other partner integrations are not confirmed |
+| Security/observability | Auth0, CHD feature controls, bundle filtering, and frontend telemetry require confirmation |
+
 ## Deployment context
 
 The Dockerized Banking.Live guide identifies PayControl as a local estate
@@ -47,3 +59,5 @@ classification, and migration impact.
 
 - Confirm which remaining capabilities are still PayControl-owned.
 - Confirm current production deployment and repository ownership.
+- Confirm API clients, backend ownership, browser-to-service protocol, and
+  production CHD feature configuration.

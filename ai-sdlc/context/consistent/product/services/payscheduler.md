@@ -33,6 +33,18 @@ assigns it to Clearing & Reporting.
 - Tenant routing uses client context and applies to PayCore, PayTok, and
   PayLog database types.
 
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | Java service; Maven `uber-jar`; Helm chart includes service and scheduler ports |
+| Data stores | PayCore, PayTok, and PayLog tenant-routed database types; scheduler/job tables are service-owned in the target flow |
+| Database connectivity/pool | Database routing uses tenant/client context; pool values require current chart/config discovery |
+| Communication | REST APIs on the target PayAPI integration; Quartz scheduling; historical TCP daemon socket path is legacy |
+| Internal dependencies | PayAPI, Quartz, database consumers, and client-context/IAM routing |
+| External dependencies | SFTP/file destinations may be job-specific; confirm per task type |
+| Security/observability | Basic Auth is documented for PayAPI REST integration; secrets, certificates, probes, and scheduler metrics require confirmation |
+
 ## Deployment context
 
 Runs in the Banking.Live estate and has a Lume/Kubernetes service shape. Confirm
@@ -47,3 +59,5 @@ failure recovery, and operational visibility.
 
 - Confirm current REST contract and deployment manifest.
 - Confirm whether a feature changes scheduler ownership or only its API client.
+- Confirm REST ports, pool/transaction settings, queue or consumer behavior,
+  job persistence, and any SFTP or external delivery protocol.

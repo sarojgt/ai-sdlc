@@ -92,7 +92,7 @@ def suggestion(repo_root: Path, entry: dict[str, str]) -> str:
     title = title_match.group(1).strip() if title_match else entry["id"].replace("-", " ").title()
     terms = sorted(words(entry["id"].replace("-", " ") + " " + title) - STOPWORDS)[:12]
     headings = heading_titles(text)
-    selected = [heading for heading in headings if re.search(r"hld|requirement|implication|decision|guardrail|boundary|design", heading, re.I)][:4]
+    selected = [heading for heading in headings if re.search(r"hld|requirement|implication|decision|guardrail|boundary|design|technical|repository|dependenc|deployment|context gap", heading, re.I)][:6]
     if not selected:
         selected = headings[:2] or ["all"]
     summary = f"Review and describe {title.lower()} for HLD context selection."
