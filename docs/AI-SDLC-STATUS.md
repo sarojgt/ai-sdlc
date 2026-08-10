@@ -182,6 +182,18 @@ from starting early.
       context packages on `main`.
 - [x] Provide manual, evidence-only context drift evaluation; it never
       regenerates an HLD automatically.
+- [x] Add concise Banking.Live service/repository context for PayAPI,
+      PayControl, PayPower, PayScheduler, PayRoute, PayKeyService, PayCore DB,
+      PayTok DB, PayLog DB, Rules Engine, Decision Engine, PayCredit, PaySwitch,
+      Atlas, and BL environments; unresolved mappings remain explicit gaps.
+- [x] Enrich service context with reusable interface, database, scheduling,
+      audit, deployment, and evidence-backed discovery maps; HLD generation is
+      repository-context-only and records missing facts as owned gaps.
+- [x] Clone and scan the catalogue-referenced repositories locally, pin scan
+      commits, and add business-capability summaries to the service context.
+- [x] Enrich the highest-impact service pages with scan-confirmed API, data,
+      job, module, deployment, and reuse anchors from the local repository
+      snapshots; unresolved details remain explicit context gaps.
 - [ ] Add repository/API/schema/ADR discovery adapters.
 - [ ] Add secure context filtering for sensitive content.
 - [ ] Add Confluence synchronization as a future source connector.

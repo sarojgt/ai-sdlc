@@ -230,6 +230,29 @@ class LifecycleToolTests(unittest.TestCase):
             self.assertEqual(again.returncode, 0, again.stderr)
             self.assertEqual(updated, (config / "context-index.yaml").read_text(encoding="utf-8"))
 
+    def test_context_catalog_sync_discovers_markdown_after_merge(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = root / "ai-sdlc" / "config"
+            context = root / "ai-sdlc" / "context" / "consistent" / "product" / "services"
+            config.mkdir(parents=True)
+            context.mkdir(parents=True)
+            (context / "new-service.md").write_text(
+                "---\ncontext_id: service-new\nauthority: service-owner\n"
+                "context_type: consistent\nstatus: imported-snapshot\n"
+                "owner: service-team\nreview_cadence: 90d\n---\n"
+                "# New Service\n\n## HLD implications\nUse this service.\n",
+                encoding="utf-8",
+            )
+            (config / "context-sources.yaml").write_text("context_sources:\n", encoding="utf-8")
+            (config / "context-index.yaml").write_text("context_index:\n  version: \"1\"\n  entries:\n", encoding="utf-8")
+            update = self.run_tool(str(TOOLING / "sync_context_catalog.py"), "--root", str(root), "--update")
+            self.assertEqual(update.returncode, 0, update.stderr)
+            registry = (config / "context-sources.yaml").read_text(encoding="utf-8")
+            catalog = (config / "context-index.yaml").read_text(encoding="utf-8")
+            self.assertIn("id: service-new", registry)
+            self.assertIn("id: service-new", catalog)
+
     def test_reviewer_allowlist_rejects_untrusted_login(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             policy = Path(directory) / "governance.yaml"

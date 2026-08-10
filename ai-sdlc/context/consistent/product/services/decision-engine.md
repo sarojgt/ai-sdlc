@@ -1,0 +1,98 @@
+---
+context_id: service-decision-engine
+context_type: consistent
+authority: service-catalog-and-repository-discovery
+status: imported-snapshot
+owner: banking-live-decisioning-owners
+review_cadence: verify-against-repository-and-service-catalog-before-material-design
+sources:
+  - https://paymentology.atlassian.net/wiki/spaces/TS/pages/9865330792/Decision+Engine+PayControl+to+Atlas+migration+guide
+  - https://github.com/Paymentology/decision-engine
+  - https://github.com/Paymentology/decision-engine-dsl
+  - https://github.com/Paymentology/decision-engine-atlas
+retrieved: 2026-08-10
+repository_commit: b7976e1
+scan_scope: readme-build-source-database-api-deployment
+---
+
+# Decision Engine
+
+## Service role
+
+Decision Engine owns transaction rule-configuration capability. It is being
+migrated from PayControl into Atlas surfaces including Helm and PayPortal.
+
+## Business capability
+
+Decision Engine evaluates transaction and product rules and provides
+administrative configuration capabilities. It separates decision logic from
+API and infrastructure adapters. Initiatives must distinguish runtime
+decision execution from configuration and UI delivery.
+
+## Repository map
+
+| Repository | Status | Use |
+| --- | --- | --- |
+| [Paymentology/decision-engine](https://github.com/Paymentology/decision-engine) | confirmed | Existing Decision Engine implementation |
+| [Paymentology/decision-engine-dsl](https://github.com/Paymentology/decision-engine-dsl) | confirmed | DSL-related implementation or shared artifact |
+| [Paymentology/decision-engine-atlas](https://github.com/Paymentology/decision-engine-atlas) | confirmed | Atlas migration/integration repository |
+
+## Dependencies and boundaries
+
+- One shared frontend capability is intended for Helm and PayPortal, subject
+  to Atlas topology confirmation.
+- Atlas-facing BFFs sit between the frontend and downstream services such as
+  PayAPI.
+- Helm is private; PayPortal is public. Shell authentication and context come
+  from Atlas, while Decision Engine owns internal routing and flows.
+
+## Technical profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Runtime | Decision Engine v3 core service; hexagonal modules include app, domain, API, and infrastructure |
+| Data stores | PostgreSQL database with Liquibase and a dedicated database module |
+| Database connectivity/pool | Spring datasource configuration is used; exact pool and timeout values require environment configuration |
+| Communication | Administrative API and transaction-processing interfaces; Atlas migration uses BFFs and downstream PayAPI context |
+| Internal dependencies | PayAPI, Atlas shells, Decision Engine DSL, identity/client context, and shared UI/platform services |
+| External dependencies | No external partner endpoint confirmed |
+| Security/observability | Auth0/Atlas shell context, service authorization, deployment secrets, probes, traces, and rule-evaluation audit are required |
+
+## Deployment context
+
+Public MFEs follow the S3/CloudFront delivery model. Private MFEs are bundled
+through the Atlas UI router. BFFs and remote services run on EKS.
+
+## HLD implications
+
+Cover host surface, shared frontend/BFF topology, authorization, client scope,
+DSL compatibility, deployment path, and behavior preservation.
+
+## Scan-confirmed delivery profile
+
+The repository confirms a Gradle hexagonal service with `app`, `domain`, `api`,
+and `infra` modules, PostgreSQL/Liquibase persistence, PostgreSQL integration
+tests, and Kubernetes deployment. Confirm the Atlas BFF and frontend repository
+when the initiative is user-facing.
+
+## Scan-confirmed implementation anchors
+
+- The core service follows a hexagonal split: `app`, `domain`, `api`, and
+  `infra`. New decision behavior should keep domain logic independent of HTTP,
+  persistence, and deployment adapters.
+- The repository contains administrative decision-tree APIs, transaction
+  history/configuration repositories, rule assignment and evaluation stores,
+  and scheduled-job logging tables.
+- Database changes are delivered through the dedicated database module and
+  Liquibase SQL, with integration tests able to run against Testcontainers or a
+  local database.
+- User-facing work may span Decision Engine, an Atlas shell/BFF, and PayAPI;
+  the HLD must identify which layer owns the API contract, authorization, and
+  client/tenant context.
+
+These anchors are from commit `b7976e1`; exact API paths, rule schema, and
+runtime integration must be confirmed for the affected capability.
+
+## Context gaps
+
+- Confirm the final Atlas repository topology and BFF split before approval.
