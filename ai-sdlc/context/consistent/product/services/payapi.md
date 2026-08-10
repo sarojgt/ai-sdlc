@@ -10,6 +10,8 @@ sources:
   - https://paymentology.atlassian.net/wiki/spaces/TS/pages/10010918939/PECA-1056+-+Migrate+PayAPI+PayScheduler+Integration+from+DB+Socket+to+REST+API
   - https://github.com/Paymentology/payapi
 retrieved: 2026-08-10
+repository_commit: bbcc4ef
+scan_scope: readme-build-source-database-deployment-observability
 ---
 
 # PayAPI
@@ -54,13 +56,32 @@ use an existing route.
 
 | Area | Confirmed context |
 | --- | --- |
-| Runtime | Java; Maven `uber-jar`; Kubernetes Helm chart |
-| Data stores | PostgreSQL is supported by the chart; exact databases and schemas are feature-specific |
-| Database connectivity/pool | Configuration is repository-managed; driver, pool, and timeout values require service configuration discovery |
-| Communication | HTTP/API surface; PayScheduler target integration is REST; historical DB-plus-TCP-socket integration is being replaced |
-| Internal dependencies | PayScheduler, PayCore, IMS/API Gateway, client context, and observability services as applicable |
+| Runtime | Java 21 runtime image, Spring Boot, Apache Camel routes, Maven `uber-jar`, and Kubernetes Helm chart |
+| Data stores | Separate PayCore, PayTok, PayLog, and PaySim PostgreSQL data sources are configured; read-select pools exist for Core, Tok, and Log |
+| Database connectivity/pool | Hikari pools use tenant-aware/IAM-capable datasource construction; the scanned defaults use minimum idle 5, 10-minute idle timeout, 30-minute max lifetime, and 20-second leak detection; PayLog has a 5-second connection timeout and other pools use 10 seconds |
+| Communication | Camel HTTP/API routes, REST integrations, JDBC/stored procedures, legacy socket-pool/ISO8583 support, HTTP clients, S3/GCS storage, and OpenAPI-generated API documentation |
+| Internal dependencies | PayScheduler, PayCore, PayTok, PayLog, PaySim, IMS/API Gateway, client identity authorization, rule actions, Decision Engine admin client, and observability libraries |
 | External dependencies | Feature-specific partner integrations require discovery |
-| Security/observability | Gateway/authentication, secrets, NetworkPolicy, probes, metrics, traces, and logs require feature confirmation |
+| Security/observability | Spring Security, client identity verification, TLS/JKS secrets, NetworkPolicy, Actuator probes, OpenTelemetry, Datadog Java tracing, metrics, and structured API logs |
+
+## Deployment and interface profile
+
+| Area | Confirmed context |
+| --- | --- |
+| Container | Production image runs `/bl/app.jar`; local/prod targets expose application port 8080, health/Actuator port 8082, and telemetry/debug-related ports by deployment target |
+| Health | Docker liveness uses `/actuator/health/liveness`; the chart provides Kubernetes probes and Gateway API/Ingress options |
+| API documentation | Camel OpenAPI support is enabled; chart configuration uses an HTTPS API documentation host and `/ppws` base path pattern; environment values must be confirmed per deployment |
+| Client identity | `X-Client-Id` is verified against request body/client context on configured paths; malformed or mismatched identity requests are rejected or handled according to the configured verification mode |
+| Tenant routing | Core, Tok, Log, and PaySim datasource builders support IAM, region, multi-tenancy environment/workload, and tenant configuration |
+| Deployment configuration | Helm controls image, service, Gateway API/Ingress, secrets, NetworkPolicy, probes, storage, and cloud-specific AWS/GCP database or object-storage settings |
+
+## Repository scan evidence
+
+The local scan covered README, Maven dependencies, Dockerfile, application
+configuration, Helm values, Hikari datasource classes, API controllers, and
+database-access classes. It confirms capability families but does not expose
+environment secrets or production configuration values. The scan was pinned to
+`bbcc4ef` on 2026-08-10.
 
 ## Deployment context
 
@@ -82,3 +103,5 @@ downstream services, deployment target, and backward compatibility.
   the stored procedure/table/function and read/write path.
 - Confirm the effective pool, timeout, downstream integration, port, chart, and
   deployment repository from the affected branch/environment.
+- Confirm whether the scanned `bbcc4ef` commit remains current before a
+  material design; refresh this page when the service or chart changes.
