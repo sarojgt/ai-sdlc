@@ -44,6 +44,25 @@ the Data team and identifies PayCore as a tenant-routed database type.
 | External dependencies | RDS/Aurora or approved PostgreSQL placement is environment-specific |
 | Security/observability | CHD/data isolation, least privilege, migration audit, backup/recovery, and database telemetry are required |
 
+## Data model profile
+
+This is a structural inventory, not a complete schema catalogue. Confirm the
+current migration repository and runtime schema before designing a query or
+change.
+
+| Area | Confirmed context |
+| --- | --- |
+| Business data | Core banking operational data, including accounts, products, cards, transactions, limits, rules, and client/tenant configuration. |
+| Representative objects | `t_txn_ext_rid` stores transaction-to-external-reference mapping; `p_account_balance_records` stores account balance record history; `ps_tasks_configurations` stores task configuration. These examples are not exhaustive. |
+| Schema objects | Tables, sequences, indexes, views, triggers, PostgreSQL functions, and typed records are delivered through the staged Liquibase SQL tree. |
+| Functions and procedures | Repository evidence includes card/product creation, rules, limits, reporting, authorization/session, currency, health, and operational helper functions. |
+| Sensitive data | May include CHD, payment, account, customer, and security-related data. Do not copy columns, values, credentials, or secrets into this context. |
+| Source of truth | The database repository changelog plus approved runtime/schema evidence; service documentation alone is insufficient for table selection. |
+
+For an initiative, record the exact table/view/function, access path, tenant
+scope, indexes, and classification only after confirming them from the relevant
+schema version and service owner.
+
 ## Deployment context
 
 PayCore is deployed per the Banking.Live client/environment model. Confirm RDS,
@@ -58,3 +77,5 @@ replication/read strategy, and data-retention requirements.
 
 - Confirm the exact schema/table and current production topology from the
   repository or approved runtime evidence.
+- Confirm the complete domain-to-table inventory and retention policy; the
+  examples above are intentionally representative rather than exhaustive.

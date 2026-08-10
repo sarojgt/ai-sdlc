@@ -44,6 +44,23 @@ the Data team.
 | External dependencies | Token partners or networks are feature-specific |
 | Security/observability | Token handling, encryption, residency, retention, access audit, and secure logging are mandatory |
 
+## Data model profile
+
+This is a safe structural summary. It must not be used as a substitute for
+reviewing the current PayTok migrations before selecting a table or field.
+
+| Area | Confirmed context |
+| --- | --- |
+| Business data | Tokenization and card/token lifecycle data, card and account processing support data, product/configuration data, delivery/personalisation data, and token-related operational records. |
+| Representative objects | Repository functions reference card creation, card files, card status, token/account generation, product data, delivery-customer data, and reporting flows. Exact table ownership must be confirmed from the migration files. |
+| Schema objects | PostgreSQL tables, sequences, composite types, functions, and staged Liquibase SQL changelogs. |
+| Sensitive data | Token, encrypted payment, key-reference, customer, and card-related data may be present. Do not place PAN, secrets, token values, cryptographic material, or production examples in context documents. |
+| Source of truth | `Paymentology/paytokdb` migrations and approved tokenization/security evidence. Service names or function names alone do not prove a safe query path. |
+
+For an initiative, identify the exact table/view/function, token boundary,
+tenant scope, indexes, retention, and authorization path from the approved
+schema and service owner.
+
 ## Deployment context
 
 Confirm client/environment placement, regional residency, RDS topology, and
@@ -57,3 +74,6 @@ retention, migration, and auditability.
 ## Context gaps
 
 - Confirm the owning service and exact schema/table for each initiative.
+- Confirm the complete domain-to-table inventory and retention/residency policy;
+  this page intentionally provides categories rather than a sensitive schema
+  dump.
