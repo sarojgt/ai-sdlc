@@ -221,9 +221,23 @@ if [ "${AI_SDLC_HLD_LOOP_DRY_RUN:-0}" = "1" ]; then
 fi
 
 mkdir -p "$target/feedback" "$target/evidence"
-python3 "$root/tooling/run_lifecycle_hooks.py" before_hld "$target"
+if [ "$resume" = "1" ] && [ -f "$checkpoint_file" ]; then
+  AI_SDLC_READ_ONLY_CONTEXT=1 python3 "$root/tooling/run_lifecycle_hooks.py" before_hld "$target"
+else
+  python3 "$root/tooling/run_lifecycle_hooks.py" before_hld "$target"
+fi
 python3 "$root/tooling/initialize_design_artifacts.py" "$target" hld
-python3 "$root/tooling/build_context_pack.py" "$target"
+if [ "$resume" = "1" ] && [ -f "$checkpoint_file" ]; then
+  # Resume is read-only with respect to context.  Rebuilding here could change
+  # the manifest after the checkpoint hash was verified and invalidate the
+  # historical design baseline.
+  python3 "$root/tooling/build_context_pack.py" "$target" --check
+else
+  python3 "$root/tooling/build_context_pack.py" "$target"
+  # The context pack assembly materializes the initiative context manifest.
+  # Checkpoints and provenance validation must refer to that assembled file.
+  context_manifest_hash="$(file_hash "$target/context-manifest.yaml")"
+fi
 
 if [ "$profile" = "auto" ]; then
   assessment_file="$target/evidence/hld-assessment.yaml"

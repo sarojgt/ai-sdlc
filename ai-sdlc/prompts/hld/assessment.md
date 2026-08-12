@@ -12,11 +12,25 @@ security, deployment, migration, operations, and governance. Prefer the
 smallest adequate profile; do not use simple as a category. If facts are
 missing, record concise context gaps and retrieval actions; do not invent facts.
 
+Assess the architectural posture, not only the list of impacted components. For
+each material boundary, contract, state lifecycle, data store, event, job, or
+deployment concern, evaluate reuse, extension, versioning, a new service or
+adapter, a new data structure, and split-design options. Select the smallest
+adequate architecture, but do not assume that the existing boundary is correct.
+A new component is appropriate when ownership ambiguity, coupling, scale,
+security, data integrity, compatibility, or operational evidence justifies it.
+Identify whether backward compatibility, forward compatibility, API/event
+versioning, schema evolution, migration, parallel operation, or rollback are
+material impacts. Record the selected architectural posture and alternatives
+so the generator must make a decision rather than merely describe the current
+state.
+
 Write only evidence/hld-assessment.yaml with these top-level fields:
 `change_size`, `complexity`, `recommended_profile`, `rationale`,
 `impact_dimensions`, `affected_services`, `affected_repositories`,
 `affected_apis`, `affected_data`, `integration_points`, `selected_sections`,
-`selected_design_views`, and `context_gaps`. `recommended_profile` must be
+`selected_design_views`, `architecture_posture`, and `context_gaps`.
+`recommended_profile` must be
 small, medium, or large. Preserve names and evidence: affected-item fields are
 lists of objects containing `name`, `change`, and `evidence`; do not replace
 them with counts. `impact_dimensions` records only material impact for data,
@@ -49,6 +63,12 @@ affected_data: []
 integration_points: []
 selected_sections: []
 selected_design_views: []
+architecture_posture:
+  boundary_strategy: "reuse_existing | extend_existing | version_contract | introduce_boundary | split_design"
+  data_strategy: "reuse_existing | extend_schema | introduce_data_structure | migrate_data"
+  compatibility_strategy: "not_material | additive | versioned | parallel_migration | discovery_required"
+  alternatives_considered: []
+  boundary_challenge_result: ""
 context_gaps: []
 ```
 

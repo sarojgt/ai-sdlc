@@ -26,6 +26,17 @@ Check that one canonical gap register and one
 canonical risk register are used, and that the chosen sections are proportionate
 to the assessed change size.
 
+Review the architecture posture explicitly. Confirm that the HLD challenges the
+existing boundary where appropriate and evaluates reuse, extension, versioning,
+new components, new data structures, and split-design options when the change
+creates a material ownership, lifecycle, contract, scale, security, data
+integrity, or operational concern. Flag designs that default to reuse without
+evidence. Also check that affected APIs, events, schemas, and deployments have
+an appropriate backward/forward compatibility, versioning, migration, rollout,
+parallel-operation, and rollback strategy. Missing facts may remain discovery
+gates, but the HLD must still present the viable architectural choices and a
+conditional direction rather than simply declining to design.
+
 Treat unresolved gaps about the actual service/repository boundary, authoritative
 data owner, expiry or scheduling mechanism, security boundary, or deployment
 boundary as discovery blockers when the recommendation depends on them. Return

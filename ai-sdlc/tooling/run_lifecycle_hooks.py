@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -22,7 +23,10 @@ def main() -> int:
     tooling = Path(__file__).resolve().parent
     if phase == "before_hld":
         run(sys.executable, str(tooling / "approval_gate.py"), "requirements", str(initiative))
-        run(sys.executable, str(tooling / "build_context_pack.py"), str(initiative))
+        context_args = [str(initiative)]
+        if os.environ.get("AI_SDLC_READ_ONLY_CONTEXT") == "1":
+            context_args.append("--check")
+        run(sys.executable, str(tooling / "build_context_pack.py"), *context_args)
         completed = ["validate_initiative_exists", "validate_required_parent_artifact", "validate_context_pack", "create_agent_run_record"]
     elif phase == "after_hld":
         run(sys.executable, str(tooling / "validate_hld_artifacts.py"), str(initiative))

@@ -100,6 +100,9 @@ from starting early.
       reference sections are maintained in a separate inclusion catalog.
 - [x] HLD recommendation uses enterprise principles, guardrails, standards,
       and approved patterns.
+- [x] HLD assessment and generation explicitly challenge reuse, extension,
+      versioning, new boundaries, data evolution, compatibility, migration,
+      rollout, and rollback before selecting a design.
 - [x] HLD alternatives are limited to meaningful trade-offs or constraints.
 - [x] Useful Mermaid diagrams can be embedded in the primary HLD document;
       diagrams are optional and proportionate to the decision.

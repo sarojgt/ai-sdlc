@@ -5,6 +5,8 @@ hld_profiles:
     document_strategy: "Do not generate a final HLD while the profile remains auto."
     supporting_documents: "Decided by the selected concrete profile."
     option_analysis: "Decided by material trade-offs in the selected concrete profile."
+    architecture_challenge: "Assess whether the current boundary remains appropriate; do not assume reuse is correct."
+    compatibility_strategy: "Assess API, event, schema, and rollout compatibility only when the change affects a contract or state lifecycle."
     design_views: "Selected from assessed impact; never include every available view by default."
     diagram_guidance: "Diagrams are optional and selected only when they improve the human decision."
     max_iterations: 4
@@ -17,6 +19,8 @@ hld_profiles:
     document_strategy: "Keep one short hld.md containing only the mandatory core and relevant optional sections."
     supporting_documents: "Discouraged; add one only when essential evidence would obscure the main decision."
     option_analysis: "Include alternatives only when a material trade-off exists; do not manufacture options."
+    architecture_challenge: "Test reuse versus extension and introduce a new boundary only when ownership, coupling, security, data integrity, or operational evidence justifies it."
+    compatibility_strategy: "Use an additive change by default; assess versioning, backward/forward compatibility, migration, and rollback when a contract or state lifecycle changes."
     design_views: "Use only a view needed to clarify the changed boundary or interaction."
     diagram_guidance: "Usually none; include a diagram only when it is clearer than concise prose."
     max_iterations: 2
@@ -29,6 +33,8 @@ hld_profiles:
     document_strategy: "Keep hld.md as the reviewable decision summary and include only assessment-selected sections and views."
     supporting_documents: "Create a focused supporting artifact only when detail would make hld.md harder to review."
     option_analysis: "Compare alternatives when a material architectural trade-off exists."
+    architecture_challenge: "Compare reuse, extension, versioning, new component, new data structure, and split-design options when a material boundary or lifecycle decision exists."
+    compatibility_strategy: "State the backward/forward compatibility, versioning, schema evolution, migration, and rollback approach for affected contracts or state."
     design_views: "Use only the assessment-selected logical, data, integration, security, deployment, or rollout views."
     diagram_guidance: "Use a small number of purposeful diagrams only where they clarify material boundaries or flows."
     max_iterations: 3
@@ -41,6 +47,8 @@ hld_profiles:
     document_strategy: "Keep hld.md as the parent decision summary and divide complex concerns into focused linked design parts."
     supporting_documents: "Expected for independent security, data, deployment, migration, options, or domain views when they are substantial."
     option_analysis: "Compare viable options and material trade-offs; state why the recommendation is preferred."
+    architecture_challenge: "Challenge existing boundaries across domains, repositories, ownership, trust, scale, and operations; propose new boundaries when evidence supports them."
+    compatibility_strategy: "Provide an explicit evolution strategy for APIs, events, schemas, deployments, migrations, and parallel operation where applicable."
     design_views: "Use assessment-selected views and divide them by concern or domain rather than expanding one monolithic document."
     diagram_guidance: "Use only diagrams that materially support the parent decision or a focused design part."
     max_iterations: 4
