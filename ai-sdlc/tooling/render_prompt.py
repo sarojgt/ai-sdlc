@@ -43,6 +43,8 @@ def profile_contract(profile: str, values: dict[str, str]) -> str:
         ("Document strategy", "document_strategy"),
         ("Supporting documents", "supporting_documents"),
         ("Option analysis", "option_analysis"),
+        ("Architecture challenge", "architecture_challenge"),
+        ("Compatibility and evolution", "compatibility_strategy"),
         ("Design views", "design_views"),
         ("Diagrams", "diagram_guidance"),
     )

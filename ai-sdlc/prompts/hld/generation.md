@@ -32,12 +32,27 @@ The machine-readable baseline remains authoritative in
 evidence/design-baseline.yaml. Reference it once from the HLD; add a compact
 human-readable context summary only when context versions materially affect
 the decision. Never duplicate the full manifest.
-Assess and state the change size, complexity/risk, affected services and
+Think like a Solution Architect making a decision, not a technical writer
+summarizing context. Assess and state the change size, complexity/risk, affected services and
 repositories, APIs, data stores, events, jobs, infrastructure, channels,
 integrations, security, deployment, migration, operations, and governance.
 Apply confirmed enterprise standards and approved patterns. Recommend the
-smallest compliant design and reuse existing capabilities where evidence
-supports reuse. Include alternatives only for material trade-offs.
+smallest compliant design, but challenge the existing boundary before selecting
+it. For each material concern, decide whether to reuse, extend, version,
+introduce, migrate, or split the affected capability. A new service, endpoint,
+table, event, job, adapter, or deployment boundary is valid when ownership,
+coupling, scale, security, data integrity, compatibility, or operational
+evidence justifies it. Do not introduce components merely because context is
+incomplete. When a decision depends on missing evidence, present the viable
+options, state the preferred conditional direction, and identify the exact
+human-owned discovery decision. Include alternatives only for material
+trade-offs.
+
+Explicitly assess API, event, schema, and deployment evolution. Where relevant,
+state the backward-compatibility, forward-compatibility, versioning, migration,
+parallel-operation, rollout, and rollback strategy. Do not assume an additive
+change is sufficient when consumers, state lifecycles, or data ownership make
+that unsafe.
 
 Before using a generic component label such as "existing API" or "state
 service", search the assembled context, manifest, repository inventory, ADRs,
@@ -46,6 +61,13 @@ platform name. Use the concrete name when evidence exists. If it does not,
 label the component as unconfirmed and add a context gap with an owner and
 retrieval action. Do not turn an unverified capability into a confirmed
 architecture decision.
+
+Use exactly one concise Architecture Decision Summary table. Each material
+decision must appear there once with a decision ID, recommendation, rationale,
+evidence, and status. Other sections must reference the decision ID instead of
+repeating the decision. The summary must include the selected boundary,
+data/state strategy, compatibility/evolution strategy, and any alternative
+that was rejected or remains conditional.
 
 Use exactly one canonical context-gap register under `Context gaps` and one
 canonical risk register under `Risks`. Other sections must reference gap or
