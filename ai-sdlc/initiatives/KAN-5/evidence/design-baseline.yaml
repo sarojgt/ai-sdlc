@@ -1,0 +1,39 @@
+baseline_version: "0.1"
+repository_commit: "19c1f92c1e349a16146eb222cff7ae292ace5a77"
+framework_tag: "v0.4.2"
+initiative:
+  id: "KAN-5"
+  tag: "initiative/KAN-5/v0.1.0"
+requirement:
+  artifact: "REQ-KAN-5"
+  version_tag: "initiative/KAN-5/v0.1.0"
+  content_sha256: "1c60353c30497a80f2e618319d2fc5f666d4d69f3290dd9fc6af3f27834d6f0c"
+context:
+  manifest_sha256: "bed302fd02c1be170cb2a947253d71e8d57b48ecd3f574bab5a42489d4c6c72f"
+  relative_tag: "unreleased"
+  relative_content_sha256: "missing"
+  selected_packages:
+    - id: "architecture"
+      version_tag: "context/architecture/v1.0.0"
+      version_commit: "8f6a59238f155cef7395256ba90ab7f87cb51d78"
+    - id: "domain"
+      version_tag: "context/domain/v1.0.0"
+      version_commit: "8f6a59238f155cef7395256ba90ab7f87cb51d78"
+    - id: "platform"
+      version_tag: "context/platform/v1.0.0"
+      version_commit: "8f6a59238f155cef7395256ba90ab7f87cb51d78"
+    - id: "product"
+      version_tag: "context/product/v1.0.0"
+      version_commit: "8f6a59238f155cef7395256ba90ab7f87cb51d78"
+    - id: "security"
+      version_tag: "context/security/v1.0.0"
+      version_commit: "8f6a59238f155cef7395256ba90ab7f87cb51d78"
+    - id: "technology"
+      version_tag: "context/technology/v1.0.0"
+      version_commit: "8f6a59238f155cef7395256ba90ab7f87cb51d78"
+design:
+  hld_tag: "unreleased"
+  lld_tag: "unreleased"
+generation:
+  hld_uses_this_baseline: true
+  architecture_approval_required: true

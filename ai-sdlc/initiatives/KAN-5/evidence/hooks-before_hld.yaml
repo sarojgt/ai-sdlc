@@ -1,0 +1,8 @@
+hooks:
+  phase: "before_hld"
+  completed_at: "2026-08-03T06:58:26.718805+00:00"
+  completed:
+    - validate_initiative_exists
+    - validate_required_parent_artifact
+    - validate_context_pack
+    - create_agent_run_record
